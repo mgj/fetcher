@@ -77,7 +77,7 @@ Task("PackageAll")
 		BasePath = "./nuspec"
 	};
 	nugetSettings.ReleaseNotes = ParseReleaseNotes("./releasenotes/fetcher.md").Notes.ToArray();
-	NuGetPack("./nuspec/fetcher.nuspec", nugetSettings);
+	NuGetPack("./nuspec/artm.fetcher.nuspec", nugetSettings);
 });
 
 

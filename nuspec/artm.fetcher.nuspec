@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>artm.fetcher</id>
-    <title>Fetcher</title>
+    <title>Artm Fetcher</title>
     <description>Helper for fetching and caching of data from the web</description>
     <version>1.0.0</version>
     <authors>Mikkel Jensen</authors>
