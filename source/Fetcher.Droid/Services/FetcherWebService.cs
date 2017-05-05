@@ -9,6 +9,9 @@ using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using Android.Widget;
+using Fetcher.Core.Services;
+using Square.OkHttp;
+using Fetcher.Core.Models;
 
 namespace Fetcher.Droid.Services
 {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SQLite;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,15 +22,7 @@ namespace Fetcher.Core.Services
             UrlCacheInfo data;
 
             var needle = url.OriginalString;
-            try
-            {
-                data = _db.Table<UrlCacheInfo>().Where(x => x.Url == needle).FirstOrDefault();
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
-
+            data = _db.Table<UrlCacheInfo>().Where(x => x.Url == needle).FirstOrDefault();
             return data;
         }
 
