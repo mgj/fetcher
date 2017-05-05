@@ -1,7 +1,7 @@
 #tool "nuget:?package=GitVersion.CommandLine"
 #tool "nuget:?package=gitlink"
 
-var sln = new FilePath("artm.MvxPlugins.sln");
+var sln = new FilePath("Fetcher.sln");
 var binDir = new DirectoryPath("bin");
 var outputDir = new DirectoryPath("artifacts");
 var target = Argument("target", "Default");
@@ -77,7 +77,7 @@ Task("PackageAll")
 		BasePath = "./nuspec"
 	};
 	nugetSettings.ReleaseNotes = ParseReleaseNotes("./releasenotes/fetcher.md").Notes.ToArray();
-	NuGetPack("./nuspec/artm.MvxPlugins.Fetcher.nuspec", nugetSettings);
+	NuGetPack("./nuspec/fetcher.nuspec", nugetSettings);
 });
 
 
