@@ -9,9 +9,9 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: global::Android.Runtime.ResourceDesignerAttribute("Fetcher.Droid.Resource", IsApplication=false)]
+[assembly: global::Android.Runtime.ResourceDesignerAttribute("artm.Fetcher.Droid.Resource", IsApplication=false)]
 
-namespace Fetcher.Droid
+namespace artm.Fetcher.Droid
 {
 	
 	

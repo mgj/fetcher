@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Fetcher.Core.Models
+namespace artm.Fetcher.Core.Models
 {
     public class FetcherWebResponse
     {

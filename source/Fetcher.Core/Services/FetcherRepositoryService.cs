@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Fetcher.Core.Services
+namespace artm.Fetcher.Core.Services
 {
     public class FetcherRepositoryService : IFetcherRepositoryService
     {

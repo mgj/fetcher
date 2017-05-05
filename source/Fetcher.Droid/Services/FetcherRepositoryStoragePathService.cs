@@ -1,6 +1,6 @@
-﻿using Fetcher.Core.Services;
+﻿using artm.Fetcher.Core.Services;
 
-namespace Fetcher.Droid.Services
+namespace artm.Fetcher.Droid.Services
 {
     public class FetcherRepositoryStoragePathService : IFetcherRepositoryStoragePathService
     {

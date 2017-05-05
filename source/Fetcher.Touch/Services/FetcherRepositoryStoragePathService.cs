@@ -1,9 +1,9 @@
-﻿using Fetcher.Core.Services;
+﻿using artm.Fetcher.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Fetcher.Touch.Services
+namespace artm.Fetcher.Touch.Services
 {
     public class FetcherRepositoryStoragePathService : IFetcherRepositoryStoragePathService
     {

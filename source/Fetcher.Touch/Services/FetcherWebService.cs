@@ -1,12 +1,12 @@
-﻿using Fetcher.Core.Models;
-using Fetcher.Core.Services;
+﻿using artm.Fetcher.Core.Models;
+using artm.Fetcher.Core.Services;
 using Foundation;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Fetcher.Touch.Services
+namespace artm.Fetcher.Touch.Services
 {
     public class FetcherWebService : IFetcherWebService
     {
