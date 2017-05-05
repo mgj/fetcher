@@ -1,7 +1,7 @@
 ﻿using SQLite;
 using System;
 
-namespace artm.Fetcher.Core.Services
+namespace artm.Fetcher.Core.Entities
 {
     public class UrlCacheInfo : IUrlCacheInfo
     {

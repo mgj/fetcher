@@ -1,4 +1,5 @@
-﻿using System;
+﻿using artm.Fetcher.Core.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

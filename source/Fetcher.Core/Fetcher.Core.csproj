@@ -34,7 +34,6 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .NET Framework is automatically included -->
-    <Folder Include="Entities\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Models\FetcherWebResponse.cs" />
@@ -45,8 +44,8 @@
     <Compile Include="Services\IFetcherRepositoryStoragePathService.cs" />
     <Compile Include="Services\IFetcherService.cs" />
     <Compile Include="Services\IFetcherWebService.cs" />
-    <Compile Include="Services\IUrlCacheInfo.cs" />
-    <Compile Include="Services\UrlCacheInfo.cs" />
+    <Compile Include="Entities\IUrlCacheInfo.cs" />
+    <Compile Include="Entities\UrlCacheInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

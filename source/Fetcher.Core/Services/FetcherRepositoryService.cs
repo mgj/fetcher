@@ -1,4 +1,5 @@
-﻿using SQLite;
+﻿using artm.Fetcher.Core.Entities;
+using SQLite;
 using System;
 using System.Collections.Generic;
 using System.Linq;

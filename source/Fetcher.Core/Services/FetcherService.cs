@@ -1,4 +1,5 @@
-﻿using artm.Fetcher.Core.Models;
+﻿using artm.Fetcher.Core.Entities;
+using artm.Fetcher.Core.Models;
 using Polly;
 using System;
 using System.Collections.Generic;
