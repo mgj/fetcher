@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>artm.MvxPlugins.Logger</id>
+    <title>MvvmCross Logger Plugin</title>
+    <description>A MvvmCross logging plugin</description>
+    <version>1.0.0</version>
+    <authors>Mikkel Jensen</authors>
+    <tags>mvvm mvvmcross xamarin monodroid monotouch wp wpdev windowsphone xamarin wpa81 win81 mvx</tags>
+    <dependencies>
+    <group targetFramework ="net">
+      <dependency id="MvvmCross.Platform" version="4.2.3" />
+    </group>
+    <group targetFramework ="win">
+      <dependency id="MvvmCross.Platform" version="4.2.3" />
+    </group>
+    <group targetFramework ="wpa">
+      <dependency id="MvvmCross.Platform" version="4.2.3" />
+    </group>
+    <group targetFramework ="MonoAndroid">
+      <dependency id="MvvmCross.Platform" version="4.2.3" />
+      <dependency id="NLog" version="4.3.7" />
+    </group>
+    <group targetFramework ="Xamarin.iOS">
+      <dependency id="MvvmCross.Platform" version="4.2.3" />
+      <dependency id="NLog" version="4.3.7" />
+    </group>
+    <group targetFramework ="portable-net45+win8+wpa81+wp8">
+      <dependency id="Newtonsoft.Json" version="8.0.2" />
+      <dependency id="MvvmCross.Platform" version="4.2.3" />
+    </group>
+    <group targetFramework ="uap">
+      <dependency id="Newtonsoft.Json" version="8.0.2" />
+      <dependency id="MvvmCross.Platform" version="4.2.3" />
+    </group>
+    <group targetFramework ="dotnet">
+      <dependency id="Newtonsoft.Json" version="8.0.2" />
+      <dependency id="MvvmCross.Platform" version="4.2.3" />
+    </group>
+    </dependencies>
+  </metadata>
+  <files>     
+    <!-- PCL -->
+    <file src="..\Logger\artm.MvxPlugins.Logger\bin\Release\artm.MvxPlugins.Logger.*" target="lib\portable-net45+win+wpa81" />
+            
+    <!-- DROID -->
+    <file src="..\Logger\artm.MvxPlugins.Logger.Droid\bin\Release\artm.MvxPlugins.Logger.*" target="lib\MonoAndroid10" />
+    <file src="BootstrapContent\LoggerPluginBootstrapDroid.cs.pp" target="content\MonoAndroid10\Bootstrap\LoggerPluginBootstrap.cs.pp" />
+
+    <!-- TOUCH -->
+    <file src="..\Logger\artm.MvxPlugins.Logger.Touch\bin\Release\artm.MvxPlugins.Logger.*" target="lib\Xamarin.iOS10" />
+    <file src="BootstrapContent\LoggerPluginBootstrapTouch.cs.pp" target="content\Xamarin.iOS10\Bootstrap\LoggerPluginBootstrap.cs.pp" />
+
+  </files>
+</package>

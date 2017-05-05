@@ -41,6 +41,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\FetcherRepositoryStoragePathService.cs" />
+    <Compile Include="Services\FetcherWebService.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Fetcher.Core\Fetcher.Core.csproj">
+      <Project>{4921B331-6A28-4DB9-8A1A-DE947C033E2E}</Project>
+      <Name>Fetcher.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>

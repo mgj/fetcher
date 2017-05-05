@@ -34,9 +34,19 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .NET Framework is automatically included -->
+    <Folder Include="Entities\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\FetcherWebResponse.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\FetcherRepositoryService.cs" />
+    <Compile Include="Services\FetcherService.cs" />
+    <Compile Include="Services\IFetcherRepositoryService.cs" />
+    <Compile Include="Services\IFetcherRepositoryStoragePathService.cs" />
+    <Compile Include="Services\IFetcherService.cs" />
+    <Compile Include="Services\IFetcherWebService.cs" />
+    <Compile Include="Services\IUrlCacheInfo.cs" />
+    <Compile Include="Services\UrlCacheInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
 </Project>
