@@ -17,6 +17,12 @@ namespace artm.Fetcher.Core.Services
         public IFetcherWebService Webservice { get; set; }
         public IFetcherRepositoryService Repository { get; set; } = FetcherRepositoryService.Instance;
 
+        public void Initialize(IFetcherWebService webService, IFetcherRepositoryService repositoryService)
+        {
+            Webservice = webService;
+            Repository = repositoryService;
+        }
+
         public async Task<IUrlCacheInfo> Fetch(Uri url)
         {
             return await Fetch(url, CACHE_FRESHNESS_THRESHOLD);

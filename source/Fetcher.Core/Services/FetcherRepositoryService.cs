@@ -14,8 +14,9 @@ namespace artm.Fetcher.Core.Services
         private SQLiteConnection _db;
         public IFetcherRepositoryStoragePathService PathService;
 
-        public void Initialize()
+        public void Initialize(IFetcherRepositoryStoragePathService pathService)
         {
+            PathService = pathService;
             _db = new SQLiteConnection(PathService.GetPath());
             _db.CreateTable<UrlCacheInfo>();
         }

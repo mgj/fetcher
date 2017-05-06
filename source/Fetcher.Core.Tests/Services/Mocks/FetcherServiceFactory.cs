@@ -12,7 +12,9 @@ namespace artm.Fetcher.Core.Tests.Services.Mocks
     {
         public static FetcherRepositoryService FetcherRepositoryService()
         {
-            return new FetcherRepositoryService(FetcherRepositoryStoragePathService());
+            var result = new FetcherRepositoryService();
+            result.Initialize(FetcherRepositoryStoragePathService());
+            return result;
         }
 
         public static IFetcherRepositoryStoragePathService FetcherRepositoryStoragePathService()
