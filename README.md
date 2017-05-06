@@ -60,9 +60,11 @@ Artm Fetcher implements an exponential backoff retry mechanism using Polly . Ret
 ## Get it here
 
 GitHub: [https://github.com/mgj/fetcher](https://github.com/mgj/fetcher)
+
 NuGet: [https://www.nuget.org/packages/artm.fetcher/](https://www.nuget.org/packages/artm.fetcher/)
 
 MvvmCross Plugin GitHub: [https://github.com/mgj/MvvmCross-Plugins](https://github.com/mgj/MvvmCross-Plugins)
+
 MvvmCross Plugin NuGet: [https://www.nuget.org/packages/artm.mvxplugins.fetcher/](https://www.nuget.org/packages/artm.mvxplugins.fetcher/)
 
 
