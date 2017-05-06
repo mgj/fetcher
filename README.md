@@ -9,11 +9,12 @@ Fetcher
 
 Example
 ==========
-> IFetcherRepositoryStoragePathService path = new FetcherRepositoryStoragePathService();
-> IFetcherRepositoryService repository = new FetcherRepositoryService(path);
-> IFetcherWebService web = new FetcherWebService();
-> Mvx.LazyConstructAndRegisterSingleton<IFetcherService>(() => new FetcherService(web, repository));
-
+```
+IFetcherRepositoryStoragePathService path = new FetcherRepositoryStoragePathService();
+IFetcherRepositoryService repository = new FetcherRepositoryService(path);
+IFetcherWebService web = new FetcherWebService();
+Mvx.LazyConstructAndRegisterSingleton<IFetcherService>(() => new FetcherService(web, repository));
+```
 
 License
 =======
