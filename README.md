@@ -7,6 +7,14 @@ Fetcher
 | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Fetcher        | [![NuGet](https://img.shields.io/nuget/v/artm.fetcher.svg)](https://www.nuget.org/packages/artm.fetcher/)             |
 
+Example
+==========
+> IFetcherRepositoryStoragePathService path = new FetcherRepositoryStoragePathService();
+> IFetcherRepositoryService repository = new FetcherRepositoryService(path);
+> IFetcherWebService web = new FetcherWebService();
+> Mvx.LazyConstructAndRegisterSingleton<IFetcherService>(() => new FetcherService(web, repository));
+
+
 License
 =======
 
