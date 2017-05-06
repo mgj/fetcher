@@ -99,20 +99,7 @@ namespace artm.Fetcher.Core.Tests.Services
         }
 
         [Test]
-        public async Task Preload_EmptyDatabase_PreloadedDataIsReturned()
-        {
-            var sut = new FetcherServiceMock();
-            const string response = "myPreloadResponse";
-
-            sut.Preload(new Uri(URL), response);
-            var hero = await sut.Fetch(new Uri(URL));
-
-            Assert.IsNotNull(hero);
-            Assert.IsTrue(hero.Response.Equals(response));
-        }
-
-        [Test]
-        public async Task Preload_InternetUnavailable_PreloadedDataIsReturned()
+        public async Task Preload_InternetUnavailableAndEmptyDatabase_PreloadedDataIsReturned()
         {
             var web = new Mock<IFetcherWebService>();
             web.Setup(x => x.DoPlatformWebRequest(It.IsAny<Uri>())).Throws(new Exception("mock web exception"));
@@ -122,6 +109,7 @@ namespace artm.Fetcher.Core.Tests.Services
             sut.Preload(new Uri(URL), response);
             var hero = await sut.Fetch(new Uri(URL));
 
+            Assert.IsNotNull(hero);
             Assert.IsTrue(hero.Response.Equals(response));
         }
 
