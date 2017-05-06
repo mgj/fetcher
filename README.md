@@ -26,7 +26,8 @@ fetcher.Preload(url, "<html>Hello world!</html>");
 // Try our hardest to give you *some* response for a given url. 
 // If an url has been recently created or updated we get the response from the local cache.
 // If an url has NOT recently been created or updated we try to update 
-// the response from the network. If that fails we try to use preloaded data.
+// the response from the network. 
+// If we cannot get the url from the network, and no cached data is available, we try to use preloaded data.
 IUrlCacheInfo response = await fetcher.Fetch(url); 
 ```
 
