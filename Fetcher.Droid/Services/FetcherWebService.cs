@@ -30,15 +30,22 @@ namespace artm.Fetcher.Droid.Services
 
         public FetcherWebResponse DoPlatformWebRequest(Uri uri)
         {
-            var request = new Request.Builder().Url(uri.OriginalString).Build();
-            var response = Client.NewCall(request).Execute();
+            Request request = null;
+            Response response = null;
+
+            try
+            {
+                request = new Request.Builder().Url(uri.OriginalString).Build();
+                response = Client.NewCall(request).Execute();
+            }
+            catch (Exception)
+            {
+                return CreateFetcherWebResponseError();
+            }
+
             if (response == null)
             {
-                return new FetcherWebResponse()
-                {
-                    IsSuccess = false,
-                    Body = string.Empty
-                };
+                return CreateFetcherWebResponseError();
             }
             else
             {
@@ -48,6 +55,15 @@ namespace artm.Fetcher.Droid.Services
                     Body = response.Body().String()
                 };
             }
+        }
+
+        private static FetcherWebResponse CreateFetcherWebResponseError()
+        {
+            return new FetcherWebResponse()
+            {
+                IsSuccess = false,
+                Body = string.Empty
+            };
         }
     }
 }
