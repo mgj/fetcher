@@ -49,9 +49,7 @@ Task("GitLink")
 	.Does(() => {
 
 	GitLink(sln.GetDirectory(), new GitLinkSettings {
-		RepositoryUrl = "https://github.com/mgj/fetcher",
-		ArgumentCustomization = args => args.Append(
-			"-ignore fetcher.core.tests")
+		RepositoryUrl = "https://github.com/mgj/fetcher"
 	});
 });
 
