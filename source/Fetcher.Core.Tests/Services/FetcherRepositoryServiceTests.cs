@@ -15,8 +15,7 @@ namespace artm.Fetcher.Core.Tests.Services
     {
         private static FetcherRepositoryService FetcherRepositoryService()
         {
-            var result = new FetcherRepositoryService();
-            result.Initialize(FetcherRepositoryStoragePathService());
+            var result = new FetcherRepositoryService(FetcherRepositoryStoragePathService());
             return result;
         }
 
