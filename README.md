@@ -9,7 +9,7 @@ Network layer in Xamarin apps
 
 Doing network such as downloading a JSON file from a webserver can be difficult on mobile devices
 
-* You need to ensure you're using the platform-specific optimized network api calls to get SPDY, GZIP, etc.
+* You need to ensure you're using the platform-specific optimized network api calls to get SPDY, GZIP, HTTP/2, Connection Pooling etc.
   * On iOS this means NSUrlSession
   * On Android this means OkHttp
 * You need to have a retry mechanism if the server is unresponsive

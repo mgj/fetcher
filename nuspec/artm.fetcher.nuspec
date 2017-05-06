@@ -27,6 +27,10 @@
     <group targetFramework ="Xamarin.iOS">
       <dependency id="sqlite-net-pcl" version="1.3.1"/>
     </group>
+    <group targetFramework ="MonoTouch">
+      <dependency id="sqlite-net-pcl" version="1.3.1"/>
+    </group>
+
     
     </dependencies>
   </metadata>
@@ -38,7 +42,11 @@
     <file src="..\Fetcher.Droid\bin\Release\artm.Fetcher.Core.*" target="lib\MonoAndroid10" />
     <file src="..\Fetcher.Droid\bin\Release\artm.Fetcher.Droid.*" target="lib\MonoAndroid10" />
 
-    <!-- TOUCH -->
+    <!--Xamarin.iOS-->
+    <file src="..\Fetcher.Touch\bin\Release\artm.Fetcher.Core.*" target="lib\MonoTouch10" />
+    <file src="..\Fetcher.Touch\bin\Release\artm.Fetcher.Touch.*" target="lib\MonoTouch10" />
+
+    <!--Xamarin.iOS Unified-->
     <file src="..\Fetcher.Touch\bin\Release\artm.Fetcher.Core.*" target="lib\Xamarin.iOS10" />
     <file src="..\Fetcher.Touch\bin\Release\artm.Fetcher.Touch.*" target="lib\Xamarin.iOS10" />
 
