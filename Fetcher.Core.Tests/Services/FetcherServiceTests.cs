@@ -128,7 +128,17 @@ namespace artm.Fetcher.Core.Tests.Services
             Assert.IsTrue(isInvalid);
         }
 
-        
+        [Test]
+        public async Task Fetch_EmptyDatabaseNoPreloadInternetUnavailable_NullIsReturned()
+        {
+            var web = new Mock<IFetcherWebService>();
+            web.Setup(x => x.DoPlatformWebRequest(It.IsAny<Uri>())).Throws(new Exception("mock web exception"));
+            var sut = new FetcherServiceMock(web);
+
+            var hero = await sut.Fetch(new Uri(URL));
+
+            Assert.IsNull(hero);
+        }
 
         #region Mock factories
         private static string FetcherResponseValidFactory()

@@ -57,8 +57,17 @@ namespace artm.Fetcher.Core.Services
             else
             {
                 // Nothing in cache, get it fresh
-                var response = await FetchFromWeb(uri);
-                return Repository.InsertUrl(uri, response);
+                string response = null;
+                try
+                {
+                    response = await FetchFromWeb(uri);
+                    return Repository.InsertUrl(uri, response);
+                }
+                catch (Exception)
+                {
+                    System.Diagnostics.Debug.WriteLine("Could not update from network - giving up");
+                    return null;
+                }
             }
         }
 
