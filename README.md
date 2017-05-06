@@ -7,7 +7,7 @@ Network layer in Xamarin apps
 
 ## Introduction
 
-Doing network such as downloading a JSON file from a webserver can be, perhaps surprisingly, difficult on mobile devices
+Doing network such as downloading a JSON file from a webserver can be difficult on mobile devices
 
 * You need to ensure you're using the platform-specific optimized network api calls to get SPDY, GZIP, etc.
   * On iOS this means NSUrlSession
