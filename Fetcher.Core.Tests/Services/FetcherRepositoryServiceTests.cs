@@ -15,15 +15,10 @@ namespace artm.Fetcher.Core.Tests.Services
     {
         private static FetcherRepositoryService FetcherRepositoryService()
         {
-            var result = new FetcherRepositoryService(FetcherRepositoryStoragePathService());
-            return result;
-        }
+            var mock = new Mock<IFetcherRepositoryStoragePathService>();
+            mock.Setup(x => x.GetPath(It.IsAny<string>())).Returns(() => ":memory:");
 
-        private static IFetcherRepositoryStoragePathService FetcherRepositoryStoragePathService()
-        {
-            var result = new Mock<IFetcherRepositoryStoragePathService>();
-            result.Setup(x => x.GetPath(It.IsAny<string>())).Returns(() => ":memory:");
-            return result.Object;
+            return new FetcherRepositoryService(mock.Object);
         }
 
         [Test]
