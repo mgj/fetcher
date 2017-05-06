@@ -60,12 +60,12 @@ namespace artm.Fetcher.Core.Tests.Services
             var sut = new FetcherServiceMock();
 
             var response1 = await sut.Fetch(new Uri(URL));
-            var access1 = response1.LastAccessed;
-            await Task.Delay(10);
+            var access1 = response1.LastAccessed.ToString();
+            await Task.Delay(1000);
             var response2 = await sut.Fetch(new Uri(URL));
-            var access2 = response2.LastAccessed;
+            var access2 = response2.LastAccessed.ToString();
 
-            var delta = access2 - access1;
+            var delta = response2.LastAccessed - response1.LastAccessed;
             Assert.IsTrue( delta.TotalMilliseconds > 0);
         }
 
