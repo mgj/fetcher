@@ -61,10 +61,9 @@ namespace artm.Fetcher.Core.Tests.Services
 
             var response1 = await sut.Fetch(new Uri(URL));
             var access1 = response1.LastAccessed;
-            await Task.Delay(100);
+            await Task.Delay(10);
             var response2 = await sut.Fetch(new Uri(URL));
             var access2 = response2.LastAccessed;
-
 
             var delta = access2 - access1;
             Assert.IsTrue( delta.TotalMilliseconds > 0);
@@ -99,9 +98,11 @@ namespace artm.Fetcher.Core.Tests.Services
         }
 
         [Test]
-        public async Task Preload_EmptyDatabase_PreloadedDataIsReturned()
+        public async Task Preload_InternetUnavailableAndEmptyDatabase_PreloadedDataIsReturned()
         {
-            var sut = new FetcherServiceMock();
+            var web = new Mock<IFetcherWebService>();
+            web.Setup(x => x.DoPlatformWebRequest(It.IsAny<Uri>())).Throws(new Exception("mock web exception"));
+            var sut = new FetcherServiceMock(web);
             const string response = "myPreloadResponse";
 
             sut.Preload(new Uri(URL), response);
@@ -110,6 +111,24 @@ namespace artm.Fetcher.Core.Tests.Services
             Assert.IsNotNull(hero);
             Assert.IsTrue(hero.Response.Equals(response));
         }
+
+        [Test]
+        public async Task Preload_InternetUnavailable_PreloadedDataIsConsideredInvalidated()
+        {
+            var web = new Mock<IFetcherWebService>();
+            web.Setup(x => x.DoPlatformWebRequest(It.IsAny<Uri>())).Throws(new Exception("mock web exception"));
+            var sut = new FetcherServiceMock(web);
+            const string response = "myPreloadResponse";
+
+            sut.Preload(new Uri(URL), response);
+            var hero = await sut.Fetch(new Uri(URL));
+
+            var isInvalid = FetcherService.ShouldInvalidate(hero, sut.CACHE_FRESHNESS_THRESHOLD);
+
+            Assert.IsTrue(isInvalid);
+        }
+
+        
 
         #region Mock factories
         private static string FetcherResponseValidFactory()

@@ -11,9 +11,22 @@ namespace artm.Fetcher.Core.Tests.Services.Mocks
 {
     public class FetcherServiceMock : FetcherService
     {
+        private Mock<IFetcherWebService> web;
+
         public FetcherServiceMock() : base(null, GetRepositoryService())
         {
             SetWebserviceDummy();
+        }
+
+        public FetcherServiceMock(IFetcherRepositoryService repository) : base(null, repository)
+        {
+            SetWebserviceDummy();
+        }
+
+        public FetcherServiceMock(Mock<IFetcherWebService> web) : base(web.Object, GetRepositoryService())
+        {
+            WebServiceMock = web;
+            base.Webservice = WebServiceMock.Object;
         }
 
         private void SetWebserviceDummy()
@@ -21,11 +34,6 @@ namespace artm.Fetcher.Core.Tests.Services.Mocks
             WebServiceMock = new Mock<IFetcherWebService>();
             WebServiceMock.Setup(x => x.DoPlatformWebRequest(It.IsAny<Uri>())).Returns(() => new FetcherWebResponse() { IsSuccess = true, Body = "myBody" });
             base.Webservice = WebServiceMock.Object;
-        }
-
-        public FetcherServiceMock(IFetcherRepositoryService repository) : base(null, repository)
-        {
-            SetWebserviceDummy();
         }
 
         private static IFetcherRepositoryService GetRepositoryService()
