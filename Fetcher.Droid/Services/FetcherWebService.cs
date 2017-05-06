@@ -32,11 +32,22 @@ namespace artm.Fetcher.Droid.Services
         {
             var request = new Request.Builder().Url(uri.OriginalString).Build();
             var response = Client.NewCall(request).Execute();
-            return new FetcherWebResponse()
+            if (response == null)
             {
-                IsSuccess = response.IsSuccessful,
-                Body = response.Body().String()
-            };
+                return new FetcherWebResponse()
+                {
+                    IsSuccess = false,
+                    Body = string.Empty
+                };
+            }
+            else
+            {
+                return new FetcherWebResponse()
+                {
+                    IsSuccess = response.IsSuccessful,
+                    Body = response.Body().String()
+                };
+            }
         }
     }
 }
