@@ -61,10 +61,9 @@ namespace artm.Fetcher.Core.Tests.Services
 
             var response1 = await sut.Fetch(new Uri(URL));
             var access1 = response1.LastAccessed;
-            await Task.Delay(100);
+            await Task.Delay(10);
             var response2 = await sut.Fetch(new Uri(URL));
             var access2 = response2.LastAccessed;
-
 
             var delta = access2 - access1;
             Assert.IsTrue( delta.TotalMilliseconds > 0);
