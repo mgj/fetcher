@@ -13,19 +13,11 @@ namespace artm.Fetcher.Core.Tests.Services
     [TestFixture]
     public class FetcherRepositoryServiceTests
     {
-        private static FetcherRepositoryService FetcherRepositoryService()
-        {
-            var mock = new Mock<IFetcherRepositoryStoragePathService>();
-            mock.Setup(x => x.GetPath(It.IsAny<string>())).Returns(() => ":memory:");
-
-            return new FetcherRepositoryService(mock.Object);
-        }
-
         [Test]
         public void GetEntryForUrl_NoEntryExists_NullIsReturned()
         {
             var url = new Uri("https://www.google.com");
-            var sut = FetcherRepositoryService();
+            var sut = new FetcherRepositoryServiceMock();
 
             var entry = sut.GetEntryForUrl(url);
 
@@ -36,7 +28,7 @@ namespace artm.Fetcher.Core.Tests.Services
         public void GetEntryForUrl_EntryExists_EntryReturned()
         {
             var url = new Uri("https://www.google.com");
-            var sut = FetcherRepositoryService();
+            var sut = new FetcherRepositoryServiceMock();
 
             sut.InsertUrl(url, "myResponse");
             var entry = sut.GetEntryForUrl(url);
@@ -49,7 +41,7 @@ namespace artm.Fetcher.Core.Tests.Services
         {
             var url = new Uri("https://www.google.com");
             var response = "myTestResponse";
-            var sut = FetcherRepositoryService();
+            var sut = new FetcherRepositoryServiceMock();
 
             sut.InsertUrl(url, response);
             var original = sut.GetEntryForUrl(url);
@@ -65,7 +57,7 @@ namespace artm.Fetcher.Core.Tests.Services
         {
             var url = new Uri("https://www.google.com");
             var response = "myTestResponse";
-            var sut = FetcherRepositoryService();
+            var sut = new FetcherRepositoryServiceMock();
 
             var isNull = sut.GetEntryForUrl(url);
             sut.InsertUrl(url, response);
@@ -80,7 +72,7 @@ namespace artm.Fetcher.Core.Tests.Services
         {
             var url = new Uri("https://www.google.com");
             var response = "myTestResponse";
-            var sut = FetcherRepositoryService();
+            var sut = new FetcherRepositoryServiceMock();
 
             var isNull = sut.GetEntryForUrl(url);
             sut.PreloadUrl(url, response);
