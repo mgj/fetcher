@@ -32,13 +32,13 @@
   </metadata>
   <files>     
     <!-- PCL -->
-    <file src="..\source\Fetcher.Core\bin\Release\Fetcher.Core.*" target="lib\portable-net45+win+wpa81" />
+    <file src="..\source\Fetcher.Core\bin\Release\artm.Fetcher.Core.*" target="lib\portable-net45+win+wpa81" />
 
     <!-- DROID -->
-    <file src="..\source\Fetcher.Droid\bin\Release\Fetcher.*" target="lib\MonoAndroid10" />
+    <file src="..\source\Fetcher.Droid\bin\Release\artm.Fetcher.*" target="lib\MonoAndroid10" />
 
     <!-- TOUCH -->
-    <file src="..\source\Fetcher.Touch\bin\Release\Fetcher.*" target="lib\Xamarin.iOS10" />
+    <file src="..\source\Fetcher.Touch\bin\Release\artm.Fetcher.*" target="lib\Xamarin.iOS10" />
 
   </files>
 </package>
