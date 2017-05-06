@@ -17,7 +17,7 @@ How to handle network calls in mobile apps is a common problem.
   * Minimize network usage, as connections are often metered
   * Improve performance
   * Handle unresponive servers / endpoints / no internet connection
-* You need to handle the Cold Start problem: the very first time an app is started and there is no valid internet available. You should be able to ship your app with preloaded data for a given url.
+* You need to handle the Cold Start problem: the very first time an app is started and there is no internet available. You should be able to ship your app with preloaded data for a given url.
 
 ## Example time!
 
