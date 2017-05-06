@@ -19,12 +19,14 @@ IFetcherService fetcher = new FetcherService(web, repository);
 
 var url = new System.Uri("https://www.google.com");
 
-// Cold start: You can ship with preloaded data, and thus avoid
+// (Optional) Cold start: You can ship with preloaded data, and thus avoid
 // an initial requirement for an active internet connection
 fetcher.Preload(url, "<html>Hello world!</html>");
 
-// Try to fetch the url from the network (preloaded data is considered 
-// old and invalidated), but return the preloaded data if there's no connection
+// Try our hardest to give you *some* response for a given url. 
+// If an url has been recently created or updated we get the response from the local cache.
+// If an url has NOT recently been created or updated we try to update 
+// the response from the network. If that fails we try to use preloaded data.
 IUrlCacheInfo response = await fetcher.Fetch(url); 
 ```
 
