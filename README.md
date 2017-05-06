@@ -7,7 +7,7 @@ Network layer in Xamarin apps
 
 ## Introduction
 
-How to handle network calls in mobile apps is a common problem.
+Doing network such as downloading a JSON file from a webserver can be, perhaps surprisingly, difficult on mobile devices
 
 * You need to ensure you're using the platform-specific optimized network api calls to get SPDY, GZIP, etc.
   * On iOS this means NSUrlSession
