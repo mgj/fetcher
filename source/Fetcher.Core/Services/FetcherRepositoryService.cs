@@ -1,5 +1,4 @@
-﻿using artm.Fetcher.Core.Common;
-using artm.Fetcher.Core.Entities;
+﻿using artm.Fetcher.Core.Entities;
 using SQLite;
 using System;
 using System.Collections.Generic;
@@ -12,9 +11,9 @@ namespace artm.Fetcher.Core.Services
     public class FetcherRepositoryService : IFetcherRepositoryService
     {
         private SQLiteConnection _db;
-        public IFetcherRepositoryStoragePathService PathService;
+        protected IFetcherRepositoryStoragePathService PathService;
 
-        public void Initialize(IFetcherRepositoryStoragePathService pathService)
+        public FetcherRepositoryService(IFetcherRepositoryStoragePathService pathService)
         {
             PathService = pathService;
             _db = new SQLiteConnection(PathService.GetPath());
