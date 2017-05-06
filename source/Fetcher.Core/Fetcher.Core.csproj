@@ -34,9 +34,9 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .NET Framework is automatically included -->
+    <Folder Include="Common\" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Common\SingletonBase.cs" />
     <Compile Include="Models\FetcherWebResponse.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\FetcherRepositoryService.cs" />

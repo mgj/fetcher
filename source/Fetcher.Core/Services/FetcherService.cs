@@ -10,14 +10,14 @@ using System.Threading.Tasks;
 
 namespace artm.Fetcher.Core.Services
 {
-    public class FetcherService : SingletonBase<FetcherService>, IFetcherService
+    public class FetcherService : IFetcherService
     {
         public readonly TimeSpan CACHE_FRESHNESS_THRESHOLD = TimeSpan.FromDays(1); // 1 day
         
-        public IFetcherWebService Webservice { get; set; }
-        public IFetcherRepositoryService Repository { get; set; } = FetcherRepositoryService.Instance;
+        protected IFetcherWebService Webservice { get; set; }
+        protected IFetcherRepositoryService Repository { get; set; }
 
-        public void Initialize(IFetcherWebService webService, IFetcherRepositoryService repositoryService)
+        public FetcherService(IFetcherWebService webService, IFetcherRepositoryService repositoryService)
         {
             Webservice = webService;
             Repository = repositoryService;
@@ -37,7 +37,6 @@ namespace artm.Fetcher.Core.Services
             {
                 // Hit
                 System.Diagnostics.Debug.WriteLine("Cache hit");
-                Repository.UpdateLastAccessed(cacheHit);
                 if (ShouldInvalidate(cacheHit, freshnessTreshold))
                 {
                     // Cache needs refreshing

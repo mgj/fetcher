@@ -14,7 +14,9 @@ namespace artm.Fetcher.Core.Tests.Services.Mocks
 
         public IUrlCacheInfo GetEntryForUrl(Uri url)
         {
-            return _database.Where(x => x.Url == url.OriginalString).FirstOrDefault();
+            var hero = _database.Where(x => x.Url == url.OriginalString).FirstOrDefault();
+            if(hero != null) hero.LastAccessed = DateTimeOffset.UtcNow;
+            return hero;
         }
 
         public IUrlCacheInfo InsertUrl(Uri uri, string response)
@@ -37,11 +39,6 @@ namespace artm.Fetcher.Core.Tests.Services.Mocks
             _database.Add(hero);
 
             return hero;
-        }
-
-        public void UpdateLastAccessed(IUrlCacheInfo hero)
-        {
-            hero.LastAccessed = DateTimeOffset.UtcNow;
         }
 
         public void UpdateUrl(Uri uri, IUrlCacheInfo hero, string response)

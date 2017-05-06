@@ -11,8 +11,6 @@ namespace artm.Fetcher.Core.Services
     {
         IUrlCacheInfo GetEntryForUrl(Uri url);
 
-        void UpdateLastAccessed(IUrlCacheInfo hero);
-
         void UpdateUrl(Uri uri, IUrlCacheInfo hero, string response);
 
         IUrlCacheInfo InsertUrl(Uri uri, string response);
