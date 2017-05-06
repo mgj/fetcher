@@ -9,9 +9,16 @@ namespace artm.Fetcher.Core.Tests.Services.Mocks
 {
     public class FetcherServiceMock : FetcherService
     {
-        public FetcherServiceMock(IFetcherRepositoryService repository, IFetcherWebService webService)
-            : base(repository, webService)
+        private static FetcherServiceMock instance;
+
+        private FetcherServiceMock() { }
+
+        public static new FetcherServiceMock Instance
         {
+            get
+            {
+                return new FetcherServiceMock();
+            }
         }
 
         public string FetchFromWebResponse
@@ -21,7 +28,7 @@ namespace artm.Fetcher.Core.Tests.Services.Mocks
         }
 
 
-        protected override Task<string> FetchFromWeb(Uri uri)
+        public Task<string> FetchFromWebWithSuppliedWebResponse(Uri uri)
         {
             return Task.FromResult(FetchFromWebResponse);
         }

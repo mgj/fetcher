@@ -1,4 +1,5 @@
-﻿using artm.Fetcher.Core.Entities;
+﻿using artm.Fetcher.Core.Common;
+using artm.Fetcher.Core.Entities;
 using SQLite;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace artm.Fetcher.Core.Services
 {
-    public class FetcherRepositoryService : IFetcherRepositoryService
+    public class FetcherRepositoryService : SingletonBase<FetcherRepositoryService>, IFetcherRepositoryService
     {
         private readonly SQLiteConnection _db;
 

@@ -30,7 +30,6 @@ namespace artm.Fetcher.Core.Tests.Services
 
             sut.InsertUrl(url, "myResponse");
             var entry = sut.GetEntryForUrl(url);
-
             Assert.IsNotNull(entry);
         }
 

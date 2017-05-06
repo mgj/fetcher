@@ -1,4 +1,5 @@
-﻿using artm.Fetcher.Core.Entities;
+﻿using artm.Fetcher.Core.Common;
+using artm.Fetcher.Core.Entities;
 using artm.Fetcher.Core.Models;
 using Polly;
 using System;
@@ -9,18 +10,13 @@ using System.Threading.Tasks;
 
 namespace artm.Fetcher.Core.Services
 {
-    public class FetcherService : IFetcherService
+    public class FetcherService : SingletonBase<FetcherService>, IFetcherService
     {
         public readonly TimeSpan CACHE_FRESHNESS_THRESHOLD = TimeSpan.FromDays(1); // 1 day
+        
+        public IFetcherWebService Webservice { get; set; }
+        public IFetcherRepositoryService Repository { get; set; } = FetcherRepositoryService.Instance;
 
-        private readonly IFetcherRepositoryService _repository;
-        private readonly IFetcherWebService _webService;
-
-        public FetcherService(IFetcherRepositoryService repositoryService, IFetcherWebService webService)
-        {
-            _repository = repositoryService;
-            _webService = webService;
-        }
 
         public async Task<IUrlCacheInfo> Fetch(Uri url)
         {
@@ -31,18 +27,18 @@ namespace artm.Fetcher.Core.Services
         {
             System.Diagnostics.Debug.WriteLine("Fetching for uri: " + uri.OriginalString);
 
-            var cacheHit = _repository.GetEntryForUrl(uri);
+            var cacheHit = Repository.GetEntryForUrl(uri);
             if (cacheHit != null)
             {
                 // Hit
                 System.Diagnostics.Debug.WriteLine("Cache hit");
-                _repository.UpdateLastAccessed(cacheHit);
+                Repository.UpdateLastAccessed(cacheHit);
                 if (ShouldInvalidate(cacheHit, freshnessTreshold))
                 {
                     // Cache needs refreshing
                     System.Diagnostics.Debug.WriteLine("Refreshing cache");
                     var response = await FetchFromWeb(uri);
-                    _repository.UpdateUrl(uri, cacheHit, response);
+                    Repository.UpdateUrl(uri, cacheHit, response);
                 }
 
                 return cacheHit;
@@ -51,7 +47,7 @@ namespace artm.Fetcher.Core.Services
             {
                 // Nothing in cache, get it fresh
                 var response = await FetchFromWeb(uri);
-                return _repository.InsertUrl(uri, response);
+                return Repository.InsertUrl(uri, response);
             }
         }
 
@@ -74,19 +70,19 @@ namespace artm.Fetcher.Core.Services
 
         private async Task<FetcherWebResponse> DoWebRequest(Uri uri)
         {
-            return await Task.FromResult(_webService.DoPlatformWebRequest(uri));
+            return await Task.FromResult(Webservice.DoPlatformWebRequest(uri));
         }
 
         public void Preload(Uri url, string response)
         {
             // Ignore if already exists in db
-            var exists = _repository.GetEntryForUrl(url);
+            var exists = Repository.GetEntryForUrl(url);
             if (exists != null)
             {
                 return;
             }
 
-            _repository.InsertUrl(url, response);
+            Repository.InsertUrl(url, response);
         }
     }
 }
