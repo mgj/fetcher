@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>artm.fetcher</id>
+    <title>Artm Fetcher</title>
+    <description>Helper for fetching and caching of data from the web</description>
+    <version>1.0.0</version>
+    <authors>Mikkel Jensen</authors>
+    <tags>mvvm mvvmcross xamarin monodroid monotouch wp wpdev windowsphone xamarin wpa81 win81 mvx</tags>
+    <dependencies>
+    <group targetFramework ="net">
+      <dependency id="Polly-Signed" version="4.3.0"/>
+      <dependency id="sqlite-net-pcl" version="1.3.1"/>
+    </group>
+    <group targetFramework ="portable-net45+win8+wpa81+wp8">
+      <dependency id="Polly-Signed" version="4.3.0"/>
+      <dependency id="sqlite-net-pcl" version="1.3.1"/>
+    </group>
+    <group targetFramework ="dotnet">
+      <dependency id="Polly-Signed" version="4.3.0"/>
+      <dependency id="sqlite-net-pcl" version="1.3.1"/>
+    </group>
+    <group targetFramework ="MonoAndroid">
+      <dependency id="Square.OkHttp" version="2.7.5.0"/>
+      <dependency id="sqlite-net-pcl" version="1.3.1"/>
+    </group>
+    <group targetFramework ="Xamarin.iOS">
+      <dependency id="sqlite-net-pcl" version="1.3.1"/>
+    </group>
+    
+    </dependencies>
+  </metadata>
+  <files>     
+    <!-- PCL -->
+    <file src="..\source\Fetcher.Core\bin\Release\Fetcher.Core.*" target="lib\portable-net45+win+wpa81" />
+
+    <!-- DROID -->
+    <file src="..\source\Fetcher.Droid\bin\Release\Fetcher.*" target="lib\MonoAndroid10" />
+
+    <!-- TOUCH -->
+    <file src="..\source\Fetcher.Touch\bin\Release\Fetcher.*" target="lib\Xamarin.iOS10" />
+
+  </files>
+</package>
