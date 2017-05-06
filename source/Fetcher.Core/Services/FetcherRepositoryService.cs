@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace artm.Fetcher.Core.Services
 {
-    public class FetcherRepositoryService : SingletonBase<FetcherRepositoryService>, IFetcherRepositoryService
+    public class FetcherRepositoryService : IFetcherRepositoryService
     {
         private SQLiteConnection _db;
         public IFetcherRepositoryStoragePathService PathService;
