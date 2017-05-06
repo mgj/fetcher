@@ -65,6 +65,6 @@ MvvmCross Plugin NuGet: [https://www.nuget.org/packages/artm.mvxplugins.fetcher/
 
 ## License
 
-- **Fetcher** is licensed under [Apache 2.0][apache]
+[Apache 2.0][apache]
 
 [apache]: https://www.apache.org/licenses/LICENSE-2.0.html
