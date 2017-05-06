@@ -13,10 +13,19 @@ Example
 IFetcherRepositoryStoragePathService path = new FetcherRepositoryStoragePathService();
 IFetcherRepositoryService repository = new FetcherRepositoryService(path);
 IFetcherWebService web = new FetcherWebService();
-FetcherService fetcher = new FetcherService(web, repository);
+
+// Primary interface you should use
+IFetcherService fetcher = new FetcherService(web, repository);
+
 var url = new System.Uri("https://www.google.com");
+
+// Cold start: You can ship with preloaded data, and thus avoid
+// an initial requirement for an active internet connection
 fetcher.Preload(url, "<html>Hello world!</html>");
-IUrlCacheInfo response = await fetcher.Fetch(url);
+
+// Try to fetch the url from the network (preloaded data is considered 
+// old and invalidated), but return the preloaded data if there's no connection
+IUrlCacheInfo response = await fetcher.Fetch(url); 
 ```
 
 License
