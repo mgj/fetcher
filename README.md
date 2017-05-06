@@ -30,6 +30,10 @@ fetcher.Preload(url, "<html>Hello world!</html>");
 IUrlCacheInfo response = await fetcher.Fetch(url); 
 ```
 
+MvvmCross
+=======
+MvvmCross plugin: [https://github.com/mgj/MvvmCross-Plugins](https://github.com/mgj/MvvmCross-Plugins)
+
 License
 =======
 
