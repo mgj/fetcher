@@ -13,7 +13,10 @@ Example
 IFetcherRepositoryStoragePathService path = new FetcherRepositoryStoragePathService();
 IFetcherRepositoryService repository = new FetcherRepositoryService(path);
 IFetcherWebService web = new FetcherWebService();
-Mvx.LazyConstructAndRegisterSingleton<IFetcherService>(() => new FetcherService(web, repository));
+FetcherService fetcher = new FetcherService(web, repository);
+var url = new System.Uri("https://www.google.com");
+fetcher.Preload(url, "<html>Hello world!</html>");
+IUrlCacheInfo response = await fetcher.Fetch(url);
 ```
 
 License
