@@ -13,15 +13,16 @@ Network layer in Xamarin apps
 ## Introduction
 
 How to handle network calls in mobile apps is a common problem.
-You need to ensure you're using the platform-specific optimized network api calls to get SPDY, GZIP, etc.
-On iOS this means NSUrlSession
-On Android this means OkHttp
-You need to have a retry mechanism if the server is unresponsive
-You need to have a caching layer to
-Minimize network usage, as connections are often metered
-Improve performance
-Handle unresponive servers / endpoints / no internet connection
-You need to handle the Cold Start problem: the very first time an app is started and there is no valid internet available. You should be able to ship your app with preloaded data for a given url.
+
+* You need to ensure you're using the platform-specific optimized network api calls to get SPDY, GZIP, etc.
+  * On iOS this means NSUrlSession
+  * On Android this means OkHttp
+* You need to have a retry mechanism if the server is unresponsive
+* You need to have a caching layer to
+  * Minimize network usage, as connections are often metered
+  * Improve performance
+  * Handle unresponive servers / endpoints / no internet connection
+* You need to handle the Cold Start problem: the very first time an app is started and there is no valid internet available. You should be able to ship your app with preloaded data for a given url.
 
 ## Example time!
 
