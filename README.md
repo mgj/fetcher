@@ -20,7 +20,9 @@ IFetcherService fetcher = new FetcherService(web, repository);
 var url = new System.Uri("https://www.google.com");
 
 // (Optional) Cold start: You can ship with preloaded data, and thus avoid
-// an initial requirement for an active internet connection
+// an initial requirement for an active internet connection.
+// Calling Preload() multiple times for the same url will 
+// *NOT* update the response for the url - only the first call is used
 fetcher.Preload(url, "<html>Hello world!</html>");
 
 // Try our hardest to give you *some* response for a given url. 
