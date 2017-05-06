@@ -1,18 +1,13 @@
 # Fetcher
 
 [![Build status](https://ci.appveyor.com/api/projects/status/iysnpswp82ogp4vb?svg=true)](https://ci.appveyor.com/project/mgj/fetcher)
-
-| Plugin          | NuGet version                                                                                                                                                              |
-| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Fetcher        | [![NuGet](https://img.shields.io/nuget/v/artm.fetcher.svg)](https://www.nuget.org/packages/artm.fetcher/)             |
-
+[![NuGet](https://img.shields.io/nuget/v/artm.fetcher.svg)](https://www.nuget.org/packages/artm.fetcher/)
 
 Network layer in Xamarin apps
 
-
 ## Introduction
 
-How to handle network calls in mobile apps is a common problem.
+Doing network such as downloading a JSON file from a webserver can be, perhaps surprisingly, difficult on mobile devices
 
 * You need to ensure you're using the platform-specific optimized network api calls to get SPDY, GZIP, etc.
   * On iOS this means NSUrlSession
@@ -22,7 +17,7 @@ How to handle network calls in mobile apps is a common problem.
   * Minimize network usage, as connections are often metered
   * Improve performance
   * Handle unresponive servers / endpoints / no internet connection
-* You need to handle the Cold Start problem: the very first time an app is started and there is no valid internet available. You should be able to ship your app with preloaded data for a given url.
+* You need to handle the Cold Start problem: the very first time an app is started and there is no internet available. You should be able to ship your app with preloaded data for a given url.
 
 ## Example time!
 
@@ -60,18 +55,16 @@ Artm Fetcher implements an exponential backoff retry mechanism using Polly . Ret
 ## Get it here
 
 GitHub: [https://github.com/mgj/fetcher](https://github.com/mgj/fetcher)
+
 NuGet: [https://www.nuget.org/packages/artm.fetcher/](https://www.nuget.org/packages/artm.fetcher/)
 
-MvvmCross Plugin GitHub: [https://github.com/mgj/MvvmCross-Plugins](https://github.com/mgj/MvvmCross-Plugins)
-MvvmCross Plugin NuGet: [https://www.nuget.org/packages/artm.mvxplugins.fetcher/](https://www.nuget.org/packages/artm.mvxplugins.fetcher/)
+(Optional) MvvmCross Plugin GitHub: [https://github.com/mgj/MvvmCross-Plugins](https://github.com/mgj/MvvmCross-Plugins)
 
+(Optional) MvvmCross Plugin NuGet: [https://www.nuget.org/packages/artm.mvxplugins.fetcher/](https://www.nuget.org/packages/artm.mvxplugins.fetcher/)
 
-## MvvmCross
-
-MvvmCross plugin: [https://github.com/mgj/MvvmCross-Plugins](https://github.com/mgj/MvvmCross-Plugins)
 
 ## License
 
-- **Fetcher** is licensed under [Apache 2.0][apache]
+[Apache 2.0][apache]
 
 [apache]: https://www.apache.org/licenses/LICENSE-2.0.html

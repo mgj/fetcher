@@ -76,7 +76,7 @@ namespace artm.Fetcher.Core.Services
 
         public void UpdateUrl(Uri uri, IUrlCacheInfo hero, string response)
         {
-            if (string.IsNullOrEmpty(response))
+            if (uri == null || hero == null || string.IsNullOrEmpty(response))
             {
                 return;
             }
