@@ -10,7 +10,7 @@ namespace artm.Fetcher.Core.Services
 {
     public class FetcherRepositoryService : IFetcherRepositoryService
     {
-        private SQLiteConnection _db;
+        protected SQLiteConnection _db;
         protected IFetcherRepositoryStoragePathService PathService;
 
         public FetcherRepositoryService(IFetcherRepositoryStoragePathService pathService)
@@ -26,6 +26,12 @@ namespace artm.Fetcher.Core.Services
 
             var needle = url.OriginalString;
             data = _db.Table<UrlCacheInfo>().Where(x => x.Url == needle).FirstOrDefault();
+
+            if(data != null)
+            {
+                UpdateLastAccessed(data);
+            }
+
             return data;
         }
 
