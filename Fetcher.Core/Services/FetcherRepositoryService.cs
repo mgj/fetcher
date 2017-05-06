@@ -29,7 +29,18 @@ namespace artm.Fetcher.Core.Services
             return data;
         }
 
+        public IUrlCacheInfo PreloadUrl(Uri uri, string response)
+        {
+            var timestamp = DateTimeOffset.UtcNow.AddYears(-1);
+            return InsertUrl(uri, response, timestamp);
+        }
+
         public IUrlCacheInfo InsertUrl(Uri uri, string response)
+        {
+            return InsertUrl(uri, response, DateTimeOffset.UtcNow);
+        }
+
+        private IUrlCacheInfo InsertUrl(Uri uri, string response, DateTimeOffset timestamp)
         {
             UrlCacheInfo hero = null;
             if (string.IsNullOrEmpty(response))
@@ -42,8 +53,6 @@ namespace artm.Fetcher.Core.Services
             {
                 _db.Delete(existing);
             }
-
-            var timestamp = DateTime.UtcNow;
 
             hero = new UrlCacheInfo()
             {

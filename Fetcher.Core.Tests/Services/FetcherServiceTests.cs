@@ -111,6 +111,38 @@ namespace artm.Fetcher.Core.Tests.Services
             Assert.IsTrue(hero.Response.Equals(response));
         }
 
+        [Test]
+        public async Task Preload_InternetUnavailable_PreloadedDataIsReturned()
+        {
+            var web = new Mock<IFetcherWebService>();
+            web.Setup(x => x.DoPlatformWebRequest(It.IsAny<Uri>())).Throws(new Exception("mock web exception"));
+            var sut = new FetcherServiceMock(web);
+            const string response = "myPreloadResponse";
+
+            sut.Preload(new Uri(URL), response);
+            var hero = await sut.Fetch(new Uri(URL));
+
+            Assert.IsTrue(hero.Response.Equals(response));
+        }
+
+        [Test]
+        public async Task Preload_InternetUnavailable_PreloadedDataIsConsideredInvalidated()
+        {
+            var web = new Mock<IFetcherWebService>();
+            web.Setup(x => x.DoPlatformWebRequest(It.IsAny<Uri>())).Throws(new Exception("mock web exception"));
+            var sut = new FetcherServiceMock(web);
+            const string response = "myPreloadResponse";
+
+            sut.Preload(new Uri(URL), response);
+            var hero = await sut.Fetch(new Uri(URL));
+
+            var isInvalid = FetcherService.ShouldInvalidate(hero, sut.CACHE_FRESHNESS_THRESHOLD);
+
+            Assert.IsTrue(isInvalid);
+        }
+
+        
+
         #region Mock factories
         private static string FetcherResponseValidFactory()
         {

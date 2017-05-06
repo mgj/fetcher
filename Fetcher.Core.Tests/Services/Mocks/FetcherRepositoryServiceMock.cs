@@ -19,15 +19,13 @@ namespace artm.Fetcher.Core.Tests.Services.Mocks
             return hero;
         }
 
-        public IUrlCacheInfo InsertUrl(Uri uri, string response)
+        public IUrlCacheInfo InsertUrl(Uri uri, string response, DateTimeOffset timestamp)
         {
             var existing = GetEntryForUrl(uri);
             if (existing != null)
             {
                 _database.Remove(existing);
             }
-
-            var timestamp = DateTime.UtcNow;
 
             var hero = new UrlCacheInfoMock();
             hero.Response = response;
@@ -41,9 +39,20 @@ namespace artm.Fetcher.Core.Tests.Services.Mocks
             return hero;
         }
 
+        public IUrlCacheInfo PreloadUrl(Uri uri, string response)
+        {
+            var timestamp = DateTimeOffset.UtcNow.AddYears(-1);
+            return InsertUrl(uri, response, timestamp);
+        }
+
+        public IUrlCacheInfo InsertUrl(Uri uri, string response)
+        {
+            return InsertUrl(uri, response, DateTimeOffset.UtcNow);
+        }
+
         public void UpdateUrl(Uri uri, IUrlCacheInfo hero, string response)
         {
-            var timestamp = DateTime.UtcNow;
+            var timestamp = DateTimeOffset.UtcNow;
 
             hero.Response = response;
             hero.Url = uri.OriginalString;

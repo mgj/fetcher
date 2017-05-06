@@ -40,8 +40,16 @@ namespace artm.Fetcher.Core.Services
                 {
                     // Cache needs refreshing
                     System.Diagnostics.Debug.WriteLine("Refreshing cache");
-                    var response = await FetchFromWeb(uri);
-                    Repository.UpdateUrl(uri, cacheHit, response);
+                    string response = null;
+                    try
+                    {
+                        response = await FetchFromWeb(uri);
+                        Repository.UpdateUrl(uri, cacheHit, response);
+                    }
+                    catch (Exception)
+                    {
+                        System.Diagnostics.Debug.WriteLine("Could not update from network, keep using old cache data");
+                    }
                 }
 
                 return cacheHit;
@@ -65,7 +73,7 @@ namespace artm.Fetcher.Core.Services
             return response.Body;
         }
 
-        private bool ShouldInvalidate(IUrlCacheInfo hero, TimeSpan freshnessTreshold)
+        public static bool ShouldInvalidate(IUrlCacheInfo hero, TimeSpan freshnessTreshold)
         {
             var delta = DateTimeOffset.UtcNow - hero.LastUpdated;
             return delta > freshnessTreshold;
@@ -85,7 +93,7 @@ namespace artm.Fetcher.Core.Services
                 return;
             }
 
-            Repository.InsertUrl(url, response);
+            Repository.PreloadUrl(url, response);
         }
     }
 }
