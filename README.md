@@ -68,10 +68,6 @@ MvvmCross Plugin GitHub: [https://github.com/mgj/MvvmCross-Plugins](https://gith
 MvvmCross Plugin NuGet: [https://www.nuget.org/packages/artm.mvxplugins.fetcher/](https://www.nuget.org/packages/artm.mvxplugins.fetcher/)
 
 
-## MvvmCross
-
-MvvmCross plugin: [https://github.com/mgj/MvvmCross-Plugins](https://github.com/mgj/MvvmCross-Plugins)
-
 ## License
 
 - **Fetcher** is licensed under [Apache 2.0][apache]
