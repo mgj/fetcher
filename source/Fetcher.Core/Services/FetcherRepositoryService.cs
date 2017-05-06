@@ -11,11 +11,12 @@ namespace artm.Fetcher.Core.Services
 {
     public class FetcherRepositoryService : SingletonBase<FetcherRepositoryService>, IFetcherRepositoryService
     {
-        private readonly SQLiteConnection _db;
+        private SQLiteConnection _db;
+        public IFetcherRepositoryStoragePathService PathService;
 
-        public FetcherRepositoryService(IFetcherRepositoryStoragePathService pathService)
+        public void Initialize()
         {
-            _db = new SQLiteConnection(pathService.GetPath());
+            _db = new SQLiteConnection(PathService.GetPath());
             _db.CreateTable<UrlCacheInfo>();
         }
 
