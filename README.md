@@ -50,7 +50,7 @@ IUrlCacheInfo response = await fetcher.Fetch(url);
 
 Artm Fetcher uses SQLite for storing its cache. Its stored on the appropriate temporary directory on iOS and Android. On iOS, backup is disabled for the cache.
 
-Artm Fetcher implements an exponential backoff retry algorithm using (Polly)[http://www.thepollyproject.org/] 
+Artm Fetcher implements an exponential backoff retry algorithm using [Polly](http://www.thepollyproject.org/)
 
 ## Get it here
 
