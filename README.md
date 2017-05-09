@@ -46,11 +46,19 @@ IUrlCacheInfo response = await fetcher.Fetch(url);
 ```
 
 
+## For developers
+
+Consider using the Playground.Touch and Playground.Droid projects if you want to experiment with the code. Both projects are set up with dependencies and references so that you can get started quicker - Pull requests are very welcome!
+
+
+
 ## Implementation details
 
 Artm Fetcher uses SQLite for storing its cache. Its stored in the temporary directory on iOS and Android. On iOS backup is disabled for the cache.
 
 Artm Fetcher implements an exponential backoff retry algorithm using [Polly](http://www.thepollyproject.org/)
+
+
 
 ## Get it here
 
