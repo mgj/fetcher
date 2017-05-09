@@ -1,10 +1,6 @@
 ﻿using artm.Fetcher.Core.Entities;
 using SQLite;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace artm.Fetcher.Core.Services
 {
@@ -17,6 +13,7 @@ namespace artm.Fetcher.Core.Services
         {
             PathService = pathService;
             _db = new SQLiteConnection(PathService.GetPath());
+
             _db.CreateTable<UrlCacheInfo>();
         }
 

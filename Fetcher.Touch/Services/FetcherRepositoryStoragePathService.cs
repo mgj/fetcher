@@ -1,7 +1,7 @@
 ﻿using artm.Fetcher.Core.Services;
+using Foundation;
 using System;
-using System.Collections.Generic;
-using System.Text;
+using System.IO;
 
 namespace artm.Fetcher.Touch.Services
 {
@@ -9,7 +9,17 @@ namespace artm.Fetcher.Touch.Services
     {
         public string GetPath(string filename = "fetcher.db3")
         {
-            return System.IO.Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal), filename);
+            //var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            //var cache = Path.Combine(documents, "..", "Library", "Caches");
+            //var fullPath = Path.Combine(cache, filename);
+
+            var fullPath = Path.Combine(Path.GetTempPath(), filename);
+            if (File.Exists(fullPath))
+            {
+                NSFileManager.SetSkipBackupAttribute(fullPath, true);
+            }
+
+            return fullPath;
         }
     }
 }

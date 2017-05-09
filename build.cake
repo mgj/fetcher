@@ -49,7 +49,9 @@ Task("GitLink")
 	.Does(() => {
 
 	GitLink(sln.GetDirectory(), new GitLinkSettings {
-		RepositoryUrl = "https://github.com/mgj/fetcher"
+		RepositoryUrl = "https://github.com/mgj/fetcher",
+		ArgumentCustomization = args => args.Append(
+			"-ignore fetcher.playground.core,fetcher.playground.droid,fetcher.playground.touch")
 	});
 });
 

@@ -1,9 +1,5 @@
 ﻿using artm.Fetcher.Core.Entities;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace artm.Fetcher.Core.Tests.Services.Mocks
 {
@@ -18,5 +14,6 @@ namespace artm.Fetcher.Core.Tests.Services.Mocks
         public DateTimeOffset LastAccessed { get; set; }
 
         public DateTimeOffset LastUpdated { get; set; }
+        public CacheSourceType FetchedFrom { get; set; }
     }
 }

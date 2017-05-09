@@ -2,17 +2,11 @@
 using artm.Fetcher.Core.Services;
 using Moq;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace artm.Fetcher.Core.Tests.Services.Mocks
 {
     public class FetcherServiceMock : FetcherService
     {
-        private Mock<IFetcherWebService> web;
-
         public FetcherServiceMock() :base(null, new FetcherRepositoryServiceMock())
         {
             SetWebserviceDummy();

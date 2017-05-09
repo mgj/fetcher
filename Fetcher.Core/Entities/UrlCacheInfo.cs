@@ -18,5 +18,8 @@ namespace artm.Fetcher.Core.Entities
         public DateTimeOffset LastAccessed { get; set; }
 
         public DateTimeOffset LastUpdated { get; set; }
+
+        [Ignore]
+        public CacheSourceType FetchedFrom { get; set; }
     }
 }

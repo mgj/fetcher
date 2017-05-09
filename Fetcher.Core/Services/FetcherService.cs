@@ -2,9 +2,6 @@
 using artm.Fetcher.Core.Models;
 using Polly;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace artm.Fetcher.Core.Services
@@ -34,34 +31,40 @@ namespace artm.Fetcher.Core.Services
             var cacheHit = Repository.GetEntryForUrl(uri);
             if (cacheHit != null)
             {
-                // Hit
+                cacheHit.FetchedFrom = CacheSourceType.Preload;
                 System.Diagnostics.Debug.WriteLine("Cache hit");
                 if (ShouldInvalidate(cacheHit, freshnessTreshold))
                 {
-                    // Cache needs refreshing
                     System.Diagnostics.Debug.WriteLine("Refreshing cache");
                     string response = null;
                     try
                     {
                         response = await FetchFromWeb(uri);
                         Repository.UpdateUrl(uri, cacheHit, response);
+                        cacheHit.FetchedFrom = CacheSourceType.Web;
                     }
                     catch (Exception)
                     {
                         System.Diagnostics.Debug.WriteLine("Could not update from network, keep using old cache data");
                     }
                 }
+                else
+                {
+                    cacheHit.FetchedFrom = CacheSourceType.Local;
+                }
 
                 return cacheHit;
             }
             else
             {
-                // Nothing in cache, get it fresh
+                System.Diagnostics.Debug.WriteLine("Nothing found in cache, getting it fresh");
                 string response = null;
                 try
                 {
                     response = await FetchFromWeb(uri);
-                    return Repository.InsertUrl(uri, response);
+                    cacheHit = Repository.InsertUrl(uri, response);
+                    cacheHit.FetchedFrom = CacheSourceType.Web;
+                    return cacheHit;
                 }
                 catch (Exception)
                 {
