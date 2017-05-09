@@ -5,6 +5,7 @@ using artm.Fetcher.Droid.Services;
 using artm.Fetcher.Core.Services;
 using artm.Fetcher.Core.Entities;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace Fetcher.Playground.Droid
 {
@@ -40,10 +41,10 @@ namespace Fetcher.Playground.Droid
                 _fetcher.Preload(url, "<html>Hello world!</html>");
 
                 IUrlCacheInfo response = await _fetcher.Fetch(url);
+                var debug = 42;
             }
             catch (System.Exception ex)
             {
-
                 throw;
             }
         }
