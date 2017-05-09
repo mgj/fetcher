@@ -14,5 +14,6 @@ namespace artm.Fetcher.Core.Tests.Services.Mocks
         public DateTimeOffset LastAccessed { get; set; }
 
         public DateTimeOffset LastUpdated { get; set; }
+        public CacheSourceType FetchedFrom { get; set; }
     }
 }

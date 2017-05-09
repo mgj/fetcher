@@ -38,7 +38,7 @@ namespace Fetcher.Playground.Droid
                 _fetcher = new FetcherService(_web, _repository);
 
                 var url = new System.Uri("https://www.google.com");
-                _fetcher.Preload(url, "<html>Hello world!</html>");
+                //_fetcher.Preload(url, "<html>Hello world!</html>");
 
                 IUrlCacheInfo response = await _fetcher.Fetch(url);
                 var debug = 42;

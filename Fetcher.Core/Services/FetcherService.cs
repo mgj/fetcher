@@ -29,6 +29,7 @@ namespace artm.Fetcher.Core.Services
             System.Diagnostics.Debug.WriteLine("Fetching for uri: " + uri.OriginalString);
 
             var cacheHit = Repository.GetEntryForUrl(uri);
+            cacheHit.FetchedFrom = CacheSourceType.Preload;
             if (cacheHit != null)
             {
                 // Hit
@@ -42,11 +43,16 @@ namespace artm.Fetcher.Core.Services
                     {
                         response = await FetchFromWeb(uri);
                         Repository.UpdateUrl(uri, cacheHit, response);
+                        cacheHit.FetchedFrom = CacheSourceType.Web;
                     }
                     catch (Exception)
                     {
                         System.Diagnostics.Debug.WriteLine("Could not update from network, keep using old cache data");
                     }
+                }
+                else
+                {
+                    cacheHit.FetchedFrom = CacheSourceType.Local;
                 }
 
                 return cacheHit;
@@ -58,7 +64,9 @@ namespace artm.Fetcher.Core.Services
                 try
                 {
                     response = await FetchFromWeb(uri);
-                    return Repository.InsertUrl(uri, response);
+                    cacheHit = Repository.InsertUrl(uri, response);
+                    cacheHit.FetchedFrom = CacheSourceType.Web;
+                    return cacheHit;
                 }
                 catch (Exception)
                 {
