@@ -150,6 +150,55 @@ namespace artm.Fetcher.Core.Tests.Services
             Assert.AreEqual(hero.FetchedFrom, CacheSourceType.Preload);
         }
 
+        [Test]
+        public async Task Fetch_PreloadedDataWithInternet_FetchedFromWeb()
+        {
+            var sut = new FetcherServiceMock();
+
+            const string RESPONSE_STRING = "Fetch_PreloadedDataWithInternet_FetchedFromWeb";
+
+            sut.Preload(new Uri(URL), RESPONSE_STRING);
+            var hero = await sut.Fetch(new Uri(URL));
+
+            Assert.NotNull(hero);
+            Assert.AreNotEqual(RESPONSE_STRING, hero.Response);
+            Assert.AreEqual(hero.FetchedFrom, CacheSourceType.Web);
+        }
+
+        [Test]
+        public async Task Fetch_RecentlyUpdated_FetchedFromLocalCache()
+        {
+            var sut = new FetcherServiceMock();
+
+            const string RESPONSE_STRING = "Fetch_RecentlyUpdated_FetchedFromLocalCache";
+            
+            var hero = await sut.Fetch(new Uri(URL));
+            hero = await sut.Fetch(new Uri(URL));
+            
+            Assert.NotNull(hero);
+            Assert.AreNotEqual(RESPONSE_STRING, hero.Response);
+            Assert.AreEqual(hero.FetchedFrom, CacheSourceType.Local);
+        }
+
+        [Test]
+        public async Task Fetch_RecentlyUpdatedManyTimes_FetchedFromLocalCache()
+        {
+            var sut = new FetcherServiceMock();
+
+            const string RESPONSE_STRING = "Fetch_RecentlyUpdated_FetchedFromLocalCache";
+
+            var hero = await sut.Fetch(new Uri(URL));
+            hero = await sut.Fetch(new Uri(URL));
+            hero = await sut.Fetch(new Uri(URL));
+            hero = await sut.Fetch(new Uri(URL));
+            hero = await sut.Fetch(new Uri(URL));
+            hero = await sut.Fetch(new Uri(URL));
+
+            Assert.NotNull(hero);
+            Assert.AreNotEqual(RESPONSE_STRING, hero.Response);
+            Assert.AreEqual(hero.FetchedFrom, CacheSourceType.Local);
+        }
+
         private static Mock<IFetcherWebService> FetcherWebServiceInternetUnavailableMockFactory()
         {
             var web = new Mock<IFetcherWebService>();
