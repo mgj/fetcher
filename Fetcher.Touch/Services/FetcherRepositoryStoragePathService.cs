@@ -1,4 +1,5 @@
 ﻿using artm.Fetcher.Core.Services;
+using Foundation;
 using System;
 using System.IO;
 
@@ -11,6 +12,12 @@ namespace artm.Fetcher.Touch.Services
             var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             var cache = Path.Combine(documents, "..", "Library", "Caches");
             var fullPath = Path.Combine(cache, filename);
+
+            if (File.Exists(fullPath))
+            {
+                NSFileManager.SetSkipBackupAttribute(fullPath, true);
+            }
+
             return fullPath;
         }
     }
