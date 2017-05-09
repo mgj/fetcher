@@ -6,7 +6,8 @@ namespace artm.Fetcher.Droid.Services
     {
         public string GetPath(string filename = "fetcher.db3")
         {
-            return System.IO.Path.Combine(System.IO.Path.GetTempPath(), filename);
+            var fullpath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), filename);
+            return fullpath;
         }
     }
 }

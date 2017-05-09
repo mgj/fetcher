@@ -13,6 +13,7 @@ namespace artm.Fetcher.Core.Services
         {
             PathService = pathService;
             _db = new SQLiteConnection(PathService.GetPath());
+
             _db.CreateTable<UrlCacheInfo>();
         }
 
