@@ -29,14 +29,12 @@ namespace artm.Fetcher.Core.Services
             System.Diagnostics.Debug.WriteLine("Fetching for uri: " + uri.OriginalString);
 
             var cacheHit = Repository.GetEntryForUrl(uri);
-            cacheHit.FetchedFrom = CacheSourceType.Preload;
             if (cacheHit != null)
             {
-                // Hit
+                cacheHit.FetchedFrom = CacheSourceType.Preload;
                 System.Diagnostics.Debug.WriteLine("Cache hit");
                 if (ShouldInvalidate(cacheHit, freshnessTreshold))
                 {
-                    // Cache needs refreshing
                     System.Diagnostics.Debug.WriteLine("Refreshing cache");
                     string response = null;
                     try
@@ -59,7 +57,7 @@ namespace artm.Fetcher.Core.Services
             }
             else
             {
-                // Nothing in cache, get it fresh
+                System.Diagnostics.Debug.WriteLine("Nothing found in cache, getting it fresh");
                 string response = null;
                 try
                 {

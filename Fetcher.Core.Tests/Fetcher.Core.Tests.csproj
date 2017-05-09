@@ -72,6 +72,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Entities\UrlCacheInfoTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\Mocks\FetcherRepositoryServiceMock.cs" />
     <Compile Include="Services\FetcherRepositoryServiceTests.cs" />

@@ -97,8 +97,7 @@ namespace artm.Fetcher.Core.Tests.Services
         [Test]
         public async Task Preload_InternetUnavailableAndEmptyDatabase_PreloadedDataIsReturned()
         {
-            var web = new Mock<IFetcherWebService>();
-            web.Setup(x => x.DoPlatformWebRequest(It.IsAny<Uri>())).Throws(new Exception("mock web exception"));
+            var web = FetcherWebServiceInternetUnavailableMockFactory();
             var sut = new FetcherServiceMock(web);
             const string response = "myPreloadResponse";
 
@@ -112,8 +111,7 @@ namespace artm.Fetcher.Core.Tests.Services
         [Test]
         public async Task Preload_InternetUnavailable_PreloadedDataIsConsideredInvalidated()
         {
-            var web = new Mock<IFetcherWebService>();
-            web.Setup(x => x.DoPlatformWebRequest(It.IsAny<Uri>())).Throws(new Exception("mock web exception"));
+            var web = FetcherWebServiceInternetUnavailableMockFactory();
             var sut = new FetcherServiceMock(web);
             const string response = "myPreloadResponse";
 
@@ -128,8 +126,7 @@ namespace artm.Fetcher.Core.Tests.Services
         [Test]
         public async Task Fetch_EmptyDatabaseNoPreloadInternetUnavailable_NullIsReturned()
         {
-            var web = new Mock<IFetcherWebService>();
-            web.Setup(x => x.DoPlatformWebRequest(It.IsAny<Uri>())).Throws(new Exception("mock web exception"));
+            var web = FetcherWebServiceInternetUnavailableMockFactory();
             var sut = new FetcherServiceMock(web);
 
             var hero = await sut.Fetch(new Uri(URL));
@@ -137,5 +134,27 @@ namespace artm.Fetcher.Core.Tests.Services
             Assert.IsNull(hero);
         }
         
+        [Test]
+        public async Task Fetch_PreloadedDataInternetUnavailable_FetchedFromIsPreloaded()
+        {
+            var web = FetcherWebServiceInternetUnavailableMockFactory();
+            var sut = new FetcherServiceMock(web);
+
+            const string RESPONSE_STRING = "Fetch_PreloadedDataInternetUnavailable_FetchedFromIsPreloaded";
+
+            sut.Preload(new Uri(URL), RESPONSE_STRING);
+            var hero = await sut.Fetch(new Uri(URL));
+
+            Assert.NotNull(hero);
+            Assert.AreEqual(RESPONSE_STRING, hero.Response);
+            Assert.AreEqual(hero.FetchedFrom, CacheSourceType.Preload);
+        }
+
+        private static Mock<IFetcherWebService> FetcherWebServiceInternetUnavailableMockFactory()
+        {
+            var web = new Mock<IFetcherWebService>();
+            web.Setup(x => x.DoPlatformWebRequest(It.IsAny<Uri>())).Throws(new Exception("mock web exception"));
+            return web;
+        }
     }
 }
