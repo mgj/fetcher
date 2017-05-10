@@ -24,11 +24,12 @@ Doing network such as downloading a JSON file from a webserver can be difficult 
 Artm Fetcher solves this in a simple and easy to use manner:
 
 ```
+// Instantiate these on Android / iOS
 IFetcherRepositoryStoragePathService path = new FetcherRepositoryStoragePathService();
 IFetcherRepositoryService repository = new FetcherRepositoryService(path);
 IFetcherWebService web = new FetcherWebService();
 
-// Primary interface you should use
+// Primary interface you should use from your Core/PCL project
 IFetcherService fetcher = new FetcherService(web, repository);
 
 var url = new System.Uri("https://www.google.com");
