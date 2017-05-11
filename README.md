@@ -1,6 +1,6 @@
 # Fetcher
 
-[![Build status](https://ci.appveyor.com/api/projects/status/iysnpswp82ogp4vb?svg=true)](https://ci.appveyor.com/project/mgj/fetcher)
+[![Build status](https://ci.appveyor.com/api/projects/status/github/mgj/fetcher?svg=true)](https://ci.appveyor.com/project/mgj/fetcher)
 [![NuGet](https://img.shields.io/nuget/v/artm.fetcher.svg)](https://www.nuget.org/packages/artm.fetcher/)
 
 Network layer in Xamarin apps
