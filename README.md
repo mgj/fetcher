@@ -33,7 +33,16 @@ Goals for this project:
 ## Install
 
 ```
+Find the package in your IDE's nuget explorer
+
+or
+
+Install-Package artm.fetcher
+
+or
+
 nuget install artm.fetcher
+
 ```
 
 ## Example time!
