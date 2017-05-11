@@ -36,19 +36,19 @@
   </metadata>
   <files>     
     <!-- PCL -->
-    <file src="..\Fetcher.Core\bin\Release\artm.Fetcher.Core.*" target="lib\portable-net45+win+wpa81" />
+    <file src="..\Fetcher.Core\bin\Release\artm.Fetcher.Core.*" target="lib\portable-net45+win+wpa81" exclude="**\*.mdb"/>
 
     <!-- DROID -->
-    <file src="..\Fetcher.Droid\bin\Release\artm.Fetcher.Core.*" target="lib\MonoAndroid10" />
-    <file src="..\Fetcher.Droid\bin\Release\artm.Fetcher.Droid.*" target="lib\MonoAndroid10" />
+    <file src="..\Fetcher.Droid\bin\Release\artm.Fetcher.Core.*" target="lib\MonoAndroid10" exclude="**\*.mdb"/>
+    <file src="..\Fetcher.Droid\bin\Release\artm.Fetcher.Droid.*" target="lib\MonoAndroid10" exclude="**\*.mdb"/>
 
     <!--Xamarin.iOS-->
-    <file src="..\Fetcher.Touch\bin\Release\artm.Fetcher.Core.*" target="lib\MonoTouch10" />
-    <file src="..\Fetcher.Touch\bin\Release\artm.Fetcher.Touch.*" target="lib\MonoTouch10" />
+    <file src="..\Fetcher.Touch\bin\Release\artm.Fetcher.Core.*" target="lib\MonoTouch10" exclude="**\*.mdb"/>
+    <file src="..\Fetcher.Touch\bin\Release\artm.Fetcher.Touch.*" target="lib\MonoTouch10" exclude="**\*.mdb"/>
 
     <!--Xamarin.iOS Unified-->
-    <file src="..\Fetcher.Touch\bin\Release\artm.Fetcher.Core.*" target="lib\Xamarin.iOS10" />
-    <file src="..\Fetcher.Touch\bin\Release\artm.Fetcher.Touch.*" target="lib\Xamarin.iOS10" />
+    <file src="..\Fetcher.Touch\bin\Release\artm.Fetcher.Core.*" target="lib\Xamarin.iOS10" exclude="**\*.mdb"/>
+    <file src="..\Fetcher.Touch\bin\Release\artm.Fetcher.Touch.*" target="lib\Xamarin.iOS10" exclude="**\*.mdb"/>
 
   </files>
 </package>
