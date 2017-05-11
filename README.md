@@ -28,6 +28,7 @@ Goals for this project:
    * We store data in the temporary directory on iOS and Android. On iOS backup is disabled for the cache.
  * Stable and predictable - Unit tests and CI helps with this, but please open an issue or pull request if you experience crashes or surprising behavior
  * Minimal dependencies - Keep the library as small as possible. Dont add dependencies (E.g. Realm database backing store) unless we have to
+ * Distribution and easy installation - CI builds and publishes the library using NuGet. Include the library in all your projects and you should be good to go
 
 ## Install
 
