@@ -6,6 +6,7 @@ using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace artm.Fetcher.Core.Tests.Services
@@ -226,6 +227,7 @@ namespace artm.Fetcher.Core.Tests.Services
 
             Assert.AreEqual(THREAD_COUNT, results.Length);
             sut.WebServiceMock.Verify(x => x.DoPlatformWebRequest(It.IsAny<Uri>()), Times.Exactly(THREAD_COUNT));
+            Assert.IsTrue(results.All(x => x != null));
         }
 
         private List<Task<IUrlCacheInfo>> GenerateFetchTasks(FetcherService fetcher, int amount, Uri targeturl = null)
