@@ -7,7 +7,7 @@ namespace artm.Fetcher.Core.Tests.Services.Mocks
 {
     public class FetcherServiceMock : FetcherService
     {
-        public FetcherServiceMock() :base(null, new FetcherRepositoryService(GetPathServiceMemory()))
+        public FetcherServiceMock() : base(null, new FetcherRepositoryService(GetPathServiceMemory()))
         {
             SetWebserviceDummy();
         }
@@ -17,12 +17,24 @@ namespace artm.Fetcher.Core.Tests.Services.Mocks
             SetWebserviceDummy();
         }
 
+        public IFetcherRepositoryService RepositoryService
+        {
+            get
+            {
+                return Repository;
+            }
+            set
+            {
+                Repository = value;
+            }
+        }
+
         public FetcherServiceMock(Mock<IFetcherWebService> web) : base(web.Object, new FetcherRepositoryService(GetPathServiceMemory()))
         {
             WebServiceMock = web;
             base.Webservice = WebServiceMock.Object;
         }
-
+        
         public FetcherServiceMock(Mock<IFetcherRepositoryService> repository) : base(null, repository.Object)
         {
             SetWebserviceDummy();

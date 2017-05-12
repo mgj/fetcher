@@ -98,5 +98,6 @@ namespace artm.Fetcher.Core.Tests.Services
             Assert.AreEqual(lastAccess1, lastAccess2);
             Assert.AreNotEqual(lastUpdated1, lastUpdated2);
         }
+        
     }
 }

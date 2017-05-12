@@ -2,6 +2,7 @@
 using artm.Fetcher.Core.Models;
 using artm.Fetcher.Core.Services;
 using artm.Fetcher.Core.Tests.Services.Mocks;
+using artm.Fetcher.Core.Tests.Services.Stubs;
 using Moq;
 using NUnit.Framework;
 using System;
@@ -228,6 +229,36 @@ namespace artm.Fetcher.Core.Tests.Services
             Assert.AreEqual(THREAD_COUNT, results.Length);
             sut.WebServiceMock.Verify(x => x.DoPlatformWebRequest(It.IsAny<Uri>()), Times.Exactly(THREAD_COUNT));
             Assert.IsTrue(results.All(x => x != null));
+        }
+
+        [Test]
+        public async Task Fetch_MultithreadedToSameUrl_OnlyOneEntryInDatabase()
+        {
+            const int THREAD_COUNT = 10;
+
+            var sut = new FetcherServiceMock(new FetcherRepositoryServiceStub(FetcherServiceMock.GetPathServiceMemory()));
+            var tasks = GenerateFetchTasks(sut, THREAD_COUNT, new Uri("https://www.google.com"));
+            var taskResults = new List<IUrlCacheInfo>();
+
+            var results = await Task.WhenAll(tasks.ToArray());
+            var data = ((FetcherRepositoryServiceStub)sut.RepositoryService).DatabaseConnection.Table<UrlCacheInfo>();
+
+            Assert.AreEqual(1, data.Count());
+        }
+
+        [Test]
+        public async Task Fetch_MultithreadedToDifferentUrls_EntriesCreatedInDatabase()
+        {
+            const int THREAD_COUNT = 10;
+
+            var sut = new FetcherServiceMock(new FetcherRepositoryServiceStub(FetcherServiceMock.GetPathServiceMemory()));
+            var tasks = GenerateFetchTasks(sut, THREAD_COUNT);
+            var taskResults = new List<IUrlCacheInfo>();
+
+            var results = await Task.WhenAll(tasks.ToArray());
+            var data = ((FetcherRepositoryServiceStub)sut.RepositoryService).DatabaseConnection.Table<UrlCacheInfo>();
+
+            Assert.AreEqual(THREAD_COUNT, data.Count());
         }
 
         private List<Task<IUrlCacheInfo>> GenerateFetchTasks(FetcherService fetcher, int amount, Uri targeturl = null)
