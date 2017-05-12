@@ -72,10 +72,10 @@ namespace artm.Fetcher.Core.Services
 
             if (GetEntryForUrl(uri) is UrlCacheInfo existing)
             {
-                _db.Delete(existing);
+                Db.Delete(existing);
             }
 
-            _db.Insert(hero);
+            Db.Insert(hero);
 
             return hero;
         }
@@ -94,12 +94,12 @@ namespace artm.Fetcher.Core.Services
             hero.Url = uri.OriginalString;
             hero.LastUpdated = timestamp;
 
-            _db.Update(hero);
+            Db.Update(hero);
         }
 
         public void Dispose()
         {
-            _db.Close();
+            Db.Close();
         }
     }
 }
