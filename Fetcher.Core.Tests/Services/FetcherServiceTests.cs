@@ -5,6 +5,7 @@ using artm.Fetcher.Core.Tests.Services.Mocks;
 using Moq;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace artm.Fetcher.Core.Tests.Services
@@ -198,6 +199,73 @@ namespace artm.Fetcher.Core.Tests.Services
             Assert.AreNotEqual(RESPONSE_STRING, hero.Response);
             Assert.AreEqual(hero.FetchedFrom, CacheSourceType.Local);
         }
+
+        [Test]
+        public void Fetch_MultithreadedCalls_IsHandled()
+        {
+            const int THREAD_COUNT = 10;
+
+            var sut = new FetcherServiceMock();
+            var tasks = GenerateFetchTasks(sut, THREAD_COUNT);
+            var taskResults = new List<IUrlCacheInfo>();
+
+            var result = Parallel.ForEach(tasks, item => taskResults.Add(item.Result));
+
+            Assert.AreEqual(THREAD_COUNT, taskResults.Count);
+            sut.WebServiceMock.Verify(x => x.DoPlatformWebRequest(It.IsAny<Uri>()), Times.Exactly(THREAD_COUNT));
+        }
+
+        [Test]
+        public void Fetch_MultithreadedToSameUrl_OnlyOneWebRequestIsMade()
+        {
+            const int THREAD_COUNT = 10;
+
+            var sut = new FetcherServiceMock();
+            var tasks = GenerateFetchTasks(sut, THREAD_COUNT, new Uri("https://www.google.com"));
+            var taskResults = new List<IUrlCacheInfo>();
+
+            var result = Parallel.ForEach(tasks, item => taskResults.Add(item.Result));
+
+            sut.WebServiceMock.Verify(x => x.DoPlatformWebRequest(It.IsAny<Uri>()), Times.Once);
+        }
+
+        [Test]
+        public async Task Fetch_MultithreadedWhenAll_IsHandled()
+        {
+            const int THREAD_COUNT = 10;
+
+            var sut = new FetcherServiceMock();
+            var tasks = GenerateFetchTasks(sut, THREAD_COUNT);
+            var taskResults = new List<IUrlCacheInfo>();
+
+            var results = await Task.WhenAll(tasks.ToArray());
+
+            Assert.AreEqual(THREAD_COUNT, results.Length);
+            sut.WebServiceMock.Verify(x => x.DoPlatformWebRequest(It.IsAny<Uri>()), Times.Exactly(THREAD_COUNT));
+        }
+
+        private List<Task<IUrlCacheInfo>> GenerateFetchTasks(FetcherService fetcher, int amount, Uri targeturl = null)
+        {
+            var result = new List<Task<IUrlCacheInfo>>();
+            for (int i = 0; i < amount; i++)
+            {
+                if (targeturl == null)
+                {
+                    AddTask(fetcher, result, new Uri("http://" + i));
+                }
+                else
+                {
+                    AddTask(fetcher, result, targeturl);
+                }
+            }
+            return result;
+        }
+
+        private static void AddTask(FetcherService fetcher, List<Task<IUrlCacheInfo>> result, Uri url)
+        {
+            result.Add(Task.FromResult(fetcher.Fetch(url)).Result);
+        }
+
 
         private static Mock<IFetcherWebService> FetcherWebServiceInternetUnavailableMockFactory()
         {

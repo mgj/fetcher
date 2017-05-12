@@ -1,4 +1,5 @@
-﻿using artm.Fetcher.Core.Tests.Services.Mocks;
+﻿using artm.Fetcher.Core.Services;
+using artm.Fetcher.Core.Tests.Services.Mocks;
 using NUnit.Framework;
 using System;
 
@@ -11,7 +12,7 @@ namespace artm.Fetcher.Core.Tests.Services
         public void GetEntryForUrl_NoEntryExists_NullIsReturned()
         {
             var url = new Uri("https://www.google.com");
-            var sut = new FetcherRepositoryServiceMock();
+            var sut = new FetcherRepositoryService(FetcherServiceMock.GetPathServiceMemory());
 
             var entry = sut.GetEntryForUrl(url);
 
@@ -22,7 +23,7 @@ namespace artm.Fetcher.Core.Tests.Services
         public void GetEntryForUrl_EntryExists_EntryReturned()
         {
             var url = new Uri("https://www.google.com");
-            var sut = new FetcherRepositoryServiceMock();
+            var sut = new FetcherRepositoryService(FetcherServiceMock.GetPathServiceMemory());
 
             sut.InsertUrl(url, "myResponse");
             var entry = sut.GetEntryForUrl(url);
@@ -35,7 +36,7 @@ namespace artm.Fetcher.Core.Tests.Services
         {
             var url = new Uri("https://www.google.com");
             var response = "myTestResponse";
-            var sut = new FetcherRepositoryServiceMock();
+            var sut = new FetcherRepositoryService(FetcherServiceMock.GetPathServiceMemory());
 
             sut.InsertUrl(url, response);
             var original = sut.GetEntryForUrl(url);
@@ -51,7 +52,7 @@ namespace artm.Fetcher.Core.Tests.Services
         {
             var url = new Uri("https://www.google.com");
             var response = "myTestResponse";
-            var sut = new FetcherRepositoryServiceMock();
+            var sut = new FetcherRepositoryService(FetcherServiceMock.GetPathServiceMemory());
 
             var isNull = sut.GetEntryForUrl(url);
             sut.InsertUrl(url, response);
@@ -66,7 +67,7 @@ namespace artm.Fetcher.Core.Tests.Services
         {
             var url = new Uri("https://www.google.com");
             var response = "myTestResponse";
-            var sut = new FetcherRepositoryServiceMock();
+            var sut = new FetcherRepositoryService(FetcherServiceMock.GetPathServiceMemory());
 
             var isNull = sut.GetEntryForUrl(url);
             sut.PreloadUrl(url, response);
@@ -74,6 +75,28 @@ namespace artm.Fetcher.Core.Tests.Services
 
             Assert.IsNull(isNull);
             Assert.NotNull(notNull);
+        }
+
+        [Test]
+        public void UpdateUrl_UrlIsUpdated_LastAccessedIsNotUpdated()
+        {
+            var url = new Uri("https://www.google.com");
+            var response = "myTestResponse";
+            var sut = new FetcherRepositoryService(FetcherServiceMock.GetPathServiceMemory());
+
+            sut.PreloadUrl(url, response);
+            var data = sut.GetEntryForUrl(url);
+
+            var lastAccess1 = data.LastAccessed;
+            var lastUpdated1 = data.LastUpdated;
+
+            sut.UpdateUrl(url, data, "updated-response");
+            var lastAccess2 = data.LastAccessed;
+            var lastUpdated2 = data.LastUpdated;
+
+
+            Assert.AreEqual(lastAccess1, lastAccess2);
+            Assert.AreNotEqual(lastUpdated1, lastUpdated2);
         }
     }
 }
