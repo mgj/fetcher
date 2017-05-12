@@ -4,7 +4,7 @@ using System;
 
 namespace artm.Fetcher.Core.Services
 {
-    public class FetcherRepositoryService : IFetcherRepositoryService
+    public class FetcherRepositoryService : IFetcherRepositoryService, IDisposable
     {
         protected SQLiteConnection _db;
         protected IFetcherRepositoryStoragePathService PathService;
@@ -20,9 +20,8 @@ namespace artm.Fetcher.Core.Services
         public IUrlCacheInfo GetEntryForUrl(Uri url)
         {
             UrlCacheInfo data;
-
             var needle = url.OriginalString;
-            data = _db.Table<UrlCacheInfo>().Where(x => x.Url == needle).FirstOrDefault();
+            data = _db.Table<UrlCacheInfo>().Where(x => x.Url.Equals(needle)).FirstOrDefault();
 
             if(data != null)
             {
@@ -92,6 +91,11 @@ namespace artm.Fetcher.Core.Services
             hero.LastUpdated = timestamp;
 
             _db.Update(hero);
+        }
+
+        public void Dispose()
+        {
+            _db.Close();
         }
     }
 }

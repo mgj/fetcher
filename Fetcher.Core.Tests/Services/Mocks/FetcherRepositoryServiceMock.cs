@@ -1,6 +1,7 @@
 ﻿using artm.Fetcher.Core.Entities;
 using artm.Fetcher.Core.Services;
 using Moq;
+using SQLite;
 
 namespace artm.Fetcher.Core.Tests.Services.Mocks
 {
@@ -8,7 +9,6 @@ namespace artm.Fetcher.Core.Tests.Services.Mocks
     {
         public FetcherRepositoryServiceMock() : base(GetPathServiceMock())
         {
-            _db.DeleteAll<UrlCacheInfo>();
         }
 
         private static IFetcherRepositoryStoragePathService GetPathServiceMock()
