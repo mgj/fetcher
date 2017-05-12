@@ -26,7 +26,7 @@ Goals for this project:
    * We use a SQLite database as backsing store. 
    * We use exponential backoff with polly. 
    * We store data in the temporary directory on iOS and Android. On iOS backup is disabled for the cache.
- * Stable and predictable - Unit tests and CI helps with this, but please open an issue or pull request if you experience crashes or surprising behavior
+ * Stable and predictable - Unit tests helps with this, but please open an issue or pull request if you experience crashes or surprising behavior
  * Minimal dependencies - Keep the library as small as possible. Dont add dependencies (E.g. Realm database backing store) unless we have to
  * Distribution and easy installation - CI builds and publishes the library using NuGet. Include the library in all your projects and you should be good to go
 
@@ -85,10 +85,6 @@ NuGet: [https://www.nuget.org/packages/artm.fetcher/](https://www.nuget.org/pack
 (Optional) MvvmCross Plugin GitHub: [https://github.com/mgj/MvvmCross-Plugins](https://github.com/mgj/MvvmCross-Plugins)
 
 (Optional) MvvmCross Plugin NuGet: [https://www.nuget.org/packages/artm.mvxplugins.fetcher/](https://www.nuget.org/packages/artm.mvxplugins.fetcher/)
-
-## Thanks
-
-Thanks to [Cheesebaron](https://github.com/Cheesebaron) for his [MvvmCross plugins](https://github.com/Cheesebaron/Cheesebaron.MvxPlugins)
 
 
 ## License
