@@ -19,8 +19,7 @@ namespace artm.Fetcher.Core.Tests.Services
         public async Task Fetch_Sunshine_TriesToFetchFromWeb()
         {
             var web = new Mock<IFetcherWebService>();
-            web.Setup(x => x.DoPlatformWebRequest(It.IsAny<Uri>())).Returns(() => new FetcherWebResponse() { IsSuccess = true, Body = "myBody" });
-            var sut = new FetcherServiceMock(web);
+            var sut = new FetcherServiceMock();
             
             var response = await sut.Fetch(new Uri(URL));
 
@@ -198,21 +197,6 @@ namespace artm.Fetcher.Core.Tests.Services
             Assert.NotNull(hero);
             Assert.AreNotEqual(RESPONSE_STRING, hero.Response);
             Assert.AreEqual(hero.FetchedFrom, CacheSourceType.Local);
-        }
-
-        [Test]
-        public void Fetch_MultithreadedCalls_IsHandled()
-        {
-            const int THREAD_COUNT = 10;
-
-            var sut = new FetcherServiceMock();
-            var tasks = GenerateFetchTasks(sut, THREAD_COUNT);
-            var taskResults = new List<IUrlCacheInfo>();
-
-            var result = Parallel.ForEach(tasks, item => taskResults.Add(item.Result));
-
-            Assert.AreEqual(THREAD_COUNT, taskResults.Count);
-            sut.WebServiceMock.Verify(x => x.DoPlatformWebRequest(It.IsAny<Uri>()), Times.Exactly(THREAD_COUNT));
         }
 
         [Test]
