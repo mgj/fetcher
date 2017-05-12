@@ -68,7 +68,7 @@ namespace artm.Fetcher.Core.Services
                 }
                 catch (Exception)
                 {
-                    System.Diagnostics.Debug.WriteLine("Could not update from network - giving up");
+                    System.Diagnostics.Debug.WriteLine("Could not insert from network - giving up");
                     return null;
                 }
             }
