@@ -229,6 +229,21 @@ namespace artm.Fetcher.Core.Tests.Services
             sut.WebServiceMock.Verify(x => x.DoPlatformWebRequest(It.IsAny<Uri>()), Times.Once);
         }
 
+        [Test]
+        public async Task Fetch_MultithreadedWhenAll_IsHandled()
+        {
+            const int THREAD_COUNT = 10;
+
+            var sut = new FetcherServiceMock();
+            var tasks = GenerateFetchTasks(sut, THREAD_COUNT);
+            var taskResults = new List<IUrlCacheInfo>();
+
+            var results = await Task.WhenAll(tasks.ToArray());
+
+            Assert.AreEqual(THREAD_COUNT, results.Length);
+            sut.WebServiceMock.Verify(x => x.DoPlatformWebRequest(It.IsAny<Uri>()), Times.Exactly(THREAD_COUNT));
+        }
+
         private List<Task<IUrlCacheInfo>> GenerateFetchTasks(FetcherService fetcher, int amount, Uri targeturl = null)
         {
             var result = new List<Task<IUrlCacheInfo>>();
