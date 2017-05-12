@@ -70,9 +70,10 @@ namespace artm.Fetcher.Core.Services
                 LastAccessed = timestamp
             };
 
-            if (GetEntryForUrl(uri) is UrlCacheInfo existing)
+            var existing = GetEntryForUrl(uri) as UrlCacheInfo;
+            if (existing != null)
             {
-                Db.Delete(existing);
+                _db.Delete(existing);
             }
 
             Db.Insert(hero);
