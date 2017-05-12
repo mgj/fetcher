@@ -6,26 +6,38 @@ namespace artm.Fetcher.Core.Services
 {
     public class FetcherRepositoryService : IFetcherRepositoryService, IDisposable
     {
-        protected SQLiteConnection _db;
         protected IFetcherRepositoryStoragePathService PathService;
+        private SQLiteConnection _db;
 
         public FetcherRepositoryService(IFetcherRepositoryStoragePathService pathService)
         {
             PathService = pathService;
-            _db = new SQLiteConnection(PathService.GetPath());
 
-            _db.CreateTable<UrlCacheInfo>();
+            Db.CreateTable<UrlCacheInfo>();
+        }
+
+        protected SQLiteConnection Db
+        {
+            get
+            {
+                if (_db == null)
+                {
+                    _db = new SQLiteConnection(PathService.GetPath());
+                }
+                return _db;
+            }
         }
 
         public IUrlCacheInfo GetEntryForUrl(Uri url)
         {
             UrlCacheInfo data;
             var needle = url.OriginalString;
-            data = _db.Table<UrlCacheInfo>().Where(x => x.Url.Equals(needle)).FirstOrDefault();
+            data = Db.Table<UrlCacheInfo>().Where(x => x.Url.Equals(needle)).FirstOrDefault();
 
             if(data != null)
             {
-                UpdateLastAccessed(data);
+                data.LastAccessed = DateTimeOffset.UtcNow;
+                Db.Update(data);
             }
 
             return data;
@@ -49,13 +61,6 @@ namespace artm.Fetcher.Core.Services
             {
                 return hero;
             }
-
-            var existing = GetEntryForUrl(uri) as UrlCacheInfo;
-            if (existing != null)
-            {
-                _db.Delete(existing);
-            }
-
             hero = new UrlCacheInfo()
             {
                 Response = response,
@@ -65,16 +70,16 @@ namespace artm.Fetcher.Core.Services
                 LastAccessed = timestamp
             };
 
+            if (GetEntryForUrl(uri) is UrlCacheInfo existing)
+            {
+                _db.Delete(existing);
+            }
+
             _db.Insert(hero);
 
             return hero;
         }
-
-        public void UpdateLastAccessed(IUrlCacheInfo hero)
-        {
-            hero.LastAccessed = DateTimeOffset.UtcNow;
-            _db.Update(hero);
-        }
+       
 
         public void UpdateUrl(Uri uri, IUrlCacheInfo hero, string response)
         {
@@ -87,7 +92,6 @@ namespace artm.Fetcher.Core.Services
 
             hero.Response = response;
             hero.Url = uri.OriginalString;
-            hero.LastAccessed = timestamp;
             hero.LastUpdated = timestamp;
 
             _db.Update(hero);

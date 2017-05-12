@@ -75,5 +75,27 @@ namespace artm.Fetcher.Core.Tests.Services
             Assert.IsNull(isNull);
             Assert.NotNull(notNull);
         }
+
+        [Test]
+        public void UpdateUrl_UrlIsUpdated_LastAccessedIsNotUpdated()
+        {
+            var url = new Uri("https://www.google.com");
+            var response = "myTestResponse";
+            var sut = new FetcherRepositoryServiceMock();
+
+            sut.PreloadUrl(url, response);
+            var data = sut.GetEntryForUrl(url);
+
+            var lastAccess1 = data.LastAccessed;
+            var lastUpdated1 = data.LastUpdated;
+
+            sut.UpdateUrl(url, data, "updated-response");
+            var lastAccess2 = data.LastAccessed;
+            var lastUpdated2 = data.LastUpdated;
+
+
+            Assert.AreEqual(lastAccess1, lastAccess2);
+            Assert.AreNotEqual(lastUpdated1, lastUpdated2);
+        }
     }
 }
