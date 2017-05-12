@@ -86,6 +86,10 @@ NuGet: [https://www.nuget.org/packages/artm.fetcher/](https://www.nuget.org/pack
 
 (Optional) MvvmCross Plugin NuGet: [https://www.nuget.org/packages/artm.mvxplugins.fetcher/](https://www.nuget.org/packages/artm.mvxplugins.fetcher/)
 
+## Thanks
+
+Thanks to [Cheesebaron](https://github.com/Cheesebaron) for his [MvvmCross plugins](https://github.com/Cheesebaron/Cheesebaron.MvxPlugins)
+
 
 ## License
 
