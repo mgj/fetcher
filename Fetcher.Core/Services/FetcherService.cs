@@ -8,7 +8,7 @@ namespace artm.Fetcher.Core.Services
 {
     public class FetcherService : IFetcherService
     {
-        public readonly TimeSpan CACHE_FRESHNESS_THRESHOLD = TimeSpan.FromDays(1); // 1 day
+        public readonly TimeSpan CACHE_FRESHNESS_THRESHOLD = TimeSpan.FromDays(1);
         
         protected IFetcherWebService Webservice { get; set; }
         protected IFetcherRepositoryService Repository { get; set; }
