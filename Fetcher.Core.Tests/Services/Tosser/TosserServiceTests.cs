@@ -15,7 +15,7 @@ namespace artm.Fetcher.Core.Tests.Services.Tosser
         private readonly Uri URL = new Uri("https://www.google.com");
 
         [Test]
-        public void Toss_Sunshine_ReturnsResult()
+        public void Toss_Sunshine_IsSuccess()
         {
             var sut = new TosserService(FetcherMockFactory.IFetcherWebServiceInternetOn().Object);
             var response = sut.Toss(URL);
