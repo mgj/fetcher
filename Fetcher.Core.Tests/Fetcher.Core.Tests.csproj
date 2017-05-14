@@ -74,11 +74,12 @@
   <ItemGroup>
     <Compile Include="Entities\UrlCacheInfoTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\FetcherRepositoryServiceTests.cs" />
+    <Compile Include="Services\Fetcher\FetcherRepositoryServiceTests.cs" />
     <Compile Include="Services\Stubs\FetcherRepositoryServiceStub.cs" />
     <Compile Include="Services\Stubs\FetcherServiceMock.cs" />
-    <Compile Include="Services\FetcherServiceTests.cs" />
+    <Compile Include="Services\Fetcher\FetcherServiceTests.cs" />
     <Compile Include="Services\Stubs\UrlCacheInfoMock.cs" />
+    <Compile Include="Services\Tosser\TosserServiceTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

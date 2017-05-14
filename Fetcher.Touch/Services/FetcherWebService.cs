@@ -3,11 +3,17 @@ using artm.Fetcher.Core.Services;
 using Foundation;
 using System;
 using System.Threading.Tasks;
+using System.Net;
 
 namespace artm.Fetcher.Touch.Services
 {
     public class FetcherWebService : IFetcherWebService
     {
+        public FetcherWebResponse DoPlatformRequest(Uri uri, HttpWebRequest request)
+        {
+            throw new NotImplementedException();
+        }
+
         public FetcherWebResponse DoPlatformWebRequest(Uri uri)
         {
             var tcs = new TaskCompletionSource<FetcherWebResponse>();

@@ -2,6 +2,7 @@
 using artm.Fetcher.Core.Services;
 using Square.OkHttp;
 using artm.Fetcher.Core.Models;
+using System.Net;
 
 namespace artm.Fetcher.Droid.Services
 {
@@ -54,6 +55,63 @@ namespace artm.Fetcher.Droid.Services
                 IsSuccess = false,
                 Body = string.Empty
             };
+        }
+
+        public FetcherWebResponse DoPlatformRequest(Uri uri, HttpWebRequest request)
+        {
+            Request.Builder builder = new Request.Builder();
+            builder.Url(uri.OriginalString);
+            PrepareHeaders(request, builder);
+            PrepareMethod(request, builder);
+
+            try
+            {
+                var response = Client.NewCall(builder.Build()).Execute();
+                return new FetcherWebResponse()
+                {
+                    IsSuccess = response.IsSuccessful,
+                    Body = response.Body().String()
+                };
+            }
+            catch (Exception)
+            {
+                return CreateFetcherWebResponseError();
+            }
+        }
+
+        private static void PrepareMethod(HttpWebRequest request, Request.Builder builder)
+        {
+            var requestBody = RequestBody.Create(MediaType.Parse(request.ContentType), new byte[0]);
+            switch (request.Method)
+            {
+                case "GET":
+                    builder.Method("GET", requestBody)
+                        .Get();
+                    break;
+                case "POST":
+                    builder.Method("POST", requestBody)
+                        .Post(requestBody);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private static void PrepareHeaders(HttpWebRequest request, Request.Builder builder)
+        {
+            var headerBuilder = new Headers.Builder();
+
+            for (int i = 0; i < request.Headers.AllKeys.Length; i++)
+            {
+                var headKey = request.Headers.GetKey(i);
+                var headValues = request.Headers.GetValues(i);
+                var headValue = string.Empty;
+                for (int j = 0; j < headValues.Length; j++)
+                {
+                    headerBuilder.Add(headKey, headValues[j]);
+                }
+            }
+            builder.Headers(headerBuilder.Build());
         }
     }
 }
