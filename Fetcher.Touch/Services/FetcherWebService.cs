@@ -14,32 +14,26 @@ namespace artm.Fetcher.Touch.Services
         {
             var tcs = new TaskCompletionSource<FetcherWebResponse>();
 
-            try
-            {
-                var mutableRequest = new NSMutableUrlRequest(uri);
 
-                PrepareMethod(request, mutableRequest);
-                PrepareHeaders(request, mutableRequest);
 
-                NSUrlSessionDataTask task = CreateUrlSessionDataTask(tcs, mutableRequest);
-                task.Resume();
-            }
-            catch (Exception ex)
-            {
+            var mutableRequest = new NSMutableUrlRequest(uri);
 
-                throw;
-            }
-            
+            PrepareMethod(request, mutableRequest);
+            PrepareHeaders(request, mutableRequest);
 
+            NSUrlSessionDataTask task = CreateUrlSessionDataTask(tcs, mutableRequest);
+            task.Resume();
 
             return tcs.Task.Result;
         }
 
         private void PrepareHeaders(HttpWebRequest request, NSMutableUrlRequest mutableRequest)
         {
+            if (request == null || request.Headers == null || request.Headers.AllKeys == null) return;
+
             var dictionary = new System.Collections.Generic.Dictionary<string, string>();
 
-            for (int i = 0; i < request?.Headers?.AllKeys?.Length; i++)
+            for (int i = 0; i < request.Headers.AllKeys.Length; i++)
             {
                 var headKey = request.Headers.GetKey(i);
                 var headValues = request.Headers.GetValues(i);
@@ -57,6 +51,8 @@ namespace artm.Fetcher.Touch.Services
 
         private void PrepareMethod(HttpWebRequest request, NSMutableUrlRequest mutableRequest)
         {
+            if (request == null || mutableRequest == null) return;
+
             mutableRequest.HttpMethod = request.Method;
         }
 
@@ -81,7 +77,7 @@ namespace artm.Fetcher.Touch.Services
                                 tcs.SetResult(new FetcherWebResponse()
                                 {
                                     IsSuccess = error == null,
-                                    Error = new Exception(error.ToString()),
+                                    Error = new Exception(error?.ToString()),
                                     Body = data?.ToString()
                                 });
                             });
