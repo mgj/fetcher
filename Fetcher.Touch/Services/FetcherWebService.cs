@@ -14,14 +14,24 @@ namespace artm.Fetcher.Touch.Services
         {
             var tcs = new TaskCompletionSource<FetcherWebResponse>();
 
-            var mutableRequest = new NSMutableUrlRequest(uri);
+            try
+            {
+                var mutableRequest = new NSMutableUrlRequest(uri);
+
+                PrepareMethod(request, mutableRequest);
+                PrepareHeaders(request, mutableRequest);
+
+                NSUrlSessionDataTask task = CreateUrlSessionDataTask(tcs, mutableRequest);
+                task.Resume();
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
             
-            PrepareMethod(request, mutableRequest);
-            PrepareHeaders(request, mutableRequest);
 
-            NSUrlSessionDataTask task = CreateUrlSessionDataTask(tcs, mutableRequest);
 
-            task.Resume();
             return tcs.Task.Result;
         }
 
@@ -71,6 +81,7 @@ namespace artm.Fetcher.Touch.Services
                                 tcs.SetResult(new FetcherWebResponse()
                                 {
                                     IsSuccess = error == null,
+                                    Error = new Exception(error.ToString()),
                                     Body = data?.ToString()
                                 });
                             });

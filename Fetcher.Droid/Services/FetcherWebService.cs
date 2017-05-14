@@ -29,30 +29,37 @@ namespace artm.Fetcher.Droid.Services
                 request = new Request.Builder().Url(uri.OriginalString).Build();
                 response = Client.NewCall(request).Execute();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return CreateFetcherWebResponseError();
+                return CreateFetcherWebResponseError(ex);
             }
 
             if (response == null)
             {
-                return CreateFetcherWebResponseError();
+                return CreateFetcherWebResponseError("Could not get a response, even though nothing exceptional happened");
             }
             else
             {
                 return new FetcherWebResponse()
                 {
                     IsSuccess = response.IsSuccessful,
+                    Error = new Exception(response.Message()),
                     Body = response.Body().String()
                 };
             }
         }
 
-        private static FetcherWebResponse CreateFetcherWebResponseError()
+        private static FetcherWebResponse CreateFetcherWebResponseError(string message)
+        {
+            return CreateFetcherWebResponseError(new Exception(message));
+        }
+
+        private static FetcherWebResponse CreateFetcherWebResponseError(Exception exception)
         {
             return new FetcherWebResponse()
             {
                 IsSuccess = false,
+                Error = exception,
                 Body = string.Empty
             };
         }
@@ -75,7 +82,7 @@ namespace artm.Fetcher.Droid.Services
             }
             catch (Exception ex)
             {
-                return CreateFetcherWebResponseError();
+                return CreateFetcherWebResponseError(ex);
             }
         }
 

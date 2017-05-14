@@ -20,7 +20,17 @@ namespace artm.Fetcher.Core.Services.Tosser
 
         public FetcherWebResponse Toss(Uri url, HttpWebRequest request)
         {
-            return _web.DoPlatformRequest(url, request);
+            FetcherWebResponse result = null;
+            try
+            {
+                result = _web.DoPlatformRequest(url, request);
+            }
+            catch (Exception ex )
+            {
+
+                throw;
+            }
+            return result;
         }
     }
 }
