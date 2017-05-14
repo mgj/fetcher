@@ -19,17 +19,12 @@ namespace artm.Fetcher.Core.Services.Tosser
             WebService = webService;
         }
 
-        public FetcherWebResponse Toss(Uri url)
+        public FetcherWebResponse Toss(FetcherWebRequest request)
         {
-            if (url == null) throw new NullReferenceException("Url");
+            if (request == null) throw new NullReferenceException("request");
 
             FetcherWebResponse result = CreateFetcherWebResponseError(new Exception("Toss error"));
-            FetcherWebRequest request = new FetcherWebRequest()
-            {
-                Method = "POST",
-                Url = url
-            };
-
+            
             try
             {
                 var policy = Policy
@@ -37,11 +32,11 @@ namespace artm.Fetcher.Core.Services.Tosser
                 .WaitAndRetry(5, retryAttempt =>
                     TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
 
-                return policy.Execute(() => WebService.DoPlatformRequest(url, request));
+                return policy.Execute(() => WebService.DoPlatformRequest(request.Url, request));
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine("Failed to toss to url: " + url.OriginalString);
+                System.Diagnostics.Debug.WriteLine("Failed to toss to url: " + request.Url.OriginalString);
                 result = CreateFetcherWebResponseError(ex);
             }
             return result;

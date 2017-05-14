@@ -9,6 +9,7 @@ using artm.Fetcher.Core.Entities;
 using System.Threading.Tasks;
 using artm.Fetcher.Core.Services.Tosser;
 using System.Net;
+using artm.Fetcher.Core.Models;
 
 namespace Fetcher.Playground.Touch.Views
 {
@@ -51,7 +52,7 @@ namespace Fetcher.Playground.Touch.Views
 
             try
             {
-                var response = _tosser.Toss(url);
+                var response = _tosser.Toss(new FetcherWebRequest() { Url = url });
                 var debug = 42;
             }
             catch (Exception ex)

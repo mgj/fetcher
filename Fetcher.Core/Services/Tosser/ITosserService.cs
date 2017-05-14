@@ -11,6 +11,6 @@ namespace artm.Fetcher.Core.Services.Tosser
 {
     public interface ITosserService
     {
-        FetcherWebResponse Toss(Uri url);
+        FetcherWebResponse Toss(FetcherWebRequest request);
     }
 }

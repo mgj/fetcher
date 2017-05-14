@@ -1,4 +1,5 @@
-﻿using artm.Fetcher.Core.Services.Tosser;
+﻿using artm.Fetcher.Core.Models;
+using artm.Fetcher.Core.Services.Tosser;
 using artm.Fetcher.Core.Tests.Services.Common;
 using NUnit.Framework;
 using System;
@@ -18,7 +19,7 @@ namespace artm.Fetcher.Core.Tests.Services.Tosser
         public void Toss_Sunshine_IsSuccess()
         {
             var sut = new TosserService(FetcherMockFactory.IFetcherWebServiceInternetOn().Object);
-            var response = sut.Toss(URL);
+            var response = sut.Toss(new FetcherWebRequest() { Url = URL });
 
             Assert.IsTrue(response.IsSuccess);
         }

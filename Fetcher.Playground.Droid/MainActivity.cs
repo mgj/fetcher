@@ -9,6 +9,7 @@ using System.Diagnostics;
 using artm.Fetcher.Core.Services.Tosser;
 using System;
 using System.Net;
+using artm.Fetcher.Core.Models;
 
 namespace Fetcher.Playground.Droid
 {
@@ -39,7 +40,7 @@ namespace Fetcher.Playground.Droid
 
             try
             {
-                var response = _tosser.Toss(url);
+                var response = _tosser.Toss(new FetcherWebRequest() { Url = url });
                 var debug = 42;
             }
             catch (Exception ex)
