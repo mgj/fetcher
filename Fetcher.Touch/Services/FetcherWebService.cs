@@ -4,6 +4,7 @@ using Foundation;
 using System;
 using System.Threading.Tasks;
 using System.Net;
+using System.Linq;
 
 namespace artm.Fetcher.Touch.Services
 {
@@ -11,7 +12,42 @@ namespace artm.Fetcher.Touch.Services
     {
         public FetcherWebResponse DoPlatformRequest(Uri uri, HttpWebRequest request)
         {
-            throw new NotImplementedException();
+            var tcs = new TaskCompletionSource<FetcherWebResponse>();
+
+            var mutableRequest = new NSMutableUrlRequest(uri);
+            
+            PrepareMethod(request, mutableRequest);
+            PrepareHeaders(request, mutableRequest);
+
+            NSUrlSessionDataTask task = CreateUrlSessionDataTask(tcs, mutableRequest);
+
+            task.Resume();
+            return tcs.Task.Result;
+        }
+
+        private void PrepareHeaders(HttpWebRequest request, NSMutableUrlRequest mutableRequest)
+        {
+            var dictionary = new System.Collections.Generic.Dictionary<string, string>();
+
+            for (int i = 0; i < request?.Headers?.AllKeys?.Length; i++)
+            {
+                var headKey = request.Headers.GetKey(i);
+                var headValues = request.Headers.GetValues(i);
+                var headValue = string.Empty;
+                for (int j = 0; j < headValues.Length; j++)
+                {
+                    headValue += headValues[j];
+                }
+                dictionary.Add(headKey, headValue);
+            }
+
+            mutableRequest.Headers = NSDictionary.FromObjectsAndKeys(dictionary?.Values?.ToArray()
+                                               , dictionary?.Keys?.ToArray());
+        }
+
+        private void PrepareMethod(HttpWebRequest request, NSMutableUrlRequest mutableRequest)
+        {
+            mutableRequest.HttpMethod = request.Method;
         }
 
         public FetcherWebResponse DoPlatformWebRequest(Uri uri)
@@ -19,22 +55,25 @@ namespace artm.Fetcher.Touch.Services
             var tcs = new TaskCompletionSource<FetcherWebResponse>();
 
             var request = new NSMutableUrlRequest(uri);
-            var session = NSUrlSession.SharedSession;
             request.HttpMethod = "GET";
-
-            var task = session.CreateDataTask(request,
-                (data, response, error) =>
-                {
-                    var resp = response as NSHttpUrlResponse;
-                    tcs.SetResult(new FetcherWebResponse()
-                    {
-                        IsSuccess = error == null,
-                        Body = data?.ToString()
-                    });
-                });
+            NSUrlSessionDataTask task = CreateUrlSessionDataTask(tcs, request);
 
             task.Resume();
             return tcs.Task.Result;
+        }
+
+        private static NSUrlSessionDataTask CreateUrlSessionDataTask(TaskCompletionSource<FetcherWebResponse> tcs, NSMutableUrlRequest request)
+        {
+            return NSUrlSession.SharedSession.CreateDataTask(request,
+                            (data, response, error) =>
+                            {
+                                var resp = response as NSHttpUrlResponse;
+                                tcs.SetResult(new FetcherWebResponse()
+                                {
+                                    IsSuccess = error == null,
+                                    Body = data?.ToString()
+                                });
+                            });
         }
     }
 }
