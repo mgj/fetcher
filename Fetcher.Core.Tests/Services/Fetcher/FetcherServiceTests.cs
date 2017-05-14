@@ -198,15 +198,14 @@ namespace artm.Fetcher.Core.Tests.Services
         }
 
         [Test]
-        public void Fetch_MultithreadedToSameUrl_OnlyOneWebRequestIsMade()
+        public async Task Fetch_MultithreadedToSameUrl_OnlyOneWebRequestIsMade()
         {
             const int THREAD_COUNT = 10;
 
             var sut = new FetcherServiceStub();
             var tasks = GenerateFetchTasks(sut, THREAD_COUNT, new Uri("https://www.google.com"));
-            var taskResults = new List<IUrlCacheInfo>();
 
-            var result = Parallel.ForEach(tasks, item => taskResults.Add(item.Result));
+            var results = await Task.WhenAll(tasks.ToArray());
 
             sut.WebServiceMock.Verify(x => x.DoPlatformWebRequest(It.IsAny<Uri>()), Times.Once);
         }

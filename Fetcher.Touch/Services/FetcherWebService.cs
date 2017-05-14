@@ -36,8 +36,16 @@ namespace artm.Fetcher.Touch.Services
         private void PrepareMethod(FetcherWebRequest request)
         {
             if (request == null || _mutableRequest == null) return;
-
             _mutableRequest.HttpMethod = request.Method;
+
+            PrepareContentType(request);
+        }
+
+        private void PrepareContentType(FetcherWebRequest request)
+        {
+            if (request == null || string.IsNullOrEmpty(request.ContentType)) return;
+
+            _mutableRequest.SetValueForKey(new NSString("content-type"), new NSString(request.ContentType));
         }
 
         public override FetcherWebResponse DoPlatformWebRequest(Uri uri)

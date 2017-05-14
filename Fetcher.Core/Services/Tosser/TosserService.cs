@@ -22,7 +22,10 @@ namespace artm.Fetcher.Core.Services.Tosser
         public FetcherWebResponse Toss(FetcherWebRequest request)
         {
             if (request == null) throw new NullReferenceException("request");
-
+            if(string.IsNullOrEmpty(request.Method) == true)
+            {
+                request.Method = "POST";
+            }
             FetcherWebResponse result = CreateFetcherWebResponseError(new Exception("Toss error"));
             
             try

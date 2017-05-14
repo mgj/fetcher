@@ -44,7 +44,6 @@ namespace Fetcher.Playground.Droid
             }
             catch (Exception)
             {
-
                 throw;
             }
         }

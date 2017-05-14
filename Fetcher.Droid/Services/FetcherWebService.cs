@@ -96,12 +96,7 @@ namespace artm.Fetcher.Droid.Services
         private static void PrepareMethod(FetcherWebRequest request, Request.Builder builder)
         {
             if (request == null || builder == null) return;
-
-            MediaType contentType = null;
-            if (request.ContentType != null)
-            {
-                contentType = MediaType.Parse(request.ContentType);
-            }
+            MediaType contentType = PrepareContentType(request);
 
             var requestBody = RequestBody.Create(contentType, new byte[0]);
             switch (request.Method)
@@ -115,6 +110,17 @@ namespace artm.Fetcher.Droid.Services
                 default:
                     break;
             }
+        }
+
+        private static MediaType PrepareContentType(FetcherWebRequest request)
+        {
+            MediaType contentType = null;
+            if (request != null && string.IsNullOrEmpty(request.ContentType) == false)
+            {
+                contentType = MediaType.Parse(request.ContentType);
+            }
+
+            return contentType;
         }
 
         protected override void AddHeader(string key, string value)
