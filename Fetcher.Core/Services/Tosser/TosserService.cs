@@ -34,7 +34,7 @@ namespace artm.Fetcher.Core.Services.Tosser
             {
                 var policy = Policy
                 .HandleResult<FetcherWebResponse>(r => r.IsSuccess == false)
-                .WaitAndRetryAsync(5, retryAttempt =>
+                .WaitAndRetry(5, retryAttempt =>
                     TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
 
                 return policy.Execute(() => WebService.DoPlatformRequest(url, request));
