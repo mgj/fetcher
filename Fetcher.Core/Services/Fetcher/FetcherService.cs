@@ -10,12 +10,12 @@ namespace artm.Fetcher.Core.Services
     {
         public readonly TimeSpan CACHE_FRESHNESS_THRESHOLD = TimeSpan.FromDays(1);
         
-        protected IFetcherWebService Webservice { get; set; }
+        protected IFetcherWebService WebService { get; set; }
         protected IFetcherRepositoryService Repository { get; set; }
 
         public FetcherService(IFetcherWebService webService, IFetcherRepositoryService repositoryService)
         {
-            Webservice = webService;
+            WebService = webService;
             Repository = repositoryService;
         }
 
@@ -93,7 +93,7 @@ namespace artm.Fetcher.Core.Services
 
         private async Task<FetcherWebResponse> DoWebRequest(Uri uri)
         {
-            return await Task.FromResult(Webservice.DoPlatformWebRequest(uri));
+            return await Task.FromResult(WebService.DoPlatformWebRequest(uri));
         }
 
         public void Preload(Uri url, string response)

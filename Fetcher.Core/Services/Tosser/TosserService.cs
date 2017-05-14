@@ -1,5 +1,6 @@
 ﻿using artm.Fetcher.Core.Entities;
 using artm.Fetcher.Core.Models;
+using Polly;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,18 +12,18 @@ namespace artm.Fetcher.Core.Services.Tosser
 {
     public class TosserService : ITosserService
     {
-        private readonly IFetcherWebService _web;
+        protected IFetcherWebService WebService { get; set; }
 
         public TosserService(IFetcherWebService webService)
         {
-            _web = webService;
+            WebService = webService;
         }
 
         public FetcherWebResponse Toss(Uri url)
         {
             if (url == null) throw new NullReferenceException("Url");
 
-            FetcherWebResponse result = null;
+            FetcherWebResponse result = CreateFetcherWebResponseError(new Exception("Toss error"));
             FetcherWebRequest request = new FetcherWebRequest()
             {
                 Method = "POST",
@@ -31,14 +32,29 @@ namespace artm.Fetcher.Core.Services.Tosser
 
             try
             {
-                result = _web.DoPlatformRequest(url, request);
+                var policy = Policy
+                .HandleResult<FetcherWebResponse>(r => r.IsSuccess == false)
+                .WaitAndRetryAsync(5, retryAttempt =>
+                    TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
+
+                return policy.Execute(() => WebService.DoPlatformRequest(url, request));
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("Failed to toss to url: " + url.OriginalString);
-                throw;
+                result = CreateFetcherWebResponseError(ex);
             }
             return result;
+        }
+
+        private static FetcherWebResponse CreateFetcherWebResponseError(Exception exception)
+        {
+            return new FetcherWebResponse()
+            {
+                IsSuccess = false,
+                Error = exception,
+                Body = string.Empty
+            };
         }
     }
 }

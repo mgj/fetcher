@@ -11,13 +11,13 @@ namespace artm.Fetcher.Core.Tests.Services.Mocks
         public FetcherServiceStub() : base(null, new FetcherRepositoryService(FetcherMockFactory.IFetcherRepositoryStoragePathServiceMemory().Object))
         {
             WebServiceMock = FetcherMockFactory.IFetcherWebServiceInternetOn();
-            Webservice = WebServiceMock.Object;
+            WebService = WebServiceMock.Object;
         }
 
         public FetcherServiceStub(IFetcherRepositoryService repository) : base(null, repository)
         {
             WebServiceMock = FetcherMockFactory.IFetcherWebServiceInternetOn();
-            Webservice = WebServiceMock.Object;
+            WebService = WebServiceMock.Object;
         }
 
         public IFetcherRepositoryService RepositoryService
@@ -35,13 +35,13 @@ namespace artm.Fetcher.Core.Tests.Services.Mocks
         public FetcherServiceStub(Mock<IFetcherWebService> web) : base(web.Object, new FetcherRepositoryService(FetcherMockFactory.IFetcherRepositoryStoragePathServiceMemory().Object))
         {
             WebServiceMock = web;
-            base.Webservice = WebServiceMock.Object;
+            base.WebService = WebServiceMock.Object;
         }
         
         public FetcherServiceStub(Mock<IFetcherRepositoryService> repository) : base(null, repository.Object)
         {
             WebServiceMock = FetcherMockFactory.IFetcherWebServiceInternetOn();
-            Webservice = WebServiceMock.Object;
+            WebService = WebServiceMock.Object;
 
             RepositoryMock = repository;
         }
