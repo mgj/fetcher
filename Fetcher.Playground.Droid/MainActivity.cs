@@ -34,16 +34,15 @@ namespace Fetcher.Playground.Droid
             Task.Run(() => DoToss());
         }
 
-        private async Task DoToss()
+        private void DoToss()
         {
             var url = new Uri("http://requestb.in/1mjfqsz1");
 
             try
             {
                 var response = _tosser.Toss(new FetcherWebRequest() { Url = url });
-                var debug = 42;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
                 throw;
@@ -67,9 +66,8 @@ namespace Fetcher.Playground.Droid
                 //_fetcher.Preload(url, "<html>Hello world!</html>");
 
                 IUrlCacheInfo response = await _fetcher.Fetch(url);
-                var debug = 42;
             }
-            catch (System.Exception ex)
+            catch (Exception)
             {
                 throw;
             }

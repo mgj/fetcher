@@ -46,16 +46,15 @@ namespace Fetcher.Playground.Touch.Views
             DoToss();
         }
 
-        private async Task DoToss()
+        private void DoToss()
         {
             var url = new Uri("http://requestb.in/1mjfqsz1");
 
             try
             {
                 var response = _tosser.Toss(new FetcherWebRequest() { Url = url });
-                var debug = 42;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
                 throw;
