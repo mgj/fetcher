@@ -1,6 +1,7 @@
 ﻿using artm.Fetcher.Core.Entities;
 using artm.Fetcher.Core.Models;
 using artm.Fetcher.Core.Services;
+using artm.Fetcher.Core.Tests.Services.Common;
 using artm.Fetcher.Core.Tests.Services.Mocks;
 using artm.Fetcher.Core.Tests.Services.Stubs;
 using Moq;
@@ -21,7 +22,7 @@ namespace artm.Fetcher.Core.Tests.Services
         public async Task Fetch_Sunshine_TriesToFetchFromWeb()
         {
             var web = new Mock<IFetcherWebService>();
-            var sut = new FetcherServiceMock();
+            var sut = new FetcherServiceStub();
             
             var response = await sut.Fetch(new Uri(URL));
 
@@ -32,7 +33,7 @@ namespace artm.Fetcher.Core.Tests.Services
         public async Task Fetch_NoEntries_RepositoryInsertUrlIsCalled()
         {
             var repository = new Mock<IFetcherRepositoryService>();
-            var sut = new FetcherServiceMock(repository.Object);
+            var sut = new FetcherServiceStub(repository.Object);
 
             var response = await sut.Fetch(new Uri(URL));
 
@@ -44,7 +45,7 @@ namespace artm.Fetcher.Core.Tests.Services
         {
             var repository = new Mock<IFetcherRepositoryService>();
             repository.Setup(x => x.GetEntryForUrl(It.IsAny<Uri>())).Returns(() => new UrlCacheInfoMock() { Url = URL, Created = DateTimeOffset.UtcNow, LastAccessed = DateTimeOffset.UtcNow, LastUpdated = DateTimeOffset.UtcNow, Response = "myResponse" });
-            var sut = new FetcherServiceMock(repository.Object);
+            var sut = new FetcherServiceStub(repository.Object);
 
             var response = await sut.Fetch(new Uri(URL));
             await sut.Fetch(new Uri(URL));
@@ -56,7 +57,7 @@ namespace artm.Fetcher.Core.Tests.Services
         [Test]
         public async Task Fetch_MultipleCallsToSameUrl_LastAccessedIsUpdated()
         {
-            var sut = new FetcherServiceMock();
+            var sut = new FetcherServiceStub();
 
             var response1 = await sut.Fetch(new Uri(URL));
             var access1 = response1.LastAccessed.ToString();
@@ -75,7 +76,7 @@ namespace artm.Fetcher.Core.Tests.Services
             var created = DateTimeOffset.UtcNow - TimeSpan.FromDays(100);
             repository.Setup(x => x.GetEntryForUrl(It.IsAny<Uri>())).Returns(() => new UrlCacheInfoMock() { Url = URL, Created = created, LastAccessed = DateTimeOffset.UtcNow, LastUpdated = created, Response = "myResponse" });
 
-            var sut = new FetcherServiceMock(repository.Object);
+            var sut = new FetcherServiceStub(repository.Object);
 
             var response = await sut.Fetch(new Uri(URL));
 
@@ -89,7 +90,7 @@ namespace artm.Fetcher.Core.Tests.Services
             var created = DateTimeOffset.UtcNow - TimeSpan.FromMilliseconds(1);
             repository.Setup(x => x.GetEntryForUrl(It.IsAny<Uri>())).Returns(() => new UrlCacheInfoMock() { Url = URL, Created = created, LastAccessed = DateTimeOffset.UtcNow, LastUpdated = created, Response = "myResponse" });
 
-            var sut = new FetcherServiceMock(repository.Object);
+            var sut = new FetcherServiceStub(repository.Object);
 
             var response = await sut.Fetch(new Uri(URL));
 
@@ -99,8 +100,7 @@ namespace artm.Fetcher.Core.Tests.Services
         [Test]
         public async Task Preload_InternetUnavailableAndEmptyDatabase_PreloadedDataIsReturned()
         {
-            var web = FetcherWebServiceInternetUnavailableMockFactory();
-            var sut = new FetcherServiceMock(web);
+            var sut = new FetcherServiceStub(FetcherMockFactory.IFetcherWebServiceInternetOff());
             const string response = "myPreloadResponse";
 
             sut.Preload(new Uri(URL), response);
@@ -113,8 +113,7 @@ namespace artm.Fetcher.Core.Tests.Services
         [Test]
         public async Task Preload_InternetUnavailable_PreloadedDataIsConsideredInvalidated()
         {
-            var web = FetcherWebServiceInternetUnavailableMockFactory();
-            var sut = new FetcherServiceMock(web);
+            var sut = new FetcherServiceStub(FetcherMockFactory.IFetcherWebServiceInternetOff());
             const string response = "myPreloadResponse";
 
             sut.Preload(new Uri(URL), response);
@@ -128,8 +127,7 @@ namespace artm.Fetcher.Core.Tests.Services
         [Test]
         public async Task Fetch_EmptyDatabaseNoPreloadInternetUnavailable_NullIsReturned()
         {
-            var web = FetcherWebServiceInternetUnavailableMockFactory();
-            var sut = new FetcherServiceMock(web);
+            var sut = new FetcherServiceStub(FetcherMockFactory.IFetcherWebServiceInternetOff());
 
             var hero = await sut.Fetch(new Uri(URL));
 
@@ -139,9 +137,7 @@ namespace artm.Fetcher.Core.Tests.Services
         [Test]
         public async Task Fetch_PreloadedDataInternetUnavailable_FetchedFromIsPreloaded()
         {
-            var web = FetcherWebServiceInternetUnavailableMockFactory();
-            var sut = new FetcherServiceMock(web);
-
+            var sut = new FetcherServiceStub(FetcherMockFactory.IFetcherWebServiceInternetOff());
             const string RESPONSE_STRING = "Fetch_PreloadedDataInternetUnavailable_FetchedFromIsPreloaded";
 
             sut.Preload(new Uri(URL), RESPONSE_STRING);
@@ -155,7 +151,7 @@ namespace artm.Fetcher.Core.Tests.Services
         [Test]
         public async Task Fetch_PreloadedDataWithInternet_FetchedFromWeb()
         {
-            var sut = new FetcherServiceMock();
+            var sut = new FetcherServiceStub();
 
             const string RESPONSE_STRING = "Fetch_PreloadedDataWithInternet_FetchedFromWeb";
 
@@ -170,7 +166,7 @@ namespace artm.Fetcher.Core.Tests.Services
         [Test]
         public async Task Fetch_RecentlyUpdated_FetchedFromLocalCache()
         {
-            var sut = new FetcherServiceMock();
+            var sut = new FetcherServiceStub();
 
             const string RESPONSE_STRING = "Fetch_RecentlyUpdated_FetchedFromLocalCache";
             
@@ -185,7 +181,7 @@ namespace artm.Fetcher.Core.Tests.Services
         [Test]
         public async Task Fetch_RecentlyUpdatedManyTimes_FetchedFromLocalCache()
         {
-            var sut = new FetcherServiceMock();
+            var sut = new FetcherServiceStub();
 
             const string RESPONSE_STRING = "Fetch_RecentlyUpdated_FetchedFromLocalCache";
 
@@ -206,7 +202,7 @@ namespace artm.Fetcher.Core.Tests.Services
         {
             const int THREAD_COUNT = 10;
 
-            var sut = new FetcherServiceMock();
+            var sut = new FetcherServiceStub();
             var tasks = GenerateFetchTasks(sut, THREAD_COUNT, new Uri("https://www.google.com"));
             var taskResults = new List<IUrlCacheInfo>();
 
@@ -220,7 +216,7 @@ namespace artm.Fetcher.Core.Tests.Services
         {
             const int THREAD_COUNT = 10;
 
-            var sut = new FetcherServiceMock();
+            var sut = new FetcherServiceStub();
             var tasks = GenerateFetchTasks(sut, THREAD_COUNT);
             var taskResults = new List<IUrlCacheInfo>();
 
@@ -236,7 +232,7 @@ namespace artm.Fetcher.Core.Tests.Services
         {
             const int THREAD_COUNT = 10;
 
-            var sut = new FetcherServiceMock(new FetcherRepositoryServiceStub(FetcherServiceMock.GetPathServiceMemory()));
+            var sut = new FetcherServiceStub(new FetcherRepositoryServiceStub());
             var tasks = GenerateFetchTasks(sut, THREAD_COUNT, new Uri("https://www.google.com"));
             var taskResults = new List<IUrlCacheInfo>();
 
@@ -251,7 +247,7 @@ namespace artm.Fetcher.Core.Tests.Services
         {
             const int THREAD_COUNT = 10;
 
-            var sut = new FetcherServiceMock(new FetcherRepositoryServiceStub(FetcherServiceMock.GetPathServiceMemory()));
+            var sut = new FetcherServiceStub(new FetcherRepositoryServiceStub());
             var tasks = GenerateFetchTasks(sut, THREAD_COUNT);
             var taskResults = new List<IUrlCacheInfo>();
 
@@ -281,14 +277,6 @@ namespace artm.Fetcher.Core.Tests.Services
         private static void AddTask(FetcherService fetcher, List<Task<IUrlCacheInfo>> result, Uri url)
         {
             result.Add(Task.FromResult(fetcher.Fetch(url)).Result);
-        }
-
-
-        private static Mock<IFetcherWebService> FetcherWebServiceInternetUnavailableMockFactory()
-        {
-            var web = new Mock<IFetcherWebService>();
-            web.Setup(x => x.DoPlatformWebRequest(It.IsAny<Uri>())).Throws(new Exception("mock web exception"));
-            return web;
         }
     }
 }

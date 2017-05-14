@@ -3,12 +3,15 @@ using artm.Fetcher.Core.Services;
 using Square.OkHttp;
 using artm.Fetcher.Core.Models;
 using System.Net;
+using System.Linq;
+using artm.Fetcher.Core.Services.Fetcher;
 
 namespace artm.Fetcher.Droid.Services
 {
-    public class FetcherWebService : IFetcherWebService
+    public class FetcherWebService : FetcherWebServiceBase, IFetcherWebService
     {
         private OkHttpClient _client;
+        private Headers.Builder _headerBuilder;
 
         protected OkHttpClient Client
         {
@@ -19,7 +22,7 @@ namespace artm.Fetcher.Droid.Services
             }
         }
 
-        public FetcherWebResponse DoPlatformWebRequest(Uri uri)
+        public override FetcherWebResponse DoPlatformWebRequest(Uri uri)
         {
             Request request = null;
             Response response = null;
@@ -64,16 +67,20 @@ namespace artm.Fetcher.Droid.Services
             };
         }
 
-        public FetcherWebResponse DoPlatformRequest(Uri uri, HttpWebRequest request)
+        public override FetcherWebResponse DoPlatformRequest(Uri uri, FetcherWebRequest request)
         {
-            Request.Builder builder = new Request.Builder();
-            builder.Url(uri.OriginalString);
-            PrepareMethod(request, builder);
-            PrepareHeaders(request, builder);
+            var requestBuilder = new Request.Builder();
+            requestBuilder.Url(uri.OriginalString);
+
+            PrepareMethod(request, requestBuilder);
+
+            _headerBuilder = new Headers.Builder();
+            PrepareHeaders(request);
+            requestBuilder.Headers(_headerBuilder.Build());
 
             try
             {
-                var response = Client.NewCall(builder.Build()).Execute();
+                var response = Client.NewCall(requestBuilder.Build()).Execute();
                 return new FetcherWebResponse()
                 {
                     IsSuccess = response.IsSuccessful,
@@ -86,7 +93,7 @@ namespace artm.Fetcher.Droid.Services
             }
         }
 
-        private static void PrepareMethod(HttpWebRequest request, Request.Builder builder)
+        private static void PrepareMethod(FetcherWebRequest request, Request.Builder builder)
         {
             if (request == null || builder == null) return;
 
@@ -110,24 +117,9 @@ namespace artm.Fetcher.Droid.Services
             }
         }
 
-        private static void PrepareHeaders(HttpWebRequest request, Request.Builder builder)
+        protected override void AddHeader(string key, string value)
         {
-            if (request == null || request.Headers == null || request.Headers.AllKeys == null) return;
-
-            var headerBuilder = new Headers.Builder();
-            for (int i = 0; i < request?.Headers?.AllKeys?.Length; i++)
-            {
-                var headKey = request.Headers.GetKey(i);
-                var headValues = request.Headers.GetValues(i);
-                var headValue = string.Empty;
-                for (int j = 0; j < headValues.Length; j++)
-                {
-                    headValue += headValues[j];
-
-                }
-                headerBuilder.Add(headKey, headValue);
-            }
-            builder.Headers(headerBuilder.Build());
+            _headerBuilder.Add(key, value);
         }
     }
 }

@@ -8,6 +8,6 @@ namespace artm.Fetcher.Core.Services
     {
         FetcherWebResponse DoPlatformWebRequest(Uri uri);
 
-        FetcherWebResponse DoPlatformRequest(Uri uri, HttpWebRequest request);
+        FetcherWebResponse DoPlatformRequest(Uri uri, FetcherWebRequest request);
     }
 }

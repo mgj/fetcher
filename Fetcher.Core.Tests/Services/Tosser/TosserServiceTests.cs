@@ -1,4 +1,5 @@
 ﻿using artm.Fetcher.Core.Services.Tosser;
+using artm.Fetcher.Core.Tests.Services.Common;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -11,12 +12,15 @@ namespace artm.Fetcher.Core.Tests.Services.Tosser
     [TestFixture]
     public class TosserServiceTests
     {
-        [Test]
-        public async Task Toss_Sunshine_ReturnsResult()
-        {
-            //var sut = new TosserService();
+        private readonly Uri URL = new Uri("https://www.google.com");
 
-            //sut.
+        [Test]
+        public void Toss_Sunshine_ReturnsResult()
+        {
+            var sut = new TosserService(FetcherMockFactory.IFetcherWebServiceInternetOn().Object);
+            var response = sut.Toss(URL);
+
+            Assert.IsTrue(response.IsSuccess);
         }
     }
 }

@@ -5,58 +5,42 @@ using System;
 using System.Threading.Tasks;
 using System.Net;
 using System.Linq;
+using artm.Fetcher.Core.Services.Fetcher;
 
 namespace artm.Fetcher.Touch.Services
 {
-    public class FetcherWebService : IFetcherWebService
+    public class FetcherWebService : FetcherWebServiceBase, IFetcherWebService
     {
-        public FetcherWebResponse DoPlatformRequest(Uri uri, HttpWebRequest request)
+        private NSMutableUrlRequest _mutableRequest;
+
+        public override FetcherWebResponse DoPlatformRequest(Uri uri, FetcherWebRequest request)
         {
             var tcs = new TaskCompletionSource<FetcherWebResponse>();
 
+            _mutableRequest = new NSMutableUrlRequest(uri);
 
+            PrepareHeaders(request);
+            PrepareMethod(request);
 
-            var mutableRequest = new NSMutableUrlRequest(uri);
-
-            PrepareMethod(request, mutableRequest);
-            PrepareHeaders(request, mutableRequest);
-
-            NSUrlSessionDataTask task = CreateUrlSessionDataTask(tcs, mutableRequest);
+            NSUrlSessionDataTask task = CreateUrlSessionDataTask(tcs, _mutableRequest);
             task.Resume();
 
             return tcs.Task.Result;
         }
 
-        private void PrepareHeaders(HttpWebRequest request, NSMutableUrlRequest mutableRequest)
+        protected override void AddHeader(string key, string value)
         {
-            if (request == null || request.Headers == null || request.Headers.AllKeys == null) return;
-
-            var dictionary = new System.Collections.Generic.Dictionary<string, string>();
-
-            for (int i = 0; i < request.Headers.AllKeys.Length; i++)
-            {
-                var headKey = request.Headers.GetKey(i);
-                var headValues = request.Headers.GetValues(i);
-                var headValue = string.Empty;
-                for (int j = 0; j < headValues.Length; j++)
-                {
-                    headValue += headValues[j];
-                }
-                dictionary.Add(headKey, headValue);
-            }
-
-            mutableRequest.Headers = NSDictionary.FromObjectsAndKeys(dictionary?.Values?.ToArray()
-                                               , dictionary?.Keys?.ToArray());
+            _mutableRequest.SetValueForKey(new NSString(key), new NSString(value));
         }
 
-        private void PrepareMethod(HttpWebRequest request, NSMutableUrlRequest mutableRequest)
+        private void PrepareMethod(FetcherWebRequest request)
         {
-            if (request == null || mutableRequest == null) return;
+            if (request == null || _mutableRequest == null) return;
 
-            mutableRequest.HttpMethod = request.Method;
+            _mutableRequest.HttpMethod = request.Method;
         }
 
-        public FetcherWebResponse DoPlatformWebRequest(Uri uri)
+        public override FetcherWebResponse DoPlatformWebRequest(Uri uri)
         {
             var tcs = new TaskCompletionSource<FetcherWebResponse>();
 
@@ -82,5 +66,8 @@ namespace artm.Fetcher.Touch.Services
                                 });
                             });
         }
+
+        
+
     }
 }

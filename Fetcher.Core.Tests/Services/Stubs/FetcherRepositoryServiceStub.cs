@@ -1,4 +1,5 @@
 ﻿using artm.Fetcher.Core.Services;
+using artm.Fetcher.Core.Tests.Services.Common;
 using SQLite;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ namespace artm.Fetcher.Core.Tests.Services.Stubs
 {
     public class FetcherRepositoryServiceStub : FetcherRepositoryService
     {
-        public FetcherRepositoryServiceStub(IFetcherRepositoryStoragePathService pathService) : base(pathService)
+        public FetcherRepositoryServiceStub() : base(FetcherMockFactory.IFetcherRepositoryStoragePathServiceMemory().Object)
         {
         }
 

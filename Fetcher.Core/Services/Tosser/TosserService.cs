@@ -18,16 +18,24 @@ namespace artm.Fetcher.Core.Services.Tosser
             _web = webService;
         }
 
-        public FetcherWebResponse Toss(Uri url, HttpWebRequest request)
+        public FetcherWebResponse Toss(Uri url)
         {
+            if (url == null) throw new NullReferenceException("Url");
+
             FetcherWebResponse result = null;
+            FetcherWebRequest request = new FetcherWebRequest()
+            {
+                Method = "POST",
+                Url = url
+            };
+
             try
             {
                 result = _web.DoPlatformRequest(url, request);
             }
-            catch (Exception ex )
+            catch (Exception ex)
             {
-
+                System.Diagnostics.Debug.WriteLine("Failed to toss to url: " + url.OriginalString);
                 throw;
             }
             return result;

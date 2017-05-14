@@ -49,12 +49,9 @@ namespace Fetcher.Playground.Touch.Views
         {
             var url = new Uri("http://requestb.in/1mjfqsz1");
 
-            var request = new HttpWebRequest(url);
-            request.Method = "POST";
-
             try
             {
-                var response = _tosser.Toss(url, request);
+                var response = _tosser.Toss(url);
                 var debug = 42;
             }
             catch (Exception ex)

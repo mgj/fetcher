@@ -38,10 +38,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Entities\CacheSourceType.cs" />
+    <Compile Include="Models\FetcherWebRequest.cs" />
     <Compile Include="Models\FetcherWebResponse.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\Fetcher\FetcherRepositoryService.cs" />
     <Compile Include="Services\Fetcher\FetcherService.cs" />
+    <Compile Include="Services\Fetcher\FetcherWebServiceBase.cs" />
     <Compile Include="Services\Fetcher\IFetcherRepositoryService.cs" />
     <Compile Include="Services\Fetcher\IFetcherRepositoryStoragePathService.cs" />
     <Compile Include="Services\Fetcher\IFetcherService.cs" />
