@@ -125,6 +125,9 @@ namespace artm.Fetcher.Droid.Services
                 case "CONNECT":
                     builder.Method("CONNECT", requestBody);
                     break;
+                case "PATCH":
+                    builder.Method("PATCH", requestBody);
+                    break;
                 default:
                     break;
             }
