@@ -42,8 +42,8 @@ namespace Fetcher.Playground.Touch.Views
                 label.Height().EqualTo(50)
                 );
 
-            //DoFetch();
-            Task.Run(() => DoToss());
+            Task.Run(() => DoFetch());
+            //Task.Run(() => DoToss());
         }
 
         private void DoToss()
@@ -51,7 +51,7 @@ namespace Fetcher.Playground.Touch.Views
             var url = new Uri("http://requestb.in/1mjfqsz1");
             try
             {
-                var response = _tosser.Toss(new FetcherWebRequest() { Url = url });
+                var response = _tosser.Toss(new FetcherWebRequest() { Url = url, Method = "POST" });
             }
             catch (Exception)
             {
@@ -71,8 +71,8 @@ namespace Fetcher.Playground.Touch.Views
 
         private async Task DoFetch()
         {
-            var url = new System.Uri("https://www.google.com");
-            _fetcher.Preload(url, "<html>Hello world!</html>");
+            var url = new System.Uri("http://requestb.in/161b4ez1");
+            //_fetcher.Preload(url, "<html>Hello world!</html>");
 
             IUrlCacheInfo response = await _fetcher.Fetch(url);
         }

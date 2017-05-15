@@ -12,7 +12,7 @@ namespace artm.Fetcher.Core.Services.Fetcher
 
         protected virtual void PrepareHeaders(FetcherWebRequest request)
         {
-            if (request == null || request.Headers == null || request.Headers == null) return;
+            if (request == null || request.Headers == null) return;
 
             for (int i = 0; i < request.Headers.Count; i++)
             {

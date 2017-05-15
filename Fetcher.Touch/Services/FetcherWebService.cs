@@ -19,8 +19,8 @@ namespace artm.Fetcher.Touch.Services
 
             _mutableRequest = new NSMutableUrlRequest(request.Url);
 
-            PrepareHeaders(request);
             PrepareMethod(request);
+            PrepareHeaders(request);
             PrepareBody(request);
 
             NSUrlSessionDataTask task = CreateUrlSessionDataTask(tcs, _mutableRequest);
@@ -30,7 +30,10 @@ namespace artm.Fetcher.Touch.Services
 
         private void PrepareBody(FetcherWebRequest request)
         {
-            _mutableRequest.Body = request.Body;
+            if(string.IsNullOrEmpty(request.Body) == false)
+            {
+                _mutableRequest.Body = request.Body;
+            }
         }
 
         protected override void AddHeader(string key, string value)
