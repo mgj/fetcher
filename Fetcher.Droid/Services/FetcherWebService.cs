@@ -45,7 +45,7 @@ namespace artm.Fetcher.Droid.Services
             {
                 return new FetcherWebResponse()
                 {
-                    IsSuccess = response.IsSuccessful,
+                    HttpStatusCode = response.Code(),
                     Error = new Exception(response.Message()),
                     Body = response.Body().String()
                 };
@@ -61,7 +61,7 @@ namespace artm.Fetcher.Droid.Services
         {
             return new FetcherWebResponse()
             {
-                IsSuccess = false,
+                HttpStatusCode = 500,
                 Error = exception,
                 Body = string.Empty
             };
@@ -83,7 +83,7 @@ namespace artm.Fetcher.Droid.Services
                 var response = Client.NewCall(requestBuilder.Build()).Execute();
                 return new FetcherWebResponse()
                 {
-                    IsSuccess = response.IsSuccessful,
+                    HttpStatusCode = response.Code(),
                     Body = response.Body().String()
                 };
             }

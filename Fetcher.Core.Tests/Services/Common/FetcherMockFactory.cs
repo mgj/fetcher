@@ -21,8 +21,8 @@ namespace artm.Fetcher.Core.Tests.Services.Common
         public static Mock<IFetcherWebService> IFetcherWebServiceInternetOn()
         {
             var mock = new Mock<IFetcherWebService>();
-            mock.Setup(x => x.DoPlatformWebRequest(It.IsAny<Uri>())).Returns(() => new FetcherWebResponse() { IsSuccess = true, Body = "DoPlatformWebRequest Default Test Body" });
-            mock.Setup(x => x.DoPlatformRequest(It.IsAny<Uri>(), It.IsAny<FetcherWebRequest>())).Returns(() => new FetcherWebResponse() { IsSuccess = true, Body = "DoPlatformRequest Default Test Body" });
+            mock.Setup(x => x.DoPlatformWebRequest(It.IsAny<Uri>())).Returns(() => new FetcherWebResponse() { HttpStatusCode = 200, Body = "DoPlatformWebRequest Default Test Body" });
+            mock.Setup(x => x.DoPlatformRequest(It.IsAny<Uri>(), It.IsAny<FetcherWebRequest>())).Returns(() => new FetcherWebResponse() { HttpStatusCode = 200, Body = "DoPlatformRequest Default Test Body" });
             return mock;
         }
 

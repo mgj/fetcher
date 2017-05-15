@@ -68,14 +68,11 @@ namespace artm.Fetcher.Touch.Services
                                 var resp = response as NSHttpUrlResponse;
                                 tcs.SetResult(new FetcherWebResponse()
                                 {
-                                    IsSuccess = error == null,
+                                    HttpStatusCode = (int)resp?.StatusCode,
                                     Error = new Exception(error?.ToString()),
                                     Body = data?.ToString()
                                 });
                             });
         }
-
-        
-
     }
 }
