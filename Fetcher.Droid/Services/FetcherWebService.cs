@@ -99,38 +99,7 @@ namespace artm.Fetcher.Droid.Services
             MediaType contentType = PrepareContentType(request);
 
             var requestBody = RequestBody.Create(contentType, new byte[0]);
-            switch (request.Method)
-            {
-                case "GET":
-                    builder.Method("GET", requestBody);
-                    break;
-                case "POST":
-                    builder.Method("POST", requestBody);
-                    break;
-                case "HEAD":
-                    builder.Method("HEAD", requestBody);
-                    break;
-                case "PUT":
-                    builder.Method("PUT", requestBody);
-                    break;
-                case "DELETE":
-                    builder.Method("DELETE", requestBody);
-                    break;
-                case "OPTIONS":
-                    builder.Method("OPTIONS", requestBody);
-                    break;
-                case "TRACE":
-                    builder.Method("TRACE", requestBody);
-                    break;
-                case "CONNECT":
-                    builder.Method("CONNECT", requestBody);
-                    break;
-                case "PATCH":
-                    builder.Method("PATCH", requestBody);
-                    break;
-                default:
-                    break;
-            }
+            builder.Method(request.Method, requestBody);
         }
 
         private static MediaType PrepareContentType(FetcherWebRequest request)
