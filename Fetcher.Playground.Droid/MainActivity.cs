@@ -30,8 +30,8 @@ namespace Fetcher.Playground.Droid
             // Set our view from the "main" layout resource
             SetContentView(Resource.Layout.Main);
 
-            //DoFetch();
-            Task.Run(() => DoToss());
+            Task.Run(() => DoFetch());
+            //Task.Run(() => DoToss());
         }
 
         private void DoToss()
@@ -61,7 +61,7 @@ namespace Fetcher.Playground.Droid
         {
             try
             {
-                var url = new System.Uri("https://www.google.com");
+                var url = new System.Uri("http://requestb.in/161b4ez1");
                 //_fetcher.Preload(url, "<html>Hello world!</html>");
 
                 IUrlCacheInfo response = await _fetcher.Fetch(url);

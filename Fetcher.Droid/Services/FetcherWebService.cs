@@ -12,8 +12,7 @@ namespace artm.Fetcher.Droid.Services
     {
         private OkHttpClient _client;
         private Headers.Builder _headerBuilder;
-
-        public static readonly MediaType JSON = MediaType.Parse("application/json; charset=utf-8");
+        public const string BODY_FORMAT = "application/json; charset=utf-8";
 
         protected OkHttpClient Client
         {
@@ -44,11 +43,10 @@ namespace artm.Fetcher.Droid.Services
             var requestBuilder = new Request.Builder();
             requestBuilder.Url(request.Url.OriginalString);
 
-            PrepareMethod(request, requestBuilder);
-
             _headerBuilder = new Headers.Builder();
             PrepareHeaders(request);
             requestBuilder.Headers(_headerBuilder.Build());
+
             PrepareBody(request, requestBuilder);
 
             try
@@ -59,7 +57,8 @@ namespace artm.Fetcher.Droid.Services
                 return new FetcherWebResponse()
                 {
                     HttpStatusCode = response.Code(),
-                    Body = response.Body().String()
+                    Error = new Exception(response.Message()),
+                    Body = response.Body()?.String()
                 };
             }
             catch (Exception ex)
@@ -70,19 +69,15 @@ namespace artm.Fetcher.Droid.Services
 
         private void PrepareBody(FetcherWebRequest request, Request.Builder requestBuilder)
         {
-            if (request == null || requestBuilder == null || request.Body == null) return;
+            if (request == null || requestBuilder == null ) return;
 
-            RequestBody body = RequestBody.Create(JSON, request.Body);
-            requestBuilder.Post(body);
-        }
+            RequestBody body = null;
+            if (string.IsNullOrEmpty(request.Body) == false)
+            {
+                body = RequestBody.Create(MediaType.Parse(BODY_FORMAT), request.Body);
+            }
 
-        private static void PrepareMethod(FetcherWebRequest request, Request.Builder builder)
-        {
-            if (request == null || builder == null) return;
-            MediaType contentType = PrepareContentType(request);
-
-            var requestBody = RequestBody.Create(contentType, new byte[0]);
-            builder.Method(request.Method, requestBody);
+            requestBuilder.Method(request.Method, body);
         }
 
         private static MediaType PrepareContentType(FetcherWebRequest request)

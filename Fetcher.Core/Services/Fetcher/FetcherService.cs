@@ -21,7 +21,16 @@ namespace artm.Fetcher.Core.Services
 
         public async Task<IUrlCacheInfo> Fetch(Uri url)
         {
-            return await Fetch(url, CACHE_FRESHNESS_THRESHOLD);
+            IUrlCacheInfo result = null;
+            try
+            {
+                result = await Fetch(url, CACHE_FRESHNESS_THRESHOLD);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            return result;
         }
 
         public async Task<IUrlCacheInfo> Fetch(Uri url, TimeSpan freshnessTreshold)
@@ -29,8 +38,9 @@ namespace artm.Fetcher.Core.Services
             return await Fetch(
                 new FetcherWebRequest()
                 {
-                    Url = url 
-}, 
+                    Url = url,
+                    Method = "GET"
+                },
                 freshnessTreshold);
         }
 
@@ -49,7 +59,7 @@ namespace artm.Fetcher.Core.Services
                     FetcherWebResponse response = null;
                     try
                     {
-                        response = await FetchFromWeb(request.Url);
+                        response = await FetchFromWeb(request);
                         Repository.UpdateUrl(request.Url, cacheHit, response.Body);
                         cacheHit.FetchedFrom = CacheSourceType.Web;
                     }
@@ -71,12 +81,12 @@ namespace artm.Fetcher.Core.Services
                 FetcherWebResponse response = null;
                 try
                 {
-                    response = await FetchFromWeb(request.Url);
+                    response = await FetchFromWeb(request);
                     cacheHit = Repository.InsertUrl(request.Url, response.Body);
                     cacheHit.FetchedFrom = CacheSourceType.Web;
                     return cacheHit;
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     System.Diagnostics.Debug.WriteLine("Could not insert from network - giving up");
                     return null;
@@ -84,13 +94,13 @@ namespace artm.Fetcher.Core.Services
             }
         }
 
-        private async Task<FetcherWebResponse> FetchFromWeb(Uri uri)
+        private async Task<FetcherWebResponse> FetchFromWeb(FetcherWebRequest request)
         {
             var policy = Policy
                 .HandleResult<FetcherWebResponse>(r => r.IsSuccess == false)
                 .WaitAndRetryAsync(5, retryAttempt =>
                     TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
-            var response = await policy.ExecuteAsync(() => DoWebRequest(uri));
+            var response = await policy.ExecuteAsync(() => DoWebRequest(request));
 
             return response;
         }
@@ -101,10 +111,9 @@ namespace artm.Fetcher.Core.Services
             return delta > freshnessTreshold;
         }
 
-        private async Task<FetcherWebResponse> DoWebRequest(Uri uri)
+        private async Task<FetcherWebResponse> DoWebRequest(FetcherWebRequest request)
         {
-            return await Task.FromResult(WebService.DoPlatformRequest(
-                new FetcherWebRequest() { Url = uri }));
+            return await Task.FromResult(WebService.DoPlatformRequest(request));
         }
 
         public void Preload(Uri url, string response)
