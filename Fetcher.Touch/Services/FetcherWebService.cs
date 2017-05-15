@@ -25,7 +25,6 @@ namespace artm.Fetcher.Touch.Services
 
             NSUrlSessionDataTask task = CreateUrlSessionDataTask(tcs, _mutableRequest);
             task.Resume();
-
             return tcs.Task.Result;
         }
 
@@ -53,18 +52,6 @@ namespace artm.Fetcher.Touch.Services
 
             _mutableRequest.SetValueForKey(new NSString("content-type"), new NSString(request.ContentType));
         }
-
-        //public override FetcherWebResponse DoPlatformWebRequest(Uri uri)
-        //{
-        //    var tcs = new TaskCompletionSource<FetcherWebResponse>();
-
-        //    var request = new NSMutableUrlRequest(uri);
-        //    request.HttpMethod = "GET";
-        //    NSUrlSessionDataTask task = CreateUrlSessionDataTask(tcs, request);
-
-        //    task.Resume();
-        //    return tcs.Task.Result;
-        //}
 
         private static NSUrlSessionDataTask CreateUrlSessionDataTask(TaskCompletionSource<FetcherWebResponse> tcs, NSMutableUrlRequest request)
         {

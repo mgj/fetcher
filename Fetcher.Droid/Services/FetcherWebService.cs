@@ -24,36 +24,6 @@ namespace artm.Fetcher.Droid.Services
             }
         }
 
-        //public override FetcherWebResponse DoPlatformWebRequest(Uri uri)
-        //{
-        //    Request request = null;
-        //    Response response = null;
-
-        //    try
-        //    {
-        //        request = new Request.Builder().Url(uri.OriginalString).Build();
-        //        response = Client.NewCall(request).Execute();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return CreateFetcherWebResponseError(ex);
-        //    }
-
-        //    if (response == null)
-        //    {
-        //        return CreateFetcherWebResponseError("Could not get a response, even though nothing exceptional happened");
-        //    }
-        //    else
-        //    {
-        //        return new FetcherWebResponse()
-        //        {
-        //            HttpStatusCode = response.Code(),
-        //            Error = new Exception(response.Message()),
-        //            Body = response.Body().String()
-        //        };
-        //    }
-        //}
-
         private static FetcherWebResponse CreateFetcherWebResponseError(string message)
         {
             return CreateFetcherWebResponseError(new Exception(message));
@@ -63,7 +33,7 @@ namespace artm.Fetcher.Droid.Services
         {
             return new FetcherWebResponse()
             {
-                HttpStatusCode = 500,
+                HttpStatusCode = 999,
                 Error = exception,
                 Body = string.Empty
             };
@@ -84,6 +54,8 @@ namespace artm.Fetcher.Droid.Services
             try
             {
                 var response = Client.NewCall(requestBuilder.Build()).Execute();
+                if(response == null) return CreateFetcherWebResponseError(new Exception("DoPlatformRequest failed"));
+
                 return new FetcherWebResponse()
                 {
                     HttpStatusCode = response.Code(),
