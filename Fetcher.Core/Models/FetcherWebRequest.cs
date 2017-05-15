@@ -11,6 +11,7 @@ namespace artm.Fetcher.Core.Models
         public Uri Url { get; set; }
         public string Method { get; set; }
         public Dictionary<string, string> Headers { get; set; }
+        public string Body { get; set; }
         public string ContentType { get; set; }
     }
 }

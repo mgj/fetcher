@@ -19,14 +19,21 @@ namespace artm.Fetcher.Core.Tests.Services
         private const string URL = "https://jsonplaceholder.typicode.com/users";
         
         [Test]
+        public void Fetch_NullUrl_Throws()
+        {
+            var sut = new FetcherServiceStub();
+
+            Assert.ThrowsAsync<NullReferenceException>(async () => await sut.Fetch(null));
+        }
+
+        [Test]
         public async Task Fetch_Sunshine_TriesToFetchFromWeb()
         {
-            var web = new Mock<IFetcherWebService>();
             var sut = new FetcherServiceStub();
             
             var response = await sut.Fetch(new Uri(URL));
 
-            sut.WebServiceMock.Verify(x => x.DoPlatformWebRequest(It.IsAny<Uri>()), Times.Once);
+            sut.WebServiceMock.Verify(x => x.DoPlatformRequest(It.IsAny<FetcherWebRequest>()), Times.Once);
         }
 
         [Test]
@@ -207,7 +214,7 @@ namespace artm.Fetcher.Core.Tests.Services
 
             var results = await Task.WhenAll(tasks.ToArray());
 
-            sut.WebServiceMock.Verify(x => x.DoPlatformWebRequest(It.IsAny<Uri>()), Times.Once);
+            sut.WebServiceMock.Verify(x => x.DoPlatformRequest(It.IsAny<FetcherWebRequest>()), Times.Once);
         }
 
         [Test]
@@ -222,7 +229,7 @@ namespace artm.Fetcher.Core.Tests.Services
             var results = await Task.WhenAll(tasks.ToArray());
 
             Assert.AreEqual(THREAD_COUNT, results.Length);
-            sut.WebServiceMock.Verify(x => x.DoPlatformWebRequest(It.IsAny<Uri>()), Times.Exactly(THREAD_COUNT));
+            sut.WebServiceMock.Verify(x => x.DoPlatformRequest(It.IsAny<FetcherWebRequest>()), Times.Exactly(THREAD_COUNT));
             Assert.IsTrue(results.All(x => x != null));
         }
 

@@ -70,6 +70,19 @@ fetcher.Preload(url, "<html>Hello world!</html>");
 IUrlCacheInfo response = await fetcher.Fetch(url); 
 ```
 
+## Tosser example
+Just as the IFetcherService can be used for doing HTTP GET requests, ITosserService can be used to do other types of requests such as HTTP POST
+
+```
+var web = new FetcherWebService();
+var tosser = new TosserService(web);
+
+// Toss a POST to a given url
+var response = tosser.Toss(new FetcherWebRequest() { Url = new Uri("http://myurl.com") });
+```
+
+
+
 
 ## For developers
 

@@ -25,8 +25,6 @@ namespace artm.Fetcher.Core.Services.Fetcher
 
         protected abstract void AddHeader(string key, string value);
 
-        public abstract FetcherWebResponse DoPlatformWebRequest(Uri uri);
-
-        public abstract FetcherWebResponse DoPlatformRequest(Uri uri, FetcherWebRequest request);
+        public abstract FetcherWebResponse DoPlatformRequest(FetcherWebRequest request);
     }
 }

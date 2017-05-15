@@ -35,7 +35,7 @@ namespace artm.Fetcher.Core.Services.Tosser
                 .WaitAndRetry(5, retryAttempt =>
                     TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
 
-                return policy.Execute(() => WebService.DoPlatformRequest(request.Url, request));
+                return policy.Execute(() => WebService.DoPlatformRequest(request));
             }
             catch (Exception ex)
             {

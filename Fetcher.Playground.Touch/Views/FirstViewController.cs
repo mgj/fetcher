@@ -49,7 +49,6 @@ namespace Fetcher.Playground.Touch.Views
         private void DoToss()
         {
             var url = new Uri("http://requestb.in/1mjfqsz1");
-
             try
             {
                 var response = _tosser.Toss(new FetcherWebRequest() { Url = url });
@@ -63,11 +62,10 @@ namespace Fetcher.Playground.Touch.Views
 
         private void PrepareFetcher()
         {
-            _path = new FetcherRepositoryStoragePathService();
-            _repository = new FetcherRepositoryService(_path);
-            _web = new FetcherWebService();
-            _fetcher = new FetcherService(_web, _repository);
-            _tosser = new TosserService(_web);
+            var web = new FetcherWebService();
+            var tosser = new TosserService(web);
+            var response = tosser.Toss(new FetcherWebRequest() { Url = new Uri("http://requestb.in/1mjfqsz1") });
+
         }
 
         private async Task DoFetch()

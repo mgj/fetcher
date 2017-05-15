@@ -13,6 +13,8 @@ namespace artm.Fetcher.Droid.Services
         private OkHttpClient _client;
         private Headers.Builder _headerBuilder;
 
+        public static readonly MediaType JSON = MediaType.Parse("application/json; charset=utf-8");
+
         protected OkHttpClient Client
         {
             get
@@ -22,35 +24,35 @@ namespace artm.Fetcher.Droid.Services
             }
         }
 
-        public override FetcherWebResponse DoPlatformWebRequest(Uri uri)
-        {
-            Request request = null;
-            Response response = null;
+        //public override FetcherWebResponse DoPlatformWebRequest(Uri uri)
+        //{
+        //    Request request = null;
+        //    Response response = null;
 
-            try
-            {
-                request = new Request.Builder().Url(uri.OriginalString).Build();
-                response = Client.NewCall(request).Execute();
-            }
-            catch (Exception ex)
-            {
-                return CreateFetcherWebResponseError(ex);
-            }
+        //    try
+        //    {
+        //        request = new Request.Builder().Url(uri.OriginalString).Build();
+        //        response = Client.NewCall(request).Execute();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return CreateFetcherWebResponseError(ex);
+        //    }
 
-            if (response == null)
-            {
-                return CreateFetcherWebResponseError("Could not get a response, even though nothing exceptional happened");
-            }
-            else
-            {
-                return new FetcherWebResponse()
-                {
-                    HttpStatusCode = response.Code(),
-                    Error = new Exception(response.Message()),
-                    Body = response.Body().String()
-                };
-            }
-        }
+        //    if (response == null)
+        //    {
+        //        return CreateFetcherWebResponseError("Could not get a response, even though nothing exceptional happened");
+        //    }
+        //    else
+        //    {
+        //        return new FetcherWebResponse()
+        //        {
+        //            HttpStatusCode = response.Code(),
+        //            Error = new Exception(response.Message()),
+        //            Body = response.Body().String()
+        //        };
+        //    }
+        //}
 
         private static FetcherWebResponse CreateFetcherWebResponseError(string message)
         {
@@ -67,16 +69,17 @@ namespace artm.Fetcher.Droid.Services
             };
         }
 
-        public override FetcherWebResponse DoPlatformRequest(Uri uri, FetcherWebRequest request)
+        public override FetcherWebResponse DoPlatformRequest(FetcherWebRequest request)
         {
             var requestBuilder = new Request.Builder();
-            requestBuilder.Url(uri.OriginalString);
+            requestBuilder.Url(request.Url.OriginalString);
 
             PrepareMethod(request, requestBuilder);
 
             _headerBuilder = new Headers.Builder();
             PrepareHeaders(request);
             requestBuilder.Headers(_headerBuilder.Build());
+            PrepareBody(request, requestBuilder);
 
             try
             {
@@ -91,6 +94,14 @@ namespace artm.Fetcher.Droid.Services
             {
                 return CreateFetcherWebResponseError(ex);
             }
+        }
+
+        private void PrepareBody(FetcherWebRequest request, Request.Builder requestBuilder)
+        {
+            if (request == null || requestBuilder == null || request.Body == null) return;
+
+            RequestBody body = RequestBody.Create(JSON, request.Body);
+            requestBuilder.Post(body);
         }
 
         private static void PrepareMethod(FetcherWebRequest request, Request.Builder builder)

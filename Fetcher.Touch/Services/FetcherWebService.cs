@@ -13,19 +13,25 @@ namespace artm.Fetcher.Touch.Services
     {
         private NSMutableUrlRequest _mutableRequest;
 
-        public override FetcherWebResponse DoPlatformRequest(Uri uri, FetcherWebRequest request)
+        public override FetcherWebResponse DoPlatformRequest(FetcherWebRequest request)
         {
             var tcs = new TaskCompletionSource<FetcherWebResponse>();
 
-            _mutableRequest = new NSMutableUrlRequest(uri);
+            _mutableRequest = new NSMutableUrlRequest(request.Url);
 
             PrepareHeaders(request);
             PrepareMethod(request);
+            PrepareBody(request);
 
             NSUrlSessionDataTask task = CreateUrlSessionDataTask(tcs, _mutableRequest);
             task.Resume();
 
             return tcs.Task.Result;
+        }
+
+        private void PrepareBody(FetcherWebRequest request)
+        {
+            _mutableRequest.Body = request.Body;
         }
 
         protected override void AddHeader(string key, string value)
@@ -48,17 +54,17 @@ namespace artm.Fetcher.Touch.Services
             _mutableRequest.SetValueForKey(new NSString("content-type"), new NSString(request.ContentType));
         }
 
-        public override FetcherWebResponse DoPlatformWebRequest(Uri uri)
-        {
-            var tcs = new TaskCompletionSource<FetcherWebResponse>();
+        //public override FetcherWebResponse DoPlatformWebRequest(Uri uri)
+        //{
+        //    var tcs = new TaskCompletionSource<FetcherWebResponse>();
 
-            var request = new NSMutableUrlRequest(uri);
-            request.HttpMethod = "GET";
-            NSUrlSessionDataTask task = CreateUrlSessionDataTask(tcs, request);
+        //    var request = new NSMutableUrlRequest(uri);
+        //    request.HttpMethod = "GET";
+        //    NSUrlSessionDataTask task = CreateUrlSessionDataTask(tcs, request);
 
-            task.Resume();
-            return tcs.Task.Result;
-        }
+        //    task.Resume();
+        //    return tcs.Task.Result;
+        //}
 
         private static NSUrlSessionDataTask CreateUrlSessionDataTask(TaskCompletionSource<FetcherWebResponse> tcs, NSMutableUrlRequest request)
         {
