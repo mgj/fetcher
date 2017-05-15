@@ -49,7 +49,7 @@ namespace artm.Fetcher.Core.Services.Tosser
         {
             return new FetcherWebResponse()
             {
-                HttpStatusCode = 500,
+                HttpStatusCode = 999,
                 Error = exception,
                 Body = string.Empty
             };
