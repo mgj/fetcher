@@ -107,6 +107,24 @@ namespace artm.Fetcher.Droid.Services
                 case "POST":
                     builder.Method("POST", requestBody);
                     break;
+                case "HEAD":
+                    builder.Method("HEAD", requestBody);
+                    break;
+                case "PUT":
+                    builder.Method("PUT", requestBody);
+                    break;
+                case "DELETE":
+                    builder.Method("DELETE", requestBody);
+                    break;
+                case "OPTIONS":
+                    builder.Method("OPTIONS", requestBody);
+                    break;
+                case "TRACE":
+                    builder.Method("TRACE", requestBody);
+                    break;
+                case "CONNECT":
+                    builder.Method("CONNECT", requestBody);
+                    break;
                 default:
                     break;
             }
