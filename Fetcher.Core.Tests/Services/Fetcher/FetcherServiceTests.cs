@@ -105,6 +105,14 @@ namespace artm.Fetcher.Core.Tests.Services
         }
 
         [Test]
+        public void Fetch_NoInternet_DoesNotThrow()
+        {
+            var sut = new FetcherServiceStub(FetcherMockFactory.IFetcherWebServiceInternetOff());
+
+            Assert.DoesNotThrowAsync(async () => await sut.Fetch(new Uri("http://test")));
+        }
+
+        [Test]
         public async Task Preload_InternetUnavailableAndEmptyDatabase_PreloadedDataIsReturned()
         {
             var sut = new FetcherServiceStub(FetcherMockFactory.IFetcherWebServiceInternetOff());
