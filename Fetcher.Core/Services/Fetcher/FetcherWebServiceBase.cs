@@ -9,6 +9,7 @@ namespace artm.Fetcher.Core.Services.Fetcher
 {
     public abstract class FetcherWebServiceBase : IFetcherWebService
     {
+
         protected virtual void PrepareHeaders(FetcherWebRequest request)
         {
             if (request == null || request.Headers == null || request.Headers == null) return;
