@@ -95,14 +95,6 @@ Task("UploadAppVeyorArtifact")
 	}
 });
 
-Task("UploadTestArtifact")
-	.IsDependentOn("PackageAll")
-	.WithCriteria(() => isRunningOnAppVeyor)
-	.Does(() => {
-		NUnit("./Fetcher.Core.Tests/**/bin/" + configuration + "/*.Tests.dll");
-	}
-});	
-
 Task("Default").IsDependentOn("UploadAppVeyorArtifact").Does(() => {});
 
 RunTarget(target);
