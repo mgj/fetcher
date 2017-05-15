@@ -26,8 +26,6 @@ namespace Fetcher.Playground.Droid
 		
 		public static void UpdateIdValues()
 		{
-			global::artm.Fetcher.Droid.Resource.String.ApplicationName = global::Fetcher.Playground.Droid.Resource.String.ApplicationName;
-			global::artm.Fetcher.Droid.Resource.String.Hello = global::Fetcher.Playground.Droid.Resource.String.Hello;
 		}
 		
 		public partial class Attribute
