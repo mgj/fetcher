@@ -38,16 +38,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Entities\CacheSourceType.cs" />
+    <Compile Include="Models\FetcherWebRequest.cs" />
     <Compile Include="Models\FetcherWebResponse.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\FetcherRepositoryService.cs" />
-    <Compile Include="Services\FetcherService.cs" />
-    <Compile Include="Services\IFetcherRepositoryService.cs" />
-    <Compile Include="Services\IFetcherRepositoryStoragePathService.cs" />
-    <Compile Include="Services\IFetcherService.cs" />
-    <Compile Include="Services\IFetcherWebService.cs" />
+    <Compile Include="Services\Fetcher\FetcherRepositoryService.cs" />
+    <Compile Include="Services\Fetcher\FetcherService.cs" />
+    <Compile Include="Services\Fetcher\FetcherWebServiceBase.cs" />
+    <Compile Include="Services\Fetcher\IFetcherRepositoryService.cs" />
+    <Compile Include="Services\Fetcher\IFetcherRepositoryStoragePathService.cs" />
+    <Compile Include="Services\Fetcher\IFetcherService.cs" />
+    <Compile Include="Services\Fetcher\IFetcherWebService.cs" />
     <Compile Include="Entities\IUrlCacheInfo.cs" />
     <Compile Include="Entities\UrlCacheInfo.cs" />
+    <Compile Include="Services\Tosser\ITosserService.cs" />
+    <Compile Include="Services\Tosser\TosserService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

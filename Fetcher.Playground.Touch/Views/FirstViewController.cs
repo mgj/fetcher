@@ -7,6 +7,9 @@ using artm.Fetcher.Core.Services;
 using artm.Fetcher.Touch.Services;
 using artm.Fetcher.Core.Entities;
 using System.Threading.Tasks;
+using artm.Fetcher.Core.Services.Tosser;
+using System.Net;
+using artm.Fetcher.Core.Models;
 
 namespace Fetcher.Playground.Touch.Views
 {
@@ -16,6 +19,7 @@ namespace Fetcher.Playground.Touch.Views
         private IFetcherRepositoryService _repository;
         private IFetcherWebService _web;
         private IFetcherService _fetcher;
+        private TosserService _tosser;
 
         public FirstViewController()
         {
@@ -37,19 +41,39 @@ namespace Fetcher.Playground.Touch.Views
                 label.WithSameWidth(View),
                 label.Height().EqualTo(50)
                 );
+
+            //DoFetch();
+            Task.Run(() => DoToss());
         }
 
-        private async Task PrepareFetcher()
+        private void DoToss()
+        {
+            var url = new Uri("http://requestb.in/1mjfqsz1");
+            try
+            {
+                var response = _tosser.Toss(new FetcherWebRequest() { Url = url });
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        private void PrepareFetcher()
         {
             _path = new FetcherRepositoryStoragePathService();
             _repository = new FetcherRepositoryService(_path);
             _web = new FetcherWebService();
-
             _fetcher = new FetcherService(_web, _repository);
+            _tosser = new TosserService(_web);
+        }
 
+        private async Task DoFetch()
+        {
             var url = new System.Uri("https://www.google.com");
             _fetcher.Preload(url, "<html>Hello world!</html>");
-            
+
             IUrlCacheInfo response = await _fetcher.Fetch(url);
         }
 
