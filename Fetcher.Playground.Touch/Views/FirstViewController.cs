@@ -7,9 +7,10 @@ using artm.Fetcher.Core.Services;
 using artm.Fetcher.Touch.Services;
 using artm.Fetcher.Core.Entities;
 using System.Threading.Tasks;
-using artm.Fetcher.Core.Services.Tosser;
 using System.Net;
 using artm.Fetcher.Core.Models;
+using SQLite.Net;
+using SQLite.Net.Platform.XamarinIOS;
 
 namespace Fetcher.Playground.Touch.Views
 {
@@ -19,7 +20,6 @@ namespace Fetcher.Playground.Touch.Views
         private IFetcherRepositoryService _repository;
         private IFetcherWebService _web;
         private IFetcherService _fetcher;
-        private TosserService _tosser;
 
         public FirstViewController()
         {
@@ -43,38 +43,46 @@ namespace Fetcher.Playground.Touch.Views
                 );
 
             Task.Run(() => DoFetch());
-            //Task.Run(() => DoToss());
-        }
-
-        private void DoToss()
-        {
-            var url = new Uri("http://requestb.in/1mjfqsz1");
-            try
-            {
-                var response = _tosser.Toss(new FetcherWebRequest() { Url = url, Method = "POST" });
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
         }
 
         private void PrepareFetcher()
         {
             _path = new FetcherRepositoryStoragePathService();
-            _repository = new FetcherRepositoryService(_path);
+            _repository = new FetcherRepositoryService(() => CreateConnection(_path));
             _web = new FetcherWebService();
             _fetcher = new FetcherService(_web, _repository);
-            _tosser = new TosserService(_web);
+        }
+
+        private static SQLiteConnectionWithLock CreateConnection(IFetcherRepositoryStoragePathService path)
+        {
+            var str = new SQLiteConnectionString(path.GetPath(), false);
+            return new SQLiteConnectionWithLock(new SQLitePlatformIOS(), str);
         }
 
         private async Task DoFetch()
         {
-            var url = new System.Uri("http://requestb.in/161b4ez1");
-            //_fetcher.Preload(url, "<html>Hello world!</html>");
+            await ((FetcherRepositoryService)_repository).Initialize();
 
-            IUrlCacheInfo response = await _fetcher.Fetch(url);
+            var url = new System.Uri("http://requestb.in/1b9zkca1");
+            //_fetcher.Preload(url, "<html>Hello world!</html>");
+            try
+            {
+
+                IUrlCacheInfo response = await _fetcher.FetchAsync(new FetcherWebRequest()
+                {
+                    Url = url.OriginalString,
+                    Method = "POST",
+                    Headers = new Dictionary<string, string>(),
+                    Body = @"[{ ""myData"": ""data"" }]",
+                    ContentType = string.Empty
+                }, TimeSpan.FromDays(1));
+                var debug = 42;
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
         }
 
         private UIButton PrepareDebugButton()

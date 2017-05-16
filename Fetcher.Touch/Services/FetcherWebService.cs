@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Net;
 using System.Linq;
 using artm.Fetcher.Core.Services.Fetcher;
+using artm.Fetcher.Core.Entities;
 
 namespace artm.Fetcher.Touch.Services
 {
@@ -13,11 +14,11 @@ namespace artm.Fetcher.Touch.Services
     {
         private NSMutableUrlRequest _mutableRequest;
 
-        public override FetcherWebResponse DoPlatformRequest(FetcherWebRequest request)
+        public override IFetcherWebResponse DoPlatformRequest(IFetcherWebRequest request)
         {
-            var tcs = new TaskCompletionSource<FetcherWebResponse>();
+            var tcs = new TaskCompletionSource<IFetcherWebResponse>();
 
-            _mutableRequest = new NSMutableUrlRequest(request.Url);
+            _mutableRequest = new NSMutableUrlRequest(new Uri(request.Url));
 
             PrepareMethod(request);
             PrepareHeaders(request);
@@ -28,7 +29,7 @@ namespace artm.Fetcher.Touch.Services
             return tcs.Task.Result;
         }
 
-        private void PrepareBody(FetcherWebRequest request)
+        private void PrepareBody(IFetcherWebRequest request)
         {
             if(string.IsNullOrEmpty(request.Body) == false)
             {
@@ -41,7 +42,7 @@ namespace artm.Fetcher.Touch.Services
             _mutableRequest.SetValueForKey(new NSString(key), new NSString(value));
         }
 
-        private void PrepareMethod(FetcherWebRequest request)
+        private void PrepareMethod(IFetcherWebRequest request)
         {
             if (request == null || _mutableRequest == null) return;
             _mutableRequest.HttpMethod = request.Method;
@@ -49,14 +50,14 @@ namespace artm.Fetcher.Touch.Services
             PrepareContentType(request);
         }
 
-        private void PrepareContentType(FetcherWebRequest request)
+        private void PrepareContentType(IFetcherWebRequest request)
         {
             if (request == null || string.IsNullOrEmpty(request.ContentType)) return;
 
             _mutableRequest.SetValueForKey(new NSString("content-type"), new NSString(request.ContentType));
         }
 
-        private static NSUrlSessionDataTask CreateUrlSessionDataTask(TaskCompletionSource<FetcherWebResponse> tcs, NSMutableUrlRequest request)
+        private static NSUrlSessionDataTask CreateUrlSessionDataTask(TaskCompletionSource<IFetcherWebResponse> tcs, NSMutableUrlRequest request)
         {
             return NSUrlSession.SharedSession.CreateDataTask(request,
                             (data, response, error) =>

@@ -2,13 +2,15 @@
 using artm.Fetcher.Core.Models;
 using Polly;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace artm.Fetcher.Core.Services
 {
     public class FetcherService : IFetcherService
     {
-        public readonly TimeSpan CACHE_FRESHNESS_THRESHOLD = TimeSpan.FromDays(1);
+        private readonly TimeSpan DEFAULT_FRESHNESS_THRESHOLD = TimeSpan.FromDays(1);
+        private readonly SemaphoreSlim _lock = new SemaphoreSlim(1);
 
         protected IFetcherWebService WebService { get; set; }
         protected IFetcherRepositoryService Repository { get; set; }
@@ -19,88 +21,96 @@ namespace artm.Fetcher.Core.Services
             Repository = repositoryService;
         }
 
-        public async Task<IUrlCacheInfo> Fetch(Uri url)
+        public async Task<IUrlCacheInfo> FetchAsync(Uri url)
         {
-            IUrlCacheInfo result = null;
-            try
-            {
-                result = await Fetch(url, CACHE_FRESHNESS_THRESHOLD);
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
-            return result;
+            return await FetchAsync(url, DEFAULT_FRESHNESS_THRESHOLD);
         }
 
-        public async Task<IUrlCacheInfo> Fetch(Uri url, TimeSpan freshnessTreshold)
+        public async Task<IUrlCacheInfo> FetchAsync(Uri url, TimeSpan freshnessTreshold)
         {
-            return await Fetch(
+            if (url == null) throw new ArgumentNullException("url");
+
+            return await FetchAsync(
                 new FetcherWebRequest()
                 {
-                    Url = url,
+                    Url = url.OriginalString,
                     Method = "GET"
                 },
                 freshnessTreshold);
         }
 
-        private async Task<IUrlCacheInfo> Fetch(FetcherWebRequest request, TimeSpan freshnessTreshold)
+        public async Task<IUrlCacheInfo> FetchAsync(IFetcherWebRequest request)
         {
-            System.Diagnostics.Debug.WriteLine("Fetching for uri: " + request.Url.OriginalString);
+            return await FetchAsync(request, DEFAULT_FRESHNESS_THRESHOLD);
+        }
 
-            var cacheHit = Repository.GetEntryForUrl(request.Url);
-            if (cacheHit != null)
+        public async Task<IUrlCacheInfo> FetchAsync(IFetcherWebRequest request, TimeSpan freshnessTreshold)
+        {
+            if (request == null) throw new ArgumentNullException("request");
+
+            System.Diagnostics.Debug.WriteLine("Fetching for uri: " + request.Url);
+
+            await _lock.WaitAsync();
+            try
             {
-                cacheHit.FetchedFrom = CacheSourceType.Preload;
-                System.Diagnostics.Debug.WriteLine("Cache hit");
-                if (ShouldInvalidate(cacheHit, freshnessTreshold))
+                var cacheHit = await Repository.GetEntryForRequestAsync(request);
+                if (cacheHit != null)
                 {
-                    System.Diagnostics.Debug.WriteLine("Refreshing cache");
-                    FetcherWebResponse response = null;
-                    try
+                    cacheHit.FetchedFrom = CacheSourceType.Preload;
+                    System.Diagnostics.Debug.WriteLine("Cache hit");
+                    if (ShouldInvalidate(cacheHit, freshnessTreshold))
                     {
-                        response = await FetchFromWeb(request);
-                        Repository.UpdateUrl(request.Url, cacheHit, response.Body);
-                        cacheHit.FetchedFrom = CacheSourceType.Web;
+                        System.Diagnostics.Debug.WriteLine("Refreshing cache");
+                        IFetcherWebResponse response = null;
+                        try
+                        {
+                            response = await FetchFromWebAsync(request);
+                            await Repository.UpdateUrlAsync(request, cacheHit, response);
+                            cacheHit.FetchedFrom = CacheSourceType.Web;
+                        }
+                        catch (Exception)
+                        {
+                            System.Diagnostics.Debug.WriteLine("Could not update from network, keep using old cache data");
+                        }
                     }
-                    catch (Exception)
+                    else
                     {
-                        System.Diagnostics.Debug.WriteLine("Could not update from network, keep using old cache data");
+                        cacheHit.FetchedFrom = CacheSourceType.Local;
                     }
+
+                    return cacheHit;
                 }
                 else
                 {
-                    cacheHit.FetchedFrom = CacheSourceType.Local;
+                    System.Diagnostics.Debug.WriteLine("Nothing found in cache, getting it fresh");
+                    IFetcherWebResponse response = null;
+                    try
+                    {
+                        response = await FetchFromWebAsync(request);
+                        cacheHit = await Repository.InsertUrlAsync(request, response);
+                        cacheHit.FetchedFrom = CacheSourceType.Web;
+                        return cacheHit;
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine("Could not insert from network - giving up");
+                        return null;
+                    }
                 }
-
-                return cacheHit;
             }
-            else
+            finally
             {
-                System.Diagnostics.Debug.WriteLine("Nothing found in cache, getting it fresh");
-                FetcherWebResponse response = null;
-                try
-                {
-                    response = await FetchFromWeb(request);
-                    cacheHit = Repository.InsertUrl(request.Url, response.Body);
-                    cacheHit.FetchedFrom = CacheSourceType.Web;
-                    return cacheHit;
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine("Could not insert from network - giving up");
-                    return null;
-                }
+                _lock.Release();
             }
         }
 
-        private async Task<FetcherWebResponse> FetchFromWeb(FetcherWebRequest request)
+        private async Task<IFetcherWebResponse> FetchFromWebAsync(IFetcherWebRequest request)
         {
             var policy = Policy
-                .HandleResult<FetcherWebResponse>(r => r.IsSuccess == false)
+                .HandleResult<IFetcherWebResponse>(r => r.IsSuccess == false)
                 .WaitAndRetryAsync(5, retryAttempt =>
                     TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
-            var response = await policy.ExecuteAsync(() => DoWebRequest(request));
+            var response = await policy.ExecuteAsync(() => DoWebRequestAsync(request));
 
             return response;
         }
@@ -111,21 +121,29 @@ namespace artm.Fetcher.Core.Services
             return delta > freshnessTreshold;
         }
 
-        private async Task<FetcherWebResponse> DoWebRequest(FetcherWebRequest request)
+        private async Task<IFetcherWebResponse> DoWebRequestAsync(IFetcherWebRequest request)
         {
             return await Task.FromResult(WebService.DoPlatformRequest(request));
         }
 
-        public void Preload(Uri url, string response)
+        public async Task PreloadAsync(IFetcherWebRequest request, IFetcherWebResponse response)
         {
-            // Ignore if already exists in db
-            var exists = Repository.GetEntryForUrl(url);
-            if (exists != null)
+            await _lock.WaitAsync();
+            try
             {
-                return;
-            }
+                // Ignore if already exists in db
+                var exists = await Repository.GetEntryForRequestAsync(request);
+                if (exists != null)
+                {
+                    return;
+                }
 
-            Repository.PreloadUrl(url, response);
+                await Repository.PreloadUrlAsync(request, response);
+            }
+            finally
+            {
+                _lock.Release();
+            }
         }
     }
 }

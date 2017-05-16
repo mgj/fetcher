@@ -1,12 +1,19 @@
-﻿using System;
+﻿using artm.Fetcher.Core.Models;
+using System;
 
 namespace artm.Fetcher.Core.Entities
 {
     public interface IUrlCacheInfo
     {
-        string Response { get; set; }
+        int Id { get; set; }
 
-        string Url { get; set; }
+        int FetcherWebRequestId { get; set; }
+
+        FetcherWebRequest FetcherWebRequest { get; set; }
+
+        int FetcherWebResponseId { get; set; }
+
+        FetcherWebResponse FetcherWebResponse { get; set; }
 
         DateTimeOffset Created { get; set; }
 
