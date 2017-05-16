@@ -51,7 +51,7 @@ Task("GitLink")
 	GitLink(sln.GetDirectory(), new GitLinkSettings {
 		RepositoryUrl = "https://github.com/mgj/fetcher",
 		ArgumentCustomization = args => args.Append(
-			"-ignore bom,bomtest,fetcher.core.tests,fetcher.playground.core,fetcher.playground.droid,fetcher.playground.touch")
+			"-ignore fetcher.core.tests,fetcher.playground.core,fetcher.playground.droid,fetcher.playground.touch")
 	});
 });
 
