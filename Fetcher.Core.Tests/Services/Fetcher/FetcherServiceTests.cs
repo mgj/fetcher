@@ -133,9 +133,17 @@ namespace artm.Fetcher.Core.Tests.Services
         {
             var sut = new FetcherServiceStub(FetcherMockFactory.IFetcherWebServiceInternetOff());
             const string response = "myPreloadResponse";
+            var asStub = sut.RepositoryService as FetcherRepositoryServiceStub;
 
             await sut.PreloadAsync(FetcherStubFactory.FetcherWebRequestGetFactory(URL), FetcherStubFactory.FetcherWebResponseSuccessFactory(response));
+
+            var caches = await asStub.AllCacheInfo();
+            var responses = await asStub.AllWebResponse();
+
             var hero = await sut.FetchAsync(URL);
+
+            caches = await asStub.AllCacheInfo();
+            responses = await asStub.AllWebResponse();
 
             var isInvalid = FetcherService.ShouldInvalidate(hero, TimeSpan.FromDays(1));
 
