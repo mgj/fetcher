@@ -256,64 +256,69 @@ namespace artm.Fetcher.Core.Tests.Services
             Assert.AreEqual(1, responses.Count);
         }
 
-        //[Test]
-        //public async Task Fetch_MultithreadedToSameUrl_OnlyOneWebRequestIsMade()
-        //{
-        //    const int THREAD_COUNT = 10;
+        [Test]
+        public async Task Fetch_MultithreadedToSameUrl_OnlyOneDatabaseEntryIsCreated()
+        {
+            const int THREAD_COUNT = 10;
 
-        //    var sut = new FetcherServiceStub();
-        //    var tasks = GenerateFetchTasks(sut, THREAD_COUNT, new Uri("https://www.google.com"));
+            var sut = new FetcherServiceStub();
+            var tasks = GenerateFetchTasks(sut, THREAD_COUNT, new Uri("https://www.google.com"));
 
-        //    var results = await Task.WhenAll(tasks.ToArray());
+            var results = await Task.WhenAll(tasks.ToArray());
 
-        //    sut.WebServiceMock.Verify(x => x.DoPlatformRequest(It.IsAny<FetcherWebRequest>()), Times.Once);
-        //}
+            var asStub = sut.RepositoryService as FetcherRepositoryServiceStub;
+            var caches = await asStub.AllCacheInfo();
+            var responses = await asStub.AllWebResponse();
 
-        //[Test]
-        //public async Task Fetch_MultithreadedWhenAll_IsHandled()
-        //{
-        //    const int THREAD_COUNT = 10;
+            Assert.AreEqual(1, caches.Count);
+            Assert.AreEqual(1, responses.Count);
+        }
 
-        //    var sut = new FetcherServiceStub();
-        //    var tasks = GenerateFetchTasks(sut, THREAD_COUNT);
-        //    var taskResults = new List<IUrlCacheInfo>();
+        [Test]
+        public async Task Fetch_MultithreadedWhenAll_IsHandled()
+        {
+            const int THREAD_COUNT = 10;
 
-        //    var results = await Task.WhenAll(tasks.ToArray());
+            var sut = new FetcherServiceStub();
+            var tasks = GenerateFetchTasks(sut, THREAD_COUNT);
+            var taskResults = new List<IUrlCacheInfo>();
 
-        //    Assert.AreEqual(THREAD_COUNT, results.Length);
-        //    sut.WebServiceMock.Verify(x => x.DoPlatformRequest(It.IsAny<FetcherWebRequest>()), Times.Exactly(THREAD_COUNT));
-        //    Assert.IsTrue(results.All(x => x != null));
-        //}
+            var results = await Task.WhenAll(tasks.ToArray());
 
-        //[Test]
-        //public async Task Fetch_MultithreadedToSameUrl_OnlyOneEntryInDatabase()
-        //{
-        //    const int THREAD_COUNT = 10;
+            Assert.AreEqual(THREAD_COUNT, results.Length);
+            sut.WebServiceMock.Verify(x => x.DoPlatformRequest(It.IsAny<FetcherWebRequest>()), Times.Exactly(THREAD_COUNT));
+            Assert.IsTrue(results.All(x => x != null));
+        }
 
-        //    var sut = new FetcherServiceStub(new FetcherRepositoryServiceStub());
-        //    var tasks = GenerateFetchTasks(sut, THREAD_COUNT, new Uri("https://www.google.com"));
-        //    var taskResults = new List<IUrlCacheInfo>();
+        [Test]
+        public async Task Fetch_MultithreadedToSameUrl_OnlyOneEntryInDatabase()
+        {
+            const int THREAD_COUNT = 10;
 
-        //    var results = await Task.WhenAll(tasks.ToArray());
-        //    var data = ((FetcherRepositoryServiceStub)sut.RepositoryService).DatabaseConnection.Table<UrlCacheInfo>();
+            var sut = new FetcherServiceStub(new FetcherRepositoryServiceStub());
+            var tasks = GenerateFetchTasks(sut, THREAD_COUNT, new Uri("https://www.google.com"));
+            var taskResults = new List<IUrlCacheInfo>();
 
-        //    Assert.AreEqual(1, data.Count());
-        //}
+            var results = await Task.WhenAll(tasks.ToArray());
+            var data = await ((FetcherRepositoryServiceStub)sut.RepositoryService).AllCacheInfo();
 
-        //[Test]
-        //public async Task Fetch_MultithreadedToDifferentUrls_EntriesCreatedInDatabase()
-        //{
-        //    const int THREAD_COUNT = 10;
+            Assert.AreEqual(1, data.Count());
+        }
 
-        //    var sut = new FetcherServiceStub(new FetcherRepositoryServiceStub());
-        //    var tasks = GenerateFetchTasks(sut, THREAD_COUNT);
-        //    var taskResults = new List<IUrlCacheInfo>();
+        [Test]
+        public async Task Fetch_MultithreadedToDifferentUrls_EntriesCreatedInDatabase()
+        {
+            const int THREAD_COUNT = 10;
 
-        //    var results = await Task.WhenAll(tasks.ToArray());
-        //    var data = ((FetcherRepositoryServiceStub)sut.RepositoryService).DatabaseConnection.Table<UrlCacheInfo>();
+            var sut = new FetcherServiceStub();
+            var tasks = GenerateFetchTasks(sut, THREAD_COUNT);
+            var taskResults = new List<IUrlCacheInfo>();
 
-        //    Assert.AreEqual(THREAD_COUNT, data.Count());
-        //}
+            var results = await Task.WhenAll(tasks.ToArray());
+            var data = await ((FetcherRepositoryServiceStub)sut.RepositoryService).AllCacheInfo();
+
+            Assert.AreEqual(THREAD_COUNT, data.Count());
+        }
 
         private List<Task<IUrlCacheInfo>> GenerateFetchTasks(FetcherService fetcher, int amount, Uri targeturl = null)
         {

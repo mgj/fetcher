@@ -6,12 +6,14 @@ using SQLite.Net.Async;
 using SQLiteNetExtensionsAsync.Extensions;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace artm.Fetcher.Core.Services
 {
     public class FetcherRepositoryService : SQLiteAsyncConnection, IFetcherRepositoryService
     {
+        private readonly SemaphoreSlim _lock = new SemaphoreSlim(1);
         public FetcherRepositoryService(Func<SQLiteConnectionWithLock> mylock) : base(mylock, null, TaskCreationOptions.None)
         {
         }
@@ -25,13 +27,24 @@ namespace artm.Fetcher.Core.Services
         public async Task<IUrlCacheInfo> GetEntryForUrlAsync(Uri url)
         {
             var needle = url.OriginalString;
-            var dbData = await this.GetAllWithChildrenAsync<UrlCacheInfo>(x => x.Url.Equals(needle));
-            var data = dbData.FirstOrDefault();
+            
+            IUrlCacheInfo data = null;
+
+            await _lock.WaitAsync();
+            try
+            {
+                var dbData = await this.GetAllWithChildrenAsync<UrlCacheInfo>(x => x.Url.Equals(needle));
+                data = dbData.FirstOrDefault();
+            }
+            finally
+            {
+                _lock.Release();
+            }
 
             if (data != null)
             {
                 data.LastAccessed = DateTimeOffset.UtcNow;
-                await this.UpdateWithChildrenAsync(data);
+                await DatabaseUpdate(data);
             }
 
             return data;
@@ -57,33 +70,69 @@ namespace artm.Fetcher.Core.Services
             }
 
             var existing = await GetEntryForUrlAsync(uri) as UrlCacheInfo;
-            if (existing != null)
+            await _lock.WaitAsync();
+            try
             {
-                await this.DeleteAsync(existing);
+                await this.RunInTransactionAsync(tran =>
+                {
+                    if (existing != null)
+                    {
+                        tran.Delete(existing);
+                    }
+
+                    var theResponse = new FetcherWebResponse()
+                    {
+                        Body = response.Body,
+                        Error = response.Error,
+                        Headers = response.Headers,
+                        HttpStatusCode = response.HttpStatusCode,
+                    };
+                    tran.Insert(theResponse);
+
+                    hero = new UrlCacheInfo()
+                    {
+                        FetcherWebResponseId = theResponse.Id,
+                        FetcherWebResponse = theResponse,
+                        Url = uri.OriginalString,
+                        Created = timestamp,
+                        LastUpdated = timestamp,
+                        LastAccessed = timestamp
+                    };
+                    tran.Insert(hero);
+                });
+            }
+            finally
+            {
+                _lock.Release();
             }
 
-            var theResponse = new FetcherWebResponse()
-            {
-                Body = response.Body,
-                Error = response.Error,
-                Headers = response.Headers,
-                HttpStatusCode = response.HttpStatusCode,
-            };
-            await this.InsertWithChildrenAsync(theResponse, true);
-
-            hero = new UrlCacheInfo()
-            {
-                FetcherWebResponseId = theResponse.Id,
-                FetcherWebResponse = theResponse,
-                Url = uri.OriginalString,
-                Created = timestamp,
-                LastUpdated = timestamp,
-                LastAccessed = timestamp
-            };
-
-            await this.InsertWithChildrenAsync(hero, true);
-
             return hero;
+        }
+
+        private async Task DatabaseInsert(object hero)
+        {
+            await _lock.WaitAsync();
+            try
+            {
+                await this.InsertWithChildrenAsync(hero, true);
+            }
+            finally
+            {
+                _lock.Release();
+            }
+        }
+
+        private async Task DatabaseUpdate(object hero)
+        {
+            await _lock.WaitAsync();
+            try
+            {
+                await this.UpdateWithChildrenAsync(hero);
+            }
+            finally
+            {
+                _lock.Release();
+            }
         }
 
         public async Task UpdateUrlAsync(Uri uri, IUrlCacheInfo hero, IFetcherWebResponse response)
@@ -110,7 +159,7 @@ namespace artm.Fetcher.Core.Services
             hero.Url = uri.OriginalString;
             hero.LastUpdated = timestamp;
 
-            await this.UpdateWithChildrenAsync(hero);
+            await DatabaseUpdate(hero);
         }
     }
 }
