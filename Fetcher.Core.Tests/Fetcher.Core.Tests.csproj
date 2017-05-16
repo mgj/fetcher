@@ -98,7 +98,6 @@
     <Compile Include="Services\Stubs\FetcherServiceStub.cs" />
     <Compile Include="Services\Fetcher\FetcherServiceTests.cs" />
     <Compile Include="Services\Stubs\UrlCacheInfoStub.cs" />
-    <Compile Include="Services\Tosser\TosserServiceTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
