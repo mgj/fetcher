@@ -28,6 +28,8 @@ namespace artm.Fetcher.Core.Services
 
         public async Task<IUrlCacheInfo> FetchAsync(Uri url, TimeSpan freshnessTreshold)
         {
+            if (url == null) throw new ArgumentNullException("url");
+
             return await FetchAsync(
                 new FetcherWebRequest()
                 {
@@ -44,6 +46,8 @@ namespace artm.Fetcher.Core.Services
 
         public async Task<IUrlCacheInfo> FetchAsync(IFetcherWebRequest request, TimeSpan freshnessTreshold)
         {
+            if (request == null) throw new ArgumentNullException("request");
+
             System.Diagnostics.Debug.WriteLine("Fetching for uri: " + request.Url);
 
             await _lock.WaitAsync();

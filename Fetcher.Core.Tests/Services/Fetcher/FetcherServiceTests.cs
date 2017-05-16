@@ -32,7 +32,7 @@ namespace artm.Fetcher.Core.Tests.Services
         {
             var sut = new FetcherServiceStub();
             Uri url = null;
-            Assert.ThrowsAsync<NullReferenceException>(async () => await sut.FetchAsync(url));
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await sut.FetchAsync(url));
         }
 
         [Test]
@@ -40,7 +40,7 @@ namespace artm.Fetcher.Core.Tests.Services
         {
             var sut = new FetcherServiceStub();
             IFetcherWebRequest request = null;
-            Assert.ThrowsAsync<NullReferenceException>(async () => await sut.FetchAsync(request));
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await sut.FetchAsync(request));
         }
 
         [Test]
