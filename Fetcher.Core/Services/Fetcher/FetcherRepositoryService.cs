@@ -1,5 +1,6 @@
 ﻿using artm.Fetcher.Core.Entities;
 using artm.Fetcher.Core.Models;
+using Polly;
 using SQLite;
 using SQLite.Net;
 using SQLite.Net.Async;
@@ -9,11 +10,17 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Polly.Retry;
 
 namespace artm.Fetcher.Core.Services
 {
     public class FetcherRepositoryService : SQLiteAsyncConnection, IFetcherRepositoryService
     {
+        private RetryPolicy _retryPolicy = Policy
+                .Handle<SQLiteException>()
+                .WaitAndRetryAsync(5, retryAttempt =>
+                    TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
+
         //private readonly SemaphoreSlim _lock = new SemaphoreSlim(1);
 
         public FetcherRepositoryService(Func<SQLiteConnectionWithLock> mylock) : base(mylock, null, TaskCreationOptions.None)
@@ -70,7 +77,7 @@ namespace artm.Fetcher.Core.Services
             if (data != null)
             {
                 data.LastAccessed = DateTimeOffset.UtcNow;
-                await DatabaseUpdate(data);
+                await _retryPolicy.ExecuteAsync(() => DatabaseUpdate(data));
             }
 
             return data;
@@ -101,39 +108,9 @@ namespace artm.Fetcher.Core.Services
             //var existingResponse = await this.GetWithChildrenAsync<FetcherWebResponse>(existingUrlCacheInfo.FetcherWebResponseId);
             try
             {
-                await this.RunInTransactionAsync(tran =>
-                {
-                    if (existingUrlCacheInfo != null)
-                    {
-                        tran.Delete<FetcherWebRequest>(existingUrlCacheInfo.FetcherWebRequestId);
-                        tran.Delete<IFetcherWebResponse>(existingUrlCacheInfo.FetcherWebResponseId);
-                        tran.Delete(existingUrlCacheInfo);
-                    }
-                    
-                    tran.InsertWithChildren(request, false);
-                    var theResponse = new FetcherWebResponse()
-                    {
-                        Body = response.Body,
-                        Error = response.Error,
-                        Headers = response.Headers,
-                        HttpStatusCode = response.HttpStatusCode,
-                    };
-                    tran.InsertWithChildren(theResponse, false);
-
-                    hero = new UrlCacheInfo()
-                    {
-                        FetcherWebResponseId = theResponse.Id,
-                        FetcherWebResponse = theResponse,
-                        FetcherWebRequestId = request.Id,
-                        FetcherWebRequest = (FetcherWebRequest)request,
-                        Created = timestamp,
-                        LastUpdated = timestamp,
-                        LastAccessed = timestamp
-                    };
-                    tran.InsertWithChildren(hero, true);
-                });
+                hero = await _retryPolicy.ExecuteAsync(() => DatabaseInsertUrlAsync(request, response, timestamp, hero, existingUrlCacheInfo));
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 var debug = 42;
             }
@@ -142,6 +119,42 @@ namespace artm.Fetcher.Core.Services
                 //_lock.Release();
             }
 
+            return hero;
+        }
+
+        private async Task<UrlCacheInfo> DatabaseInsertUrlAsync(IFetcherWebRequest request, IFetcherWebResponse response, DateTimeOffset timestamp, UrlCacheInfo hero, IUrlCacheInfo existingUrlCacheInfo)
+        {
+            await this.RunInTransactionAsync(tran =>
+            {
+                if (existingUrlCacheInfo != null)
+                {
+                    tran.Delete<FetcherWebRequest>(existingUrlCacheInfo.FetcherWebRequestId);
+                    tran.Delete<IFetcherWebResponse>(existingUrlCacheInfo.FetcherWebResponseId);
+                    tran.Delete(existingUrlCacheInfo);
+                }
+
+                tran.InsertWithChildren(request, false);
+                var theResponse = new FetcherWebResponse()
+                {
+                    Body = response.Body,
+                    Error = response.Error,
+                    Headers = response.Headers,
+                    HttpStatusCode = response.HttpStatusCode,
+                };
+                tran.InsertWithChildren(theResponse, false);
+
+                hero = new UrlCacheInfo()
+                {
+                    FetcherWebResponseId = theResponse.Id,
+                    FetcherWebResponse = theResponse,
+                    FetcherWebRequestId = request.Id,
+                    FetcherWebRequest = (FetcherWebRequest)request,
+                    Created = timestamp,
+                    LastUpdated = timestamp,
+                    LastAccessed = timestamp
+                };
+                tran.InsertWithChildren(hero, true);
+            });
             return hero;
         }
 
