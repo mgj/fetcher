@@ -14,6 +14,7 @@ namespace artm.Fetcher.Core.Services
     public class FetcherRepositoryService : SQLiteAsyncConnection, IFetcherRepositoryService
     {
         private readonly SemaphoreSlim _lock = new SemaphoreSlim(1);
+
         public FetcherRepositoryService(Func<SQLiteConnectionWithLock> mylock) : base(mylock, null, TaskCreationOptions.None)
         {
         }
