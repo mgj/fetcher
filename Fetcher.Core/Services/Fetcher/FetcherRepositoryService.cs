@@ -59,7 +59,7 @@ namespace artm.Fetcher.Core.Services
             var existing = await GetEntryForUrlAsync(uri) as UrlCacheInfo;
             if (existing != null)
             {
-                await DeleteAsync(existing);
+                await this.DeleteAsync(existing);
             }
 
             var theResponse = new FetcherWebResponse()

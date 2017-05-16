@@ -236,6 +236,26 @@ namespace artm.Fetcher.Core.Tests.Services
             Assert.AreEqual(hero.FetchedFrom, CacheSourceType.Local);
         }
 
+        [Test]
+        public async Task Fetch_MultipleCallsToSameUrl_OnlyOneDatabaseEntryIsCreated()
+        {
+            var sut = new FetcherServiceStub();
+            var asStub = sut.RepositoryService as FetcherRepositoryServiceStub;
+
+            var hero = await sut.FetchAsync(new Uri(URL));
+            hero = await sut.FetchAsync(new Uri(URL));
+            hero = await sut.FetchAsync(new Uri(URL));
+            hero = await sut.FetchAsync(new Uri(URL));
+            hero = await sut.FetchAsync(new Uri(URL));
+            hero = await sut.FetchAsync(new Uri(URL));
+
+            var caches = await asStub.AllCacheInfo();
+            var responses = await asStub.AllWebResponse();
+
+            Assert.AreEqual(1, caches.Count);
+            Assert.AreEqual(1, responses.Count);
+        }
+
         //[Test]
         //public async Task Fetch_MultithreadedToSameUrl_OnlyOneWebRequestIsMade()
         //{
