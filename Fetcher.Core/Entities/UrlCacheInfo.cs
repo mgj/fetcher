@@ -1,4 +1,7 @@
-﻿using SQLite;
+﻿using artm.Fetcher.Core.Models;
+using SQLite;
+using SQLite.Net.Attributes;
+using SQLiteNetExtensions.Attributes;
 using System;
 
 namespace artm.Fetcher.Core.Entities
@@ -8,7 +11,11 @@ namespace artm.Fetcher.Core.Entities
         [PrimaryKey, AutoIncrement]
         public int Id { get; set; }
 
-        public string Response { get; set; }
+        [ForeignKey(typeof(FetcherWebResponse))]
+        public int FetcherWebResponseId { get; set; }
+
+        [OneToOne(CascadeOperations = CascadeOperation.All)]
+        public FetcherWebResponse FetcherWebResponse { get; set; }
 
         [Indexed(Name = "Url", Unique = true)]
         public string Url { get; set; }

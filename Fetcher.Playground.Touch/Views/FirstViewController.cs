@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using artm.Fetcher.Core.Services.Tosser;
 using System.Net;
 using artm.Fetcher.Core.Models;
+using SQLite.Net;
+using SQLite.Net.Platform.XamarinIOS;
 
 namespace Fetcher.Playground.Touch.Views
 {
@@ -63,10 +65,16 @@ namespace Fetcher.Playground.Touch.Views
         private void PrepareFetcher()
         {
             _path = new FetcherRepositoryStoragePathService();
-            _repository = new FetcherRepositoryService(_path);
+            _repository = new FetcherRepositoryService(() => CreateConnection(_path));
             _web = new FetcherWebService();
             _fetcher = new FetcherService(_web, _repository);
             _tosser = new TosserService(_web);
+        }
+
+        private static SQLiteConnectionWithLock CreateConnection(IFetcherRepositoryStoragePathService path)
+        {
+            var str = new SQLiteConnectionString(path.GetPath(), false);
+            return new SQLiteConnectionWithLock(new SQLitePlatformIOS(), str);
         }
 
         private async Task DoFetch()
@@ -74,7 +82,7 @@ namespace Fetcher.Playground.Touch.Views
             var url = new System.Uri("http://requestb.in/161b4ez1");
             //_fetcher.Preload(url, "<html>Hello world!</html>");
 
-            IUrlCacheInfo response = await _fetcher.Fetch(url);
+            IUrlCacheInfo response = await _fetcher.FetchAsync(url);
         }
 
         private UIButton PrepareDebugButton()

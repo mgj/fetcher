@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace artm.Fetcher.Core.Models
 {
-    public class FetcherWebRequest
+    public class FetcherWebRequest : IFetcherWebRequest
     {
         public Uri Url { get; set; }
         public string Method { get; set; }

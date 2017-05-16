@@ -1,16 +1,17 @@
 ﻿using artm.Fetcher.Core.Entities;
 using System;
+using System.Threading.Tasks;
 
 namespace artm.Fetcher.Core.Services
 {
     public interface IFetcherRepositoryService
     {
-        IUrlCacheInfo GetEntryForUrl(Uri url);
+        Task<IUrlCacheInfo> GetEntryForUrlAsync(Uri url);
 
-        void UpdateUrl(Uri uri, IUrlCacheInfo hero, string response);
+        Task UpdateUrlAsync(Uri uri, IUrlCacheInfo hero, IFetcherWebResponse response);
 
-        IUrlCacheInfo InsertUrl(Uri uri, string response);
+        Task<IUrlCacheInfo> InsertUrlAsync(Uri uri, IFetcherWebResponse response);
 
-        IUrlCacheInfo PreloadUrl(Uri uri, string response);
+        Task<IUrlCacheInfo> PreloadUrlAsync(Uri uri, IFetcherWebResponse response);
     }
 }

@@ -19,19 +19,19 @@ namespace artm.Fetcher.Core.Services.Tosser
             WebService = webService;
         }
 
-        public FetcherWebResponse Toss(FetcherWebRequest request)
+        public IFetcherWebResponse Toss(IFetcherWebRequest request)
         {
             if (request == null) throw new NullReferenceException("request");
             if(string.IsNullOrEmpty(request.Method) == true)
             {
                 request.Method = "POST";
             }
-            FetcherWebResponse result = CreateFetcherWebResponseError(new Exception("Toss error"));
+            IFetcherWebResponse result = CreateFetcherWebResponseError(new Exception("Toss error"));
             
             try
             {
                 var policy = Policy
-                .HandleResult<FetcherWebResponse>(r => r.IsSuccess == false)
+                .HandleResult<IFetcherWebResponse>(r => r.IsSuccess == false)
                 .WaitAndRetry(5, retryAttempt =>
                     TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
 
@@ -45,7 +45,7 @@ namespace artm.Fetcher.Core.Services.Tosser
             return result;
         }
 
-        private static FetcherWebResponse CreateFetcherWebResponseError(Exception exception)
+        private static IFetcherWebResponse CreateFetcherWebResponseError(Exception exception)
         {
             return new FetcherWebResponse()
             {

@@ -1,4 +1,5 @@
-﻿using artm.Fetcher.Core.Models;
+﻿using artm.Fetcher.Core.Entities;
+using artm.Fetcher.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace artm.Fetcher.Core.Services.Fetcher
     public abstract class FetcherWebServiceBase : IFetcherWebService
     {
 
-        protected virtual void PrepareHeaders(FetcherWebRequest request)
+        protected virtual void PrepareHeaders(IFetcherWebRequest request)
         {
             if (request == null || request.Headers == null) return;
 
@@ -26,6 +27,6 @@ namespace artm.Fetcher.Core.Services.Fetcher
 
         protected abstract void AddHeader(string key, string value);
 
-        public abstract FetcherWebResponse DoPlatformRequest(FetcherWebRequest request);
+        public abstract IFetcherWebResponse DoPlatformRequest(IFetcherWebRequest request);
     }
 }

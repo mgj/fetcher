@@ -1,12 +1,11 @@
 ﻿using artm.Fetcher.Core.Entities;
+using artm.Fetcher.Core.Models;
 using System;
 
 namespace artm.Fetcher.Core.Tests.Services.Mocks
 {
-    internal class UrlCacheInfoMock : IUrlCacheInfo
+    internal class UrlCacheInfoStub : IUrlCacheInfo
     {
-        public string Response { get; set; }
-
         public string Url { get; set; }
 
         public DateTimeOffset Created { get; set; }
@@ -15,5 +14,8 @@ namespace artm.Fetcher.Core.Tests.Services.Mocks
 
         public DateTimeOffset LastUpdated { get; set; }
         public CacheSourceType FetchedFrom { get; set; }
+        public int Id { get; set; }
+        public int FetcherWebResponseId { get; set; }
+        public FetcherWebResponse FetcherWebResponse { get; set; }
     }
 }

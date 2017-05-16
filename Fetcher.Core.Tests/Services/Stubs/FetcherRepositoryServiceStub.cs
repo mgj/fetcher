@@ -6,20 +6,38 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SQLite.Net;
+using SQLite.Net.Platform.Generic;
+using System.IO;
+using artm.Fetcher.Core.Entities;
 
 namespace artm.Fetcher.Core.Tests.Services.Stubs
 {
     public class FetcherRepositoryServiceStub : FetcherRepositoryService
     {
-        public FetcherRepositoryServiceStub() : base(FetcherMockFactory.IFetcherRepositoryStoragePathServiceMemory().Object)
+        public FetcherRepositoryServiceStub() 
+            : base(() => new SQLiteConnectionWithLock(
+                new SQLitePlatformGeneric(),
+                new SQLiteConnectionString(
+                    Path.Combine(
+                        Environment.GetFolderPath(Environment.SpecialFolder.Personal), 
+                        "FetcherRepository.db3"), 
+                    false)
+                ))
         {
+            ClearAllAsync().Wait();
+            base.Initialize().Wait();
         }
 
-        public SQLiteConnection DatabaseConnection
+        private async Task ClearAllAsync()
         {
-            get
+            try
             {
-                return Db;
+                await DropTableAsync<UrlCacheInfo>();
+                await DropTableAsync<IFetcherWebResponse>();
+            }
+            catch (Exception)
+            {
             }
         }
     }

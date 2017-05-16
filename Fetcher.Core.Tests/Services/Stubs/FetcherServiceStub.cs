@@ -1,14 +1,16 @@
 ﻿using artm.Fetcher.Core.Models;
 using artm.Fetcher.Core.Services;
 using artm.Fetcher.Core.Tests.Services.Common;
+using artm.Fetcher.Core.Tests.Services.Stubs;
 using Moq;
 using System;
+using System.Threading.Tasks;
 
 namespace artm.Fetcher.Core.Tests.Services.Mocks
 {
     public class FetcherServiceStub : FetcherService
     {
-        public FetcherServiceStub() : base(null, new FetcherRepositoryService(FetcherMockFactory.IFetcherRepositoryStoragePathServiceMemory().Object))
+        public FetcherServiceStub() : base(null, new FetcherRepositoryServiceStub())
         {
             WebServiceMock = FetcherMockFactory.IFetcherWebServiceInternetOn();
             WebService = WebServiceMock.Object;
@@ -32,7 +34,7 @@ namespace artm.Fetcher.Core.Tests.Services.Mocks
             }
         }
 
-        public FetcherServiceStub(Mock<IFetcherWebService> web) : base(web.Object, new FetcherRepositoryService(FetcherMockFactory.IFetcherRepositoryStoragePathServiceMemory().Object))
+        public FetcherServiceStub(Mock<IFetcherWebService> web) : base(web.Object, new FetcherRepositoryServiceStub())
         {
             WebServiceMock = web;
             base.WebService = WebServiceMock.Object;

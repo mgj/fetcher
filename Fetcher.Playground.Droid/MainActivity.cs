@@ -24,53 +24,53 @@ namespace Fetcher.Playground.Droid
 
         protected override void OnCreate(Bundle bundle)
         {
-            base.OnCreate(bundle);
-            PrepareFetcher();
+            //base.OnCreate(bundle);
+            //PrepareFetcher();
 
-            // Set our view from the "main" layout resource
-            SetContentView(Resource.Layout.Main);
+            //// Set our view from the "main" layout resource
+            //SetContentView(Resource.Layout.Main);
 
-            Task.Run(() => DoFetch());
-            //Task.Run(() => DoToss());
+            //Task.Run(() => DoFetch());
+            ////Task.Run(() => DoToss());
         }
 
-        private void DoToss()
-        {
-            var url = new Uri("http://requestb.in/1mjfqsz1");
+        //private void DoToss()
+        //{
+        //    var url = new Uri("http://requestb.in/1mjfqsz1");
 
-            try
-            {
-                var response = _tosser.Toss(new FetcherWebRequest() { Url = url });
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
+        //    try
+        //    {
+        //        var response = _tosser.Toss(new FetcherWebRequest() { Url = url });
+        //    }
+        //    catch (Exception)
+        //    {
+        //        throw;
+        //    }
+        //}
 
-        private void PrepareFetcher()
-        {
-            _path = new FetcherRepositoryStoragePathService();
-            _repository = new FetcherRepositoryService(_path);
-            _web = new FetcherWebService();
-            _fetcher = new FetcherService(_web, _repository);
-            _tosser = new TosserService(_web);
-        }
+        //private void PrepareFetcher()
+        //{
+        //    _path = new FetcherRepositoryStoragePathService();
+        //    _repository = new FetcherRepositoryService(_path);
+        //    _web = new FetcherWebService();
+        //    _fetcher = new FetcherService(_web, _repository);
+        //    _tosser = new TosserService(_web);
+        //}
 
-        private async Task DoFetch()
-        {
-            try
-            {
-                var url = new System.Uri("http://requestb.in/161b4ez1");
-                //_fetcher.Preload(url, "<html>Hello world!</html>");
+        //private async Task DoFetch()
+        //{
+        //    try
+        //    {
+        //        var url = new System.Uri("http://requestb.in/161b4ez1");
+        //        //_fetcher.Preload(url, "<html>Hello world!</html>");
 
-                IUrlCacheInfo response = await _fetcher.Fetch(url);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
+        //        IUrlCacheInfo response = await _fetcher.Fetch(url);
+        //    }
+        //    catch (Exception)
+        //    {
+        //        throw;
+        //    }
+        //}
     }
 }
 

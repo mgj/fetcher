@@ -5,6 +5,7 @@ using artm.Fetcher.Core.Models;
 using System.Net;
 using System.Linq;
 using artm.Fetcher.Core.Services.Fetcher;
+using artm.Fetcher.Core.Entities;
 
 namespace artm.Fetcher.Droid.Services
 {
@@ -23,12 +24,12 @@ namespace artm.Fetcher.Droid.Services
             }
         }
 
-        private static FetcherWebResponse CreateFetcherWebResponseError(string message)
+        private static IFetcherWebResponse CreateFetcherWebResponseError(string message)
         {
             return CreateFetcherWebResponseError(new Exception(message));
         }
 
-        private static FetcherWebResponse CreateFetcherWebResponseError(Exception exception)
+        private static IFetcherWebResponse CreateFetcherWebResponseError(Exception exception)
         {
             return new FetcherWebResponse()
             {
@@ -38,7 +39,7 @@ namespace artm.Fetcher.Droid.Services
             };
         }
 
-        public override FetcherWebResponse DoPlatformRequest(FetcherWebRequest request)
+        public override IFetcherWebResponse DoPlatformRequest(IFetcherWebRequest request)
         {
             var requestBuilder = new Request.Builder();
             requestBuilder.Url(request.Url.OriginalString);
@@ -67,7 +68,7 @@ namespace artm.Fetcher.Droid.Services
             }
         }
 
-        private void PrepareBody(FetcherWebRequest request, Request.Builder requestBuilder)
+        private void PrepareBody(IFetcherWebRequest request, Request.Builder requestBuilder)
         {
             if (request == null || requestBuilder == null ) return;
 
@@ -80,7 +81,7 @@ namespace artm.Fetcher.Droid.Services
             requestBuilder.Method(request.Method, body);
         }
 
-        private static MediaType PrepareContentType(FetcherWebRequest request)
+        private static MediaType PrepareContentType(IFetcherWebRequest request)
         {
             MediaType contentType = null;
             if (request != null && string.IsNullOrEmpty(request.ContentType) == false)

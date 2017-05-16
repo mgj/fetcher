@@ -8,8 +8,6 @@ namespace artm.Fetcher.Core.Services
 {
     public class FetcherService : IFetcherService
     {
-        public readonly TimeSpan CACHE_FRESHNESS_THRESHOLD = TimeSpan.FromDays(1);
-
         protected IFetcherWebService WebService { get; set; }
         protected IFetcherRepositoryService Repository { get; set; }
 
@@ -19,12 +17,12 @@ namespace artm.Fetcher.Core.Services
             Repository = repositoryService;
         }
 
-        public async Task<IUrlCacheInfo> Fetch(Uri url)
+        public async Task<IUrlCacheInfo> FetchAsync(Uri url)
         {
             IUrlCacheInfo result = null;
             try
             {
-                result = await Fetch(url, CACHE_FRESHNESS_THRESHOLD);
+                result = await FetchAsync(url, TimeSpan.FromDays(1));
             }
             catch (Exception ex)
             {
@@ -33,9 +31,9 @@ namespace artm.Fetcher.Core.Services
             return result;
         }
 
-        public async Task<IUrlCacheInfo> Fetch(Uri url, TimeSpan freshnessTreshold)
+        public async Task<IUrlCacheInfo> FetchAsync(Uri url, TimeSpan freshnessTreshold)
         {
-            return await Fetch(
+            return await FetchAsync(
                 new FetcherWebRequest()
                 {
                     Url = url,
@@ -44,11 +42,11 @@ namespace artm.Fetcher.Core.Services
                 freshnessTreshold);
         }
 
-        private async Task<IUrlCacheInfo> Fetch(FetcherWebRequest request, TimeSpan freshnessTreshold)
+        public async Task<IUrlCacheInfo> FetchAsync(IFetcherWebRequest request, TimeSpan freshnessTreshold)
         {
             System.Diagnostics.Debug.WriteLine("Fetching for uri: " + request.Url.OriginalString);
 
-            var cacheHit = Repository.GetEntryForUrl(request.Url);
+            var cacheHit = await Repository.GetEntryForUrlAsync(request.Url);
             if (cacheHit != null)
             {
                 cacheHit.FetchedFrom = CacheSourceType.Preload;
@@ -56,11 +54,11 @@ namespace artm.Fetcher.Core.Services
                 if (ShouldInvalidate(cacheHit, freshnessTreshold))
                 {
                     System.Diagnostics.Debug.WriteLine("Refreshing cache");
-                    FetcherWebResponse response = null;
+                    IFetcherWebResponse response = null;
                     try
                     {
-                        response = await FetchFromWeb(request);
-                        Repository.UpdateUrl(request.Url, cacheHit, response.Body);
+                        response = await FetchFromWebAsync(request);
+                        await Repository.UpdateUrlAsync(request.Url, cacheHit, response);
                         cacheHit.FetchedFrom = CacheSourceType.Web;
                     }
                     catch (Exception)
@@ -78,11 +76,11 @@ namespace artm.Fetcher.Core.Services
             else
             {
                 System.Diagnostics.Debug.WriteLine("Nothing found in cache, getting it fresh");
-                FetcherWebResponse response = null;
+                IFetcherWebResponse response = null;
                 try
                 {
-                    response = await FetchFromWeb(request);
-                    cacheHit = Repository.InsertUrl(request.Url, response.Body);
+                    response = await FetchFromWebAsync(request);
+                    cacheHit = await Repository.InsertUrlAsync(request.Url, response);
                     cacheHit.FetchedFrom = CacheSourceType.Web;
                     return cacheHit;
                 }
@@ -93,14 +91,14 @@ namespace artm.Fetcher.Core.Services
                 }
             }
         }
-
-        private async Task<FetcherWebResponse> FetchFromWeb(FetcherWebRequest request)
+        
+        private async Task<IFetcherWebResponse> FetchFromWebAsync(IFetcherWebRequest request)
         {
             var policy = Policy
-                .HandleResult<FetcherWebResponse>(r => r.IsSuccess == false)
+                .HandleResult<IFetcherWebResponse>(r => r.IsSuccess == false)
                 .WaitAndRetryAsync(5, retryAttempt =>
                     TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
-            var response = await policy.ExecuteAsync(() => DoWebRequest(request));
+            var response = await policy.ExecuteAsync(() => DoWebRequestAsync(request));
 
             return response;
         }
@@ -111,21 +109,21 @@ namespace artm.Fetcher.Core.Services
             return delta > freshnessTreshold;
         }
 
-        private async Task<FetcherWebResponse> DoWebRequest(FetcherWebRequest request)
+        private async Task<IFetcherWebResponse> DoWebRequestAsync(IFetcherWebRequest request)
         {
             return await Task.FromResult(WebService.DoPlatformRequest(request));
         }
 
-        public void Preload(Uri url, string response)
+        public async Task PreloadAsync(Uri url, IFetcherWebResponse response)
         {
             // Ignore if already exists in db
-            var exists = Repository.GetEntryForUrl(url);
+            var exists = await Repository.GetEntryForUrlAsync(url);
             if (exists != null)
             {
                 return;
             }
 
-            Repository.PreloadUrl(url, response);
+            await Repository.PreloadUrlAsync(url, response);
         }
     }
 }
