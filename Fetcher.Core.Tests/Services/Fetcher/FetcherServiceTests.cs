@@ -75,7 +75,7 @@ namespace artm.Fetcher.Core.Tests.Services
 
             var response1 = await sut.FetchAsync(new Uri(URL));
             var access1 = response1.LastAccessed.ToString();
-            await Task.Delay(1000);
+            await Task.Delay(10);
             var response2 = await sut.FetchAsync(new Uri(URL));
             var access2 = response2.LastAccessed.ToString();
 

@@ -79,10 +79,21 @@ namespace Fetcher.Playground.Touch.Views
 
         private async Task DoFetch()
         {
-            var url = new System.Uri("http://requestb.in/161b4ez1");
-            //_fetcher.Preload(url, "<html>Hello world!</html>");
+            await ((FetcherRepositoryService)_repository).Initialize();
 
-            IUrlCacheInfo response = await _fetcher.FetchAsync(url);
+            var url = new System.Uri("http://requestb.in/1b9zkca1");
+            //_fetcher.Preload(url, "<html>Hello world!</html>");
+            try
+            {
+
+                IUrlCacheInfo response = await _fetcher.FetchAsync(url);
+                var debug = 42;
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
         }
 
         private UIButton PrepareDebugButton()

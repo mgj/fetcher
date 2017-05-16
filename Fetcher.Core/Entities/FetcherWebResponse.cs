@@ -49,13 +49,28 @@ namespace artm.Fetcher.Core.Models
                 {
                     return new Dictionary<string, string>();
                 }
-                return JsonConvert.DeserializeObject<Dictionary<string, string>>(HeadersSerialized);
+
+                Dictionary<string, string> result = null;
+                try
+                {
+                    result = JsonConvert.DeserializeObject<Dictionary<string, string>>(HeadersSerialized);
+                }
+                catch (Exception)
+                {
+                }
+                return result;
             }
             set
             {
                 if (value != null)
                 {
-                    HeadersSerialized = JsonConvert.SerializeObject(value);
+                    try
+                    {
+                        HeadersSerialized = JsonConvert.SerializeObject(value);
+                    }
+                    catch (Exception)
+                    {
+                    }
                 }
             }
         }
