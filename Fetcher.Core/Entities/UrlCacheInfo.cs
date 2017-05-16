@@ -11,14 +11,17 @@ namespace artm.Fetcher.Core.Entities
         [PrimaryKey, AutoIncrement]
         public int Id { get; set; }
 
+        [ForeignKey(typeof(FetcherWebRequest))]
+        public int FetcherWebRequestId { get; set; }
+
+        [OneToOne]
+        public FetcherWebRequest FetcherWebRequest { get; set; }
+
         [ForeignKey(typeof(FetcherWebResponse))]
         public int FetcherWebResponseId { get; set; }
 
         [OneToOne]
         public FetcherWebResponse FetcherWebResponse { get; set; }
-
-        [Indexed(Name = "Url", Unique = true)]
-        public string Url { get; set; }
 
         public DateTimeOffset Created { get; set; }
 

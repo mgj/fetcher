@@ -16,7 +16,16 @@ namespace artm.Fetcher.Core.Tests.Services
     [TestFixture]
     public class FetcherServiceTests
     {
-        private const string URL = "https://jsonplaceholder.typicode.com/users";
+        private readonly Uri URL = new Uri("https://jsonplaceholder.typicode.com/users");
+
+        private static IFetcherWebRequest IFetcherWebRequestFactory(Uri url)
+        {
+            return new FetcherWebRequest()
+            {
+                Url = url.OriginalString,
+                Method = "GET"
+            };
+        }
 
         [Test]
         public void Fetch_NullUrl_Throws()
@@ -30,7 +39,7 @@ namespace artm.Fetcher.Core.Tests.Services
         public async Task Fetch_Sunshine_TriesToFetchFromWeb()
         {
             var sut = new FetcherServiceStub();
-            var response = await sut.FetchAsync(new Uri(URL));
+            var response = await sut.FetchAsync(URL);
 
             sut.WebServiceMock.Verify(x => x.DoPlatformRequest(It.IsAny<FetcherWebRequest>()), Times.Once);
         }
@@ -41,31 +50,22 @@ namespace artm.Fetcher.Core.Tests.Services
             var repository = new Mock<IFetcherRepositoryService>();
             var sut = new FetcherServiceStub(repository.Object);
 
-            var response = await sut.FetchAsync(new Uri(URL));
+            var response = await sut.FetchAsync(URL);
 
-            repository.Verify(x => x.InsertUrlAsync(It.IsAny<Uri>(), It.IsAny<IFetcherWebResponse>()), Times.Once);
+            repository.Verify(x => x.InsertUrlAsync(It.IsAny<IFetcherWebRequest>(), It.IsAny<IFetcherWebResponse>()), Times.Once);
         }
 
         [Test]
         public async Task Fetch_MultipleCallsToSameUrl_InsertUrlCalledNeverCalledWhenEntryExists()
         {
-            var repository = new Mock<IFetcherRepositoryService>();
-            repository.Setup(x => x.GetEntryForUrlAsync(It.IsAny<Uri>()))
-                .ReturnsAsync(() => new UrlCacheInfoStub()
-                {
-                    Url = URL,
-                    Created = DateTimeOffset.UtcNow,
-                    LastAccessed = DateTimeOffset.UtcNow,
-                    LastUpdated = DateTimeOffset.UtcNow,
-                    FetcherWebResponse = FetcherStubFactory.FetcherWebResponseFactory()
-                });
-            var sut = new FetcherServiceStub(repository.Object);
+            var repository = FetcherMockFactory.IFetcherRepositoryServiceWitUpToDateEntries();
+            var sut = new FetcherServiceStub(repository);
 
-            var response = await sut.FetchAsync(new Uri(URL));
-            await sut.FetchAsync(new Uri(URL));
-            await sut.FetchAsync(new Uri(URL));
+            var response = await sut.FetchAsync(URL);
+            await sut.FetchAsync(URL);
+            await sut.FetchAsync(URL);
 
-            repository.Verify(x => x.InsertUrlAsync(It.IsAny<Uri>(), It.IsAny<IFetcherWebResponse>()), Times.Never);
+            repository.Verify(x => x.InsertUrlAsync(It.IsAny<IFetcherWebRequest>(), It.IsAny<IFetcherWebResponse>()), Times.Never);
         }
 
         [Test]
@@ -73,10 +73,10 @@ namespace artm.Fetcher.Core.Tests.Services
         {
             var sut = new FetcherServiceStub();
 
-            var response1 = await sut.FetchAsync(new Uri(URL));
+            var response1 = await sut.FetchAsync(URL);
             var access1 = response1.LastAccessed.ToString();
             await Task.Delay(10);
-            var response2 = await sut.FetchAsync(new Uri(URL));
+            var response2 = await sut.FetchAsync(URL);
             var access2 = response2.LastAccessed.ToString();
 
             var delta = response2.LastAccessed - response1.LastAccessed;
@@ -86,45 +86,25 @@ namespace artm.Fetcher.Core.Tests.Services
         [Test]
         public async Task Fetch_WithOutdatedEntries_RepositoryUpdateUrlIsCalled()
         {
-            var repository = new Mock<IFetcherRepositoryService>();
-            var created = DateTimeOffset.UtcNow - TimeSpan.FromDays(100);
-            repository.Setup(x => x.GetEntryForUrlAsync(It.IsAny<Uri>()))
-                .ReturnsAsync(() => new UrlCacheInfoStub()
-                {
-                    Url = URL,
-                    Created = created,
-                    LastAccessed = DateTimeOffset.UtcNow,
-                    LastUpdated = created,
-                    FetcherWebResponse = FetcherStubFactory.FetcherWebResponseFactory()
-                });
+            var repository = FetcherMockFactory.IFetcherRepositoryServiceWithOutdatedEntries();
 
             var sut = new FetcherServiceStub(repository.Object);
 
-            var response = await sut.FetchAsync(new Uri(URL));
+            var response = await sut.FetchAsync(URL);
 
-            repository.Verify(x => x.UpdateUrlAsync(It.IsAny<Uri>(), It.IsAny<IUrlCacheInfo>(), It.IsAny<IFetcherWebResponse>()), Times.Once);
+            repository.Verify(x => x.UpdateUrlAsync(It.IsAny<IFetcherWebRequest>(), It.IsAny<IUrlCacheInfo>(), It.IsAny<IFetcherWebResponse>()), Times.Once);
         }
 
         [Test]
         public async Task Fetch_WithUpToDateEntries_RepositoryUpdateUrlIsNotCalled()
         {
-            var repository = new Mock<IFetcherRepositoryService>();
+            var repository = FetcherMockFactory.IFetcherRepositoryServiceWitUpToDateEntries();
             var created = DateTimeOffset.UtcNow - TimeSpan.FromMilliseconds(1);
-            repository.Setup(x => x.GetEntryForUrlAsync(It.IsAny<Uri>()))
-                .ReturnsAsync(() => new UrlCacheInfoStub()
-                {
-                    Url = URL,
-                    Created = created,
-                    LastAccessed = DateTimeOffset.UtcNow,
-                    LastUpdated = created,
-                    FetcherWebResponse = FetcherStubFactory.FetcherWebResponseFactory()
-                });
-
+            
             var sut = new FetcherServiceStub(repository.Object);
+            var response = await sut.FetchAsync(URL);
 
-            var response = await sut.FetchAsync(new Uri(URL));
-
-            repository.Verify(x => x.UpdateUrlAsync(It.IsAny<Uri>(), It.IsAny<IUrlCacheInfo>(), It.IsAny<IFetcherWebResponse>()), Times.Never);
+            repository.Verify(x => x.UpdateUrlAsync(It.IsAny<IFetcherWebRequest>(), It.IsAny<IUrlCacheInfo>(), It.IsAny<IFetcherWebResponse>()), Times.Never);
         }
 
         [Test]
@@ -141,8 +121,8 @@ namespace artm.Fetcher.Core.Tests.Services
             var sut = new FetcherServiceStub(FetcherMockFactory.IFetcherWebServiceInternetOff());
             const string response = "myPreloadResponse";
 
-            await sut.PreloadAsync(new Uri(URL), FetcherStubFactory.FetcherWebResponseFactory(response));
-            var hero = await sut.FetchAsync(new Uri(URL));
+            await sut.PreloadAsync(FetcherStubFactory.FetcherWebRequestGetFactory(URL), FetcherStubFactory.FetcherWebResponseSuccessFactory(response));
+            var hero = await sut.FetchAsync(URL);
 
             Assert.IsNotNull(hero);
             Assert.IsTrue(hero.FetcherWebResponse.Body.Equals(response));
@@ -154,8 +134,8 @@ namespace artm.Fetcher.Core.Tests.Services
             var sut = new FetcherServiceStub(FetcherMockFactory.IFetcherWebServiceInternetOff());
             const string response = "myPreloadResponse";
 
-            await sut.PreloadAsync(new Uri(URL), FetcherStubFactory.FetcherWebResponseFactory(response));
-            var hero = await sut.FetchAsync(new Uri(URL));
+            await sut.PreloadAsync(FetcherStubFactory.FetcherWebRequestGetFactory(URL), FetcherStubFactory.FetcherWebResponseSuccessFactory(response));
+            var hero = await sut.FetchAsync(URL);
 
             var isInvalid = FetcherService.ShouldInvalidate(hero, TimeSpan.FromDays(1));
 
@@ -167,7 +147,7 @@ namespace artm.Fetcher.Core.Tests.Services
         {
             var sut = new FetcherServiceStub(FetcherMockFactory.IFetcherWebServiceInternetOff());
 
-            var hero = await sut.FetchAsync(new Uri(URL));
+            var hero = await sut.FetchAsync(URL);
 
             Assert.IsNull(hero);
         }
@@ -177,10 +157,9 @@ namespace artm.Fetcher.Core.Tests.Services
         {
             var sut = new FetcherServiceStub(FetcherMockFactory.IFetcherWebServiceInternetOff());
             const string RESPONSE_STRING = "Fetch_PreloadedDataInternetUnavailable_FetchedFromIsPreloaded";
-
-            var url = new Uri(URL);
-            await sut.PreloadAsync(url, FetcherStubFactory.FetcherWebResponseFactory(RESPONSE_STRING));
-            var hero = await sut.FetchAsync(url);
+            
+            await sut.PreloadAsync(FetcherStubFactory.FetcherWebRequestGetFactory(URL), FetcherStubFactory.FetcherWebResponseSuccessFactory(RESPONSE_STRING));
+            var hero = await sut.FetchAsync(URL);
 
             Assert.NotNull(hero);
             Assert.AreEqual(RESPONSE_STRING, hero.FetcherWebResponse.Body);
@@ -194,8 +173,8 @@ namespace artm.Fetcher.Core.Tests.Services
 
             const string RESPONSE_STRING = "Fetch_PreloadedDataWithInternet_FetchedFromWeb";
 
-            await sut.PreloadAsync(new Uri(URL), FetcherStubFactory.FetcherWebResponseFactory(RESPONSE_STRING));
-            var hero = await sut.FetchAsync(new Uri(URL));
+            await sut.PreloadAsync(FetcherStubFactory.FetcherWebRequestGetFactory(URL), FetcherStubFactory.FetcherWebResponseSuccessFactory(RESPONSE_STRING));
+            var hero = await sut.FetchAsync(URL);
 
             Assert.NotNull(hero);
             Assert.AreNotEqual(RESPONSE_STRING, hero.FetcherWebResponse.Body);
@@ -209,8 +188,8 @@ namespace artm.Fetcher.Core.Tests.Services
 
             const string RESPONSE_STRING = "Fetch_RecentlyUpdated_FetchedFromLocalCache";
             
-            var hero = await sut.FetchAsync(new Uri(URL));
-            hero = await sut.FetchAsync(new Uri(URL));
+            var hero = await sut.FetchAsync(URL);
+            hero = await sut.FetchAsync(URL);
             
             Assert.NotNull(hero);
             Assert.AreNotEqual(RESPONSE_STRING, hero.FetcherWebResponse.Body);
@@ -224,12 +203,13 @@ namespace artm.Fetcher.Core.Tests.Services
 
             const string RESPONSE_STRING = "Fetch_RecentlyUpdated_FetchedFromLocalCache";
 
-            var hero = await sut.FetchAsync(new Uri(URL));
-            hero = await sut.FetchAsync(new Uri(URL));
-            hero = await sut.FetchAsync(new Uri(URL));
-            hero = await sut.FetchAsync(new Uri(URL));
-            hero = await sut.FetchAsync(new Uri(URL));
-            hero = await sut.FetchAsync(new Uri(URL));
+            var hero = await sut.FetchAsync(URL);
+            hero = await sut.FetchAsync(URL);
+            hero = await sut.FetchAsync(URL);
+            hero = await sut.FetchAsync(URL);
+            hero = await sut.FetchAsync(URL);
+            hero = await sut.FetchAsync(URL);
+            hero = await sut.FetchAsync(URL);
 
             Assert.NotNull(hero);
             Assert.AreNotEqual(RESPONSE_STRING, hero.FetcherWebResponse);
@@ -242,12 +222,13 @@ namespace artm.Fetcher.Core.Tests.Services
             var sut = new FetcherServiceStub();
             var asStub = sut.RepositoryService as FetcherRepositoryServiceStub;
 
-            var hero = await sut.FetchAsync(new Uri(URL));
-            hero = await sut.FetchAsync(new Uri(URL));
-            hero = await sut.FetchAsync(new Uri(URL));
-            hero = await sut.FetchAsync(new Uri(URL));
-            hero = await sut.FetchAsync(new Uri(URL));
-            hero = await sut.FetchAsync(new Uri(URL));
+            var hero = await sut.FetchAsync(URL);
+            hero = await sut.FetchAsync(URL);
+            hero = await sut.FetchAsync(URL);
+            hero = await sut.FetchAsync(URL);
+            hero = await sut.FetchAsync(URL);
+            hero = await sut.FetchAsync(URL);
+            hero = await sut.FetchAsync(URL);
 
             var caches = await asStub.AllCacheInfo();
             var responses = await asStub.AllWebResponse();

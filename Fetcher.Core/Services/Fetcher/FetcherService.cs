@@ -36,7 +36,7 @@ namespace artm.Fetcher.Core.Services
             return await FetchAsync(
                 new FetcherWebRequest()
                 {
-                    Url = url,
+                    Url = url.OriginalString,
                     Method = "GET"
                 },
                 freshnessTreshold);
@@ -44,9 +44,9 @@ namespace artm.Fetcher.Core.Services
 
         public async Task<IUrlCacheInfo> FetchAsync(IFetcherWebRequest request, TimeSpan freshnessTreshold)
         {
-            System.Diagnostics.Debug.WriteLine("Fetching for uri: " + request.Url.OriginalString);
+            System.Diagnostics.Debug.WriteLine("Fetching for uri: " + request.Url);
 
-            var cacheHit = await Repository.GetEntryForUrlAsync(request.Url);
+            var cacheHit = await Repository.GetEntryForRequestAsync(request);
             if (cacheHit != null)
             {
                 cacheHit.FetchedFrom = CacheSourceType.Preload;
@@ -58,7 +58,7 @@ namespace artm.Fetcher.Core.Services
                     try
                     {
                         response = await FetchFromWebAsync(request);
-                        await Repository.UpdateUrlAsync(request.Url, cacheHit, response);
+                        await Repository.UpdateUrlAsync(request, cacheHit, response);
                         cacheHit.FetchedFrom = CacheSourceType.Web;
                     }
                     catch (Exception)
@@ -80,7 +80,7 @@ namespace artm.Fetcher.Core.Services
                 try
                 {
                     response = await FetchFromWebAsync(request);
-                    cacheHit = await Repository.InsertUrlAsync(request.Url, response);
+                    cacheHit = await Repository.InsertUrlAsync(request, response);
                     cacheHit.FetchedFrom = CacheSourceType.Web;
                     return cacheHit;
                 }
@@ -114,16 +114,16 @@ namespace artm.Fetcher.Core.Services
             return await Task.FromResult(WebService.DoPlatformRequest(request));
         }
 
-        public async Task PreloadAsync(Uri url, IFetcherWebResponse response)
+        public async Task PreloadAsync(IFetcherWebRequest request, IFetcherWebResponse response)
         {
             // Ignore if already exists in db
-            var exists = await Repository.GetEntryForUrlAsync(url);
+            var exists = await Repository.GetEntryForRequestAsync(request);
             if (exists != null)
             {
                 return;
             }
 
-            await Repository.PreloadUrlAsync(url, response);
+            await Repository.PreloadUrlAsync(request, response);
         }
     }
 }

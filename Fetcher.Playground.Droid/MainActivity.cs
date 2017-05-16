@@ -74,7 +74,7 @@ namespace Fetcher.Playground.Droid
 
                 IUrlCacheInfo response = await _fetcher.FetchAsync(new FetcherWebRequest()
                 {
-                    Url = url,
+                    Url = url.OriginalString,
                     Method = "POST",
                     Headers = new Dictionary<string, string>(),
                     Body = @"[{ ""myData"": ""data"" }]",

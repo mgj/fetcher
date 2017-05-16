@@ -3,6 +3,7 @@ using artm.Fetcher.Core.Models;
 using SQLite;
 using SQLite.Net;
 using SQLite.Net.Async;
+using SQLiteNetExtensions.Extensions;
 using SQLiteNetExtensionsAsync.Extensions;
 using System;
 using System.Linq;
@@ -23,19 +24,43 @@ namespace artm.Fetcher.Core.Services
         {
             await CreateTableAsync<UrlCacheInfo>();
             await CreateTableAsync<FetcherWebResponse>();
+            await CreateTableAsync<FetcherWebRequest>();
         }
 
-        public async Task<IUrlCacheInfo> GetEntryForUrlAsync(Uri url)
+        //public async Task<IUrlCacheInfo> GetEntryForUrlAsync(string url)
+        //{
+        //    return await GetEntryForUrlAsync(new Uri(url));
+        //}
+
+        public async Task<IUrlCacheInfo> GetEntryForRequestAsync(IFetcherWebRequest request)
         {
-            var needle = url.OriginalString;
-            
             IUrlCacheInfo data = null;
+            if (request == null) return data;
 
             await _lock.WaitAsync();
             try
             {
-                var dbData = await this.GetAllWithChildrenAsync<UrlCacheInfo>(x => x.Url.Equals(needle));
-                data = dbData.FirstOrDefault();
+                var dbData = await this.Table<FetcherWebRequest>()
+                    .Where(x => x.Url == request.Url &&
+                        x.Method == request.Method)
+                    .ToListAsync();
+                var dbFirst = dbData.FirstOrDefault();
+
+                var cacheInfos = await this.Table<UrlCacheInfo>().Where(x => x.FetcherWebRequestId == request.Id).ToListAsync();
+                var cacheInfo = cacheInfos.FirstOrDefault();
+
+                if (cacheInfo != null)
+                {
+                    data = await this.GetWithChildrenAsync<UrlCacheInfo>(cacheInfo.Id);
+                }
+                else
+                {
+                    data = cacheInfo;
+                }
+            }
+            catch(Exception ex)
+            {
+                var debug = 42;
             }
             finally
             {
@@ -51,18 +76,18 @@ namespace artm.Fetcher.Core.Services
             return data;
         }
 
-        public async Task<IUrlCacheInfo> PreloadUrlAsync(Uri uri, IFetcherWebResponse response)
+        public async Task<IUrlCacheInfo> PreloadUrlAsync(IFetcherWebRequest request, IFetcherWebResponse response)
         {
             var timestamp = DateTimeOffset.UtcNow.AddYears(-1);
-            return await InsertUrlAsync(uri, response, timestamp);
+            return await InsertUrlAsync(request, response, timestamp);
         }
 
-        public async Task<IUrlCacheInfo> InsertUrlAsync(Uri uri, IFetcherWebResponse response)
+        public async Task<IUrlCacheInfo> InsertUrlAsync(IFetcherWebRequest request, IFetcherWebResponse response)
         {
-            return await InsertUrlAsync(uri, response, DateTimeOffset.UtcNow);
+            return await InsertUrlAsync(request, response, DateTimeOffset.UtcNow);
         }
 
-        private async Task<IUrlCacheInfo> InsertUrlAsync(Uri uri, IFetcherWebResponse response, DateTimeOffset timestamp)
+        private async Task<IUrlCacheInfo> InsertUrlAsync(IFetcherWebRequest request, IFetcherWebResponse response, DateTimeOffset timestamp)
         {
             UrlCacheInfo hero = null;
             if (response == null || response as FetcherWebResponse == null)
@@ -70,17 +95,26 @@ namespace artm.Fetcher.Core.Services
                 return hero;
             }
 
-            var existing = await GetEntryForUrlAsync(uri) as UrlCacheInfo;
+            var existingUrlCacheInfo = await GetEntryForRequestAsync(request) as UrlCacheInfo;
+            var existingRequests = await this.Table<FetcherWebRequest>().Where(x => x.Url.Equals(request.Url)).ToListAsync();
+            var existingRequest = existingRequests.FirstOrDefault();
             await _lock.WaitAsync();
             try
             {
                 await this.RunInTransactionAsync(tran =>
                 {
-                    if (existing != null)
+                    if (existingUrlCacheInfo != null)
                     {
-                        tran.Delete(existing);
+                        tran.Delete<FetcherWebRequest>(existingUrlCacheInfo.FetcherWebRequestId);
+                        tran.Delete<IFetcherWebResponse>(existingUrlCacheInfo.FetcherWebResponseId);
+                        tran.Delete(existingUrlCacheInfo);
                     }
-
+                    if(existingRequest != null)
+                    {
+                        tran.Delete(existingRequest);
+                    }
+                    
+                    tran.InsertWithChildren(request, false);
                     var theResponse = new FetcherWebResponse()
                     {
                         Body = response.Body,
@@ -88,19 +122,24 @@ namespace artm.Fetcher.Core.Services
                         Headers = response.Headers,
                         HttpStatusCode = response.HttpStatusCode,
                     };
-                    tran.Insert(theResponse);
+                    tran.InsertWithChildren(theResponse, false);
 
                     hero = new UrlCacheInfo()
                     {
                         FetcherWebResponseId = theResponse.Id,
                         FetcherWebResponse = theResponse,
-                        Url = uri.OriginalString,
+                        FetcherWebRequestId = request.Id,
+                        FetcherWebRequest = (FetcherWebRequest)request,
                         Created = timestamp,
                         LastUpdated = timestamp,
                         LastAccessed = timestamp
                     };
-                    tran.Insert(hero);
+                    tran.InsertWithChildren(hero, true);
                 });
+            }
+            catch(Exception ex)
+            {
+                var debug = 42;
             }
             finally
             {
@@ -136,9 +175,9 @@ namespace artm.Fetcher.Core.Services
             }
         }
 
-        public async Task UpdateUrlAsync(Uri uri, IUrlCacheInfo hero, IFetcherWebResponse response)
+        public async Task UpdateUrlAsync(IFetcherWebRequest request, IUrlCacheInfo hero, IFetcherWebResponse response)
         {
-            if (uri == null || hero == null || response == null || response as FetcherWebResponse == null)
+            if (request == null || hero == null || response == null || response as FetcherWebResponse == null)
             {
                 return;
             }
@@ -157,7 +196,22 @@ namespace artm.Fetcher.Core.Services
                 hero.FetcherWebResponse.Headers = response.Headers;
                 hero.FetcherWebResponse.HttpStatusCode = response.HttpStatusCode;
             }
-            hero.Url = uri.OriginalString;
+
+            if(request.Id != 0)
+            {
+                hero.FetcherWebRequestId = request.Id;
+                hero.FetcherWebRequest = request as FetcherWebRequest;
+            }
+            else
+            {
+                hero.FetcherWebRequest.Headers = request.Headers;
+                hero.FetcherWebRequest.Body = request.Body;
+                hero.FetcherWebRequest.ContentType = request.ContentType;
+                hero.FetcherWebRequest.Method = request.Method;
+                
+            }
+
+            hero.FetcherWebRequest.Url = request.Url;
             hero.LastUpdated = timestamp;
 
             await DatabaseUpdate(hero);

@@ -35,13 +35,14 @@
   <ItemGroup>
     <!-- A reference to the entire .NET Framework is automatically included -->
     <Folder Include="Common\" />
+    <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Entities\CacheSourceType.cs" />
     <Compile Include="Entities\IFetcherWebResponse.cs" />
-    <Compile Include="Models\FetcherWebRequest.cs" />
+    <Compile Include="Entities\FetcherWebRequest.cs" />
     <Compile Include="Entities\FetcherWebResponse.cs" />
-    <Compile Include="Models\IFetcherWebRequest.cs" />
+    <Compile Include="Entities\IFetcherWebRequest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\Fetcher\FetcherRepositoryService.cs" />
     <Compile Include="Services\Fetcher\FetcherService.cs" />

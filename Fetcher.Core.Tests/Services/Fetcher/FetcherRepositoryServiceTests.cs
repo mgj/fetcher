@@ -15,12 +15,15 @@ namespace artm.Fetcher.Core.Tests.Services
     {
         private readonly Uri URL = new Uri("https://www.google.com");
 
+        
+
         [Test]
         public async Task GetEntryForUrl_NoEntryExists_NullIsReturned()
         {
             var sut = new FetcherRepositoryServiceStub();
+            var request = FetcherStubFactory.FetcherWebRequestGetFactory(URL);
 
-            var entry = await sut.GetEntryForUrlAsync(URL);
+            var entry = await sut.GetEntryForRequestAsync(request);
 
             Assert.IsNull(entry);
         }
@@ -29,9 +32,10 @@ namespace artm.Fetcher.Core.Tests.Services
         public async Task GetEntryForUrl_EntryExists_EntryReturned()
         {
             var sut = new FetcherRepositoryServiceStub();
+            var request = FetcherStubFactory.FetcherWebRequestGetFactory(URL);
 
-            await sut.InsertUrlAsync(URL, FetcherStubFactory.FetcherWebResponseFactory());
-            var entry = sut.GetEntryForUrlAsync(URL);
+            await sut.InsertUrlAsync(request, FetcherStubFactory.FetcherWebResponseSuccessFactory());
+            var entry = sut.GetEntryForRequestAsync(request);
 
             Assert.IsNotNull(entry);
         }
@@ -39,15 +43,16 @@ namespace artm.Fetcher.Core.Tests.Services
         [Test]
         public async Task UpdateUrl_UrlExists_UrlEntryIsUpdated()
         {
-            var response = FetcherStubFactory.FetcherWebResponseFactory();
+            var response = FetcherStubFactory.FetcherWebResponseSuccessFactory();
             var sut = new FetcherRepositoryServiceStub();
+            var request = FetcherStubFactory.FetcherWebRequestGetFactory(URL);
 
-            await sut.InsertUrlAsync(URL, response);
-            var original = await sut.GetEntryForUrlAsync(URL);
+            await sut.InsertUrlAsync(request, response);
+            var original = await sut.GetEntryForRequestAsync(request);
             var originalResponse = original.FetcherWebResponse;
 
-            await sut.UpdateUrlAsync(URL, original, FetcherStubFactory.FetcherWebResponseFactory("UpdatedTestResponse"));
-            var second = await sut.GetEntryForUrlAsync(URL);
+            await sut.UpdateUrlAsync(request, original, FetcherStubFactory.FetcherWebResponseSuccessFactory("UpdatedTestResponse"));
+            var second = await sut.GetEntryForRequestAsync(request);
 
             Assert.AreNotEqual(originalResponse.Body, second.FetcherWebResponse.Body);
         }
@@ -56,10 +61,11 @@ namespace artm.Fetcher.Core.Tests.Services
         public async Task InsertUrl_ValidInput_UrlIsInserted()
         {
             var sut = new FetcherRepositoryServiceStub();
+            var request = FetcherStubFactory.FetcherWebRequestGetFactory(URL);
 
-            var isNull = await sut.GetEntryForUrlAsync(URL);
-            await sut.InsertUrlAsync(URL, FetcherStubFactory.FetcherWebResponseFactory());
-            var notNull = await sut.GetEntryForUrlAsync(URL);
+            var isNull = await sut.GetEntryForRequestAsync(request);
+            await sut.InsertUrlAsync(request, FetcherStubFactory.FetcherWebResponseSuccessFactory());
+            var notNull = await sut.GetEntryForRequestAsync(request);
 
             Assert.IsNull(isNull);
             Assert.NotNull(notNull);
@@ -69,10 +75,11 @@ namespace artm.Fetcher.Core.Tests.Services
         public async Task PreloadUrl_ValidInput_UrlIsPreloaded()
         {
             var sut = new FetcherRepositoryServiceStub();
+            var request = FetcherStubFactory.FetcherWebRequestGetFactory(URL);
 
-            var isNull = await sut.GetEntryForUrlAsync(URL);
-            await sut.PreloadUrlAsync(URL, FetcherStubFactory.FetcherWebResponseFactory());
-            var notNull = await sut.GetEntryForUrlAsync(URL);
+            var isNull = await sut.GetEntryForRequestAsync(request);
+            await sut.PreloadUrlAsync(request, FetcherStubFactory.FetcherWebResponseSuccessFactory());
+            var notNull = await sut.GetEntryForRequestAsync(request);
 
             Assert.IsNull(isNull);
             Assert.NotNull(notNull);
@@ -82,14 +89,15 @@ namespace artm.Fetcher.Core.Tests.Services
         public async Task UpdateUrl_UrlIsUpdated_LastAccessedIsNotUpdated()
         {
             var sut = new FetcherRepositoryServiceStub();
+            var request = FetcherStubFactory.FetcherWebRequestGetFactory(URL);
 
-            await sut.PreloadUrlAsync(URL, FetcherStubFactory.FetcherWebResponseFactory());
-            var data = await sut.GetEntryForUrlAsync(URL);
+            await sut.PreloadUrlAsync(request, FetcherStubFactory.FetcherWebResponseSuccessFactory());
+            var data = await sut.GetEntryForRequestAsync(request);
 
             var lastAccess1 = data.LastAccessed;
             var lastUpdated1 = data.LastUpdated;
 
-            await sut.UpdateUrlAsync(URL, data, FetcherStubFactory.FetcherWebResponseFactory("updated-response"));
+            await sut.UpdateUrlAsync(request, data, FetcherStubFactory.FetcherWebResponseSuccessFactory("updated-response"));
             var lastAccess2 = data.LastAccessed;
             var lastUpdated2 = data.LastUpdated;
 

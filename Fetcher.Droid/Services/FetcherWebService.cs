@@ -42,7 +42,7 @@ namespace artm.Fetcher.Droid.Services
         public override IFetcherWebResponse DoPlatformRequest(IFetcherWebRequest request)
         {
             var requestBuilder = new Request.Builder();
-            requestBuilder.Url(request.Url.OriginalString);
+            requestBuilder.Url(request.Url);
 
             _headerBuilder = new Headers.Builder();
             PrepareHeaders(request);

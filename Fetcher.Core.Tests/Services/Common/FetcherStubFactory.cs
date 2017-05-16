@@ -10,9 +10,24 @@ namespace artm.Fetcher.Core.Tests.Services.Common
 {
     public static class FetcherStubFactory
     {
-        public static FetcherWebResponse FetcherWebResponseFactory(string response = "FetcherRepositoryServiceTests response")
+        public static FetcherWebResponse FetcherWebResponseSuccessFactory(string response = "FetcherRepositoryServiceTests response", int id = 0)
         {
-            return new FetcherWebResponse() { Body = response, HttpStatusCode = 200 };
+            return new FetcherWebResponse()
+            {
+                Id = id,
+                Body = response,
+                HttpStatusCode = 200
+            };
+        }
+
+        public static FetcherWebRequest FetcherWebRequestGetFactory(Uri url, int id = 0)
+        {
+            return new FetcherWebRequest()
+            {
+                Id = id,
+                Url = url.OriginalString,
+                Method = "GET"
+            };
         }
     }
 }

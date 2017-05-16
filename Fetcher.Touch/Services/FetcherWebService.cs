@@ -18,7 +18,7 @@ namespace artm.Fetcher.Touch.Services
         {
             var tcs = new TaskCompletionSource<IFetcherWebResponse>();
 
-            _mutableRequest = new NSMutableUrlRequest(request.Url);
+            _mutableRequest = new NSMutableUrlRequest(new Uri(request.Url));
 
             PrepareMethod(request);
             PrepareHeaders(request);
