@@ -9,6 +9,8 @@ namespace artm.Fetcher.Core.Services
     {
         Task<IUrlCacheInfo> FetchAsync(Uri url);
         Task<IUrlCacheInfo> FetchAsync(Uri url, TimeSpan freshnessTreshold);
+        Task<IUrlCacheInfo> FetchAsync(IFetcherWebRequest request);
+
         Task<IUrlCacheInfo> FetchAsync(IFetcherWebRequest request, TimeSpan freshnessTreshold);
         Task PreloadAsync(IFetcherWebRequest request, IFetcherWebResponse response);
     }

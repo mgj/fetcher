@@ -31,8 +31,16 @@ namespace artm.Fetcher.Core.Tests.Services
         public void Fetch_NullUrl_Throws()
         {
             var sut = new FetcherServiceStub();
+            Uri url = null;
+            Assert.ThrowsAsync<NullReferenceException>(async () => await sut.FetchAsync(url));
+        }
 
-            Assert.ThrowsAsync<NullReferenceException>(async () => await sut.FetchAsync(null));
+        [Test]
+        public void Fetch_NullRequest_Throws()
+        {
+            var sut = new FetcherServiceStub();
+            IFetcherWebRequest request = null;
+            Assert.ThrowsAsync<NullReferenceException>(async () => await sut.FetchAsync(request));
         }
 
         [Test]
@@ -307,6 +315,158 @@ namespace artm.Fetcher.Core.Tests.Services
             var data = await ((FetcherRepositoryServiceStub)sut.RepositoryService).AllCacheInfo();
 
             Assert.AreEqual(THREAD_COUNT, data.Count());
+        }
+
+        [Test]
+        public async Task Fetch_MultipleCalls_OnlyOneEntryInDatabase()
+        {
+            var sut = new FetcherServiceStub();
+
+            var hero = await sut.FetchAsync(URL);
+            hero = await sut.FetchAsync(URL);
+            hero = await sut.FetchAsync(URL);
+            hero = await sut.FetchAsync(URL);
+            hero = await sut.FetchAsync(URL);
+
+            FetcherRepositoryServiceStub repository = (FetcherRepositoryServiceStub)sut.RepositoryService;
+            var caches = await repository.AllCacheInfo();
+            var responses = await repository.AllWebResponse();
+            var requests = await repository.AllWebRequests();
+
+            Assert.AreEqual(1, caches.Count);
+            Assert.AreEqual(1, responses.Count);
+            Assert.AreEqual(1, requests.Count);
+        }
+
+        [Test]
+        public async Task Fetch_MultipleGetRequests_OnlyOneEntryInDatabase()
+        {
+            var sut = new FetcherServiceStub();
+            var request = new FetcherWebRequest()
+            {
+                Url = URL.OriginalString,
+                Method = "GET"
+            };
+            var hero = await sut.FetchAsync(request);
+            hero = await sut.FetchAsync(request);
+            hero = await sut.FetchAsync(request);
+            hero = await sut.FetchAsync(request);
+            hero = await sut.FetchAsync(request);
+
+            FetcherRepositoryServiceStub repository = (FetcherRepositoryServiceStub)sut.RepositoryService;
+            var caches = await repository.AllCacheInfo();
+            var responses = await repository.AllWebResponse();
+            var requests = await repository.AllWebRequests();
+
+            Assert.AreEqual(1, caches.Count);
+            Assert.AreEqual(1, responses.Count);
+            Assert.AreEqual(1, requests.Count);
+        }
+
+        [Test]
+        public async Task Fetch_MultiplePostRequests_OnlyOneEntryInDatabase()
+        {
+            var sut = new FetcherServiceStub();
+            var request = new FetcherWebRequest()
+            {
+                Url = URL.OriginalString,
+                Method = "POST"
+            };
+            var hero = await sut.FetchAsync(request);
+            hero = await sut.FetchAsync(request);
+            hero = await sut.FetchAsync(request);
+            hero = await sut.FetchAsync(request);
+            hero = await sut.FetchAsync(request);
+
+            FetcherRepositoryServiceStub repository = (FetcherRepositoryServiceStub)sut.RepositoryService;
+            var caches = await repository.AllCacheInfo();
+            var responses = await repository.AllWebResponse();
+            var requests = await repository.AllWebRequests();
+
+            Assert.AreEqual(1, caches.Count);
+            Assert.AreEqual(1, responses.Count);
+            Assert.AreEqual(1, requests.Count);
+        }
+
+        [Test]
+        public async Task Fetch_MultipleDifferentMethods_CorrectAmountOfEntriesInDatabase()
+        {
+            var sut = new FetcherServiceStub();
+
+            await sut.FetchAsync(new FetcherWebRequest()
+            {
+                Url = URL.OriginalString,
+                Method = "POST",
+                Body = "My test request body"
+            });
+            await sut.FetchAsync(new FetcherWebRequest()
+            {
+                Url = URL.OriginalString,
+                Method = "GET"
+            });
+            await sut.FetchAsync(new FetcherWebRequest()
+            {
+                Url = URL.OriginalString,
+                Method = "DELETE",
+                Body = "My test request body"
+            });
+
+            FetcherRepositoryServiceStub repository = (FetcherRepositoryServiceStub)sut.RepositoryService;
+            var caches = await repository.AllCacheInfo();
+            var responses = await repository.AllWebResponse();
+            var requests = await repository.AllWebRequests();
+
+            Assert.AreEqual(3, caches.Count);
+            Assert.AreEqual(3, responses.Count);
+            Assert.AreEqual(3, requests.Count);
+        }
+
+        [Test]
+        public async Task Fetch_MultipleDifferentMethodsMultipleCalls_CorrectAmountOfEntriesInDatabase()
+        {
+            var sut = new FetcherServiceStub();
+
+            var postRequest = new FetcherWebRequest()
+            {
+                Url = URL.OriginalString,
+                Method = "POST",
+                Body = "My test request body"
+            };
+            var getRequest = new FetcherWebRequest()
+            {
+                Url = URL.OriginalString,
+                Method = "GET"
+            };
+            var deleteRequest = new FetcherWebRequest()
+            {
+                Url = URL.OriginalString,
+                Method = "DELETE",
+                Body = "My test request body"
+            };
+
+            await sut.FetchAsync(postRequest);
+            await sut.FetchAsync(postRequest);
+            await sut.FetchAsync(postRequest);
+            await sut.FetchAsync(postRequest);
+
+            await sut.FetchAsync(getRequest);
+            await sut.FetchAsync(getRequest);
+            await sut.FetchAsync(getRequest);
+            await sut.FetchAsync(getRequest);
+
+            await sut.FetchAsync(deleteRequest);
+            await sut.FetchAsync(deleteRequest);
+            await sut.FetchAsync(deleteRequest);
+            await sut.FetchAsync(deleteRequest);
+
+            FetcherRepositoryServiceStub repository = (FetcherRepositoryServiceStub)sut.RepositoryService;
+            var caches = await repository.AllCacheInfo();
+            var responses = await repository.AllWebResponse();
+            var requests = await repository.AllWebRequests();
+
+            Assert.AreEqual(3, caches.Count);
+            Assert.AreEqual(3, responses.Count);
+            Assert.AreEqual(3, requests.Count);
         }
 
         private List<Task<IUrlCacheInfo>> GenerateFetchTasks(FetcherService fetcher, int amount, Uri targeturl = null)

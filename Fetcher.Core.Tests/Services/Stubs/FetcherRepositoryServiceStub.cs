@@ -43,6 +43,12 @@ namespace artm.Fetcher.Core.Tests.Services.Stubs
             return data.ToList();
         }
 
+        public async Task<List<FetcherWebRequest>> AllWebRequests()
+        {
+            var data = await this.GetAllWithChildrenAsync<FetcherWebRequest>(x => true);
+            return data.ToList();
+        }
+
         private async Task ClearAllAsync()
         {
             try

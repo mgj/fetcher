@@ -9,6 +9,7 @@ namespace artm.Fetcher.Core.Services
 {
     public class FetcherService : IFetcherService
     {
+        private readonly TimeSpan DEFAULT_FRESHNESS_THRESHOLD = TimeSpan.FromDays(1);
         private readonly SemaphoreSlim _lock = new SemaphoreSlim(1);
 
         protected IFetcherWebService WebService { get; set; }
@@ -22,7 +23,7 @@ namespace artm.Fetcher.Core.Services
 
         public async Task<IUrlCacheInfo> FetchAsync(Uri url)
         {
-            return await FetchAsync(url, TimeSpan.FromDays(1));
+            return await FetchAsync(url, DEFAULT_FRESHNESS_THRESHOLD);
         }
 
         public async Task<IUrlCacheInfo> FetchAsync(Uri url, TimeSpan freshnessTreshold)
@@ -34,6 +35,11 @@ namespace artm.Fetcher.Core.Services
                     Method = "GET"
                 },
                 freshnessTreshold);
+        }
+
+        public async Task<IUrlCacheInfo> FetchAsync(IFetcherWebRequest request)
+        {
+            return await FetchAsync(request, DEFAULT_FRESHNESS_THRESHOLD);
         }
 
         public async Task<IUrlCacheInfo> FetchAsync(IFetcherWebRequest request, TimeSpan freshnessTreshold)
