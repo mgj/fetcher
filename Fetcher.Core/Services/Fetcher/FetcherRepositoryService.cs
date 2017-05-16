@@ -21,8 +21,6 @@ namespace artm.Fetcher.Core.Services
                 .WaitAndRetryAsync(5, retryAttempt =>
                     TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
 
-        //private readonly SemaphoreSlim _lock = new SemaphoreSlim(1);
-
         public FetcherRepositoryService(Func<SQLiteConnectionWithLock> mylock) : base(mylock, null, TaskCreationOptions.None)
         {
         }
@@ -34,17 +32,11 @@ namespace artm.Fetcher.Core.Services
             await CreateTableAsync<FetcherWebRequest>();
         }
 
-        //public async Task<IUrlCacheInfo> GetEntryForUrlAsync(string url)
-        //{
-        //    return await GetEntryForUrlAsync(new Uri(url));
-        //}
-
         public async Task<IUrlCacheInfo> GetEntryForRequestAsync(IFetcherWebRequest request)
         {
             IUrlCacheInfo data = null;
             if (request == null) return data;
 
-            //await _lock.WaitAsync();
             try
             {
                 var dbRequest = await this.Table<FetcherWebRequest>()
@@ -69,10 +61,6 @@ namespace artm.Fetcher.Core.Services
             {
                 var debug = 42;
             }
-            //finally
-            //{
-            //    _lock.Release();
-            //}
 
             if (data != null)
             {
@@ -103,9 +91,6 @@ namespace artm.Fetcher.Core.Services
             }
 
             var existingUrlCacheInfo = await GetEntryForRequestAsync(request);
-            //await _lock.WaitAsync();
-            //var existingRequest = await this.GetWithChildrenAsync<FetcherWebRequest>(existingUrlCacheInfo.FetcherWebRequestId);
-            //var existingResponse = await this.GetWithChildrenAsync<FetcherWebResponse>(existingUrlCacheInfo.FetcherWebResponseId);
             try
             {
                 hero = await _retryPolicy.ExecuteAsync(() => DatabaseInsertUrlAsync(request, response, timestamp, hero, existingUrlCacheInfo));
@@ -158,30 +143,9 @@ namespace artm.Fetcher.Core.Services
             return hero;
         }
 
-        private async Task DatabaseInsert(object hero)
-        {
-            //await _lock.WaitAsync();
-            try
-            {
-                await this.InsertWithChildrenAsync(hero, true);
-            }
-            finally
-            {
-                //_lock.Release();
-            }
-        }
-
         private async Task DatabaseUpdate(object hero)
         {
-            //await _lock.WaitAsync();
-            try
-            {
-                await this.UpdateWithChildrenAsync(hero);
-            }
-            finally
-            {
-                //_lock.Release();
-            }
+            await this.UpdateWithChildrenAsync(hero);
         }
 
         public async Task UpdateUrlAsync(IFetcherWebRequest request, IUrlCacheInfo hero, IFetcherWebResponse response)

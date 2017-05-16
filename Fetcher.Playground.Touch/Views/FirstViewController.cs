@@ -43,7 +43,6 @@ namespace Fetcher.Playground.Touch.Views
                 );
 
             Task.Run(() => DoFetch());
-            //Task.Run(() => DoToss());
         }
 
         private void PrepareFetcher()

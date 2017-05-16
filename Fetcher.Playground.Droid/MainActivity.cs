@@ -32,22 +32,7 @@ namespace Fetcher.Playground.Droid
             SetContentView(Resource.Layout.Main);
 
             Task.Run(() => DoFetch());
-            //Task.Run(() => DoToss());
         }
-
-        //private void DoToss()
-        //{
-        //    var url = new Uri("http://requestb.in/1mjfqsz1");
-
-        //    try
-        //    {
-        //        var response = _tosser.Toss(new FetcherWebRequest() { Url = url });
-        //    }
-        //    catch (Exception)
-        //    {
-        //        throw;
-        //    }
-        //}
 
         private void PrepareFetcher()
         {
