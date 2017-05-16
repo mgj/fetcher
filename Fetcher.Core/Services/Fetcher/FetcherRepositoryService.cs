@@ -62,8 +62,14 @@ namespace artm.Fetcher.Core.Services
                 await DeleteAsync(existing);
             }
 
-            var theResponse = response as FetcherWebResponse;
-            await this.InsertAsync(theResponse);
+            var theResponse = new FetcherWebResponse()
+            {
+                Body = response.Body,
+                Error = response.Error,
+                Headers = response.Headers,
+                HttpStatusCode = response.HttpStatusCode,
+            };
+            await this.InsertWithChildrenAsync(theResponse, true);
 
             hero = new UrlCacheInfo()
             {
@@ -74,11 +80,11 @@ namespace artm.Fetcher.Core.Services
                 LastUpdated = timestamp,
                 LastAccessed = timestamp
             };
+
             await this.InsertWithChildrenAsync(hero, true);
 
             return hero;
         }
-
 
         public async Task UpdateUrlAsync(Uri uri, IUrlCacheInfo hero, IFetcherWebResponse response)
         {
@@ -89,7 +95,18 @@ namespace artm.Fetcher.Core.Services
 
             var timestamp = DateTime.UtcNow;
 
-            hero.FetcherWebResponse = response as FetcherWebResponse;
+            if(response.Id != 0)
+            {
+                hero.FetcherWebResponseId = response.Id;
+                hero.FetcherWebResponse = response as FetcherWebResponse;
+            }
+            else
+            {
+                hero.FetcherWebResponse.Body = response.Body;
+                hero.FetcherWebResponse.Error = response.Error;
+                hero.FetcherWebResponse.Headers = response.Headers;
+                hero.FetcherWebResponse.HttpStatusCode = response.HttpStatusCode;
+            }
             hero.Url = uri.OriginalString;
             hero.LastUpdated = timestamp;
 

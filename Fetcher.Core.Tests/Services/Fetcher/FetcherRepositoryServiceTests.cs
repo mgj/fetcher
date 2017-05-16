@@ -45,10 +45,11 @@ namespace artm.Fetcher.Core.Tests.Services
             await sut.InsertUrlAsync(URL, response);
             var original = await sut.GetEntryForUrlAsync(URL);
             var originalResponse = original.FetcherWebResponse;
+
             await sut.UpdateUrlAsync(URL, original, FetcherStubFactory.FetcherWebResponseFactory("UpdatedTestResponse"));
             var second = await sut.GetEntryForUrlAsync(URL);
 
-            Assert.IsTrue(!originalResponse.Equals(second.FetcherWebResponse));
+            Assert.AreNotEqual(originalResponse.Body, second.FetcherWebResponse.Body);
         }
 
         [Test]

@@ -10,6 +10,8 @@ using SQLite.Net;
 using SQLite.Net.Platform.Generic;
 using System.IO;
 using artm.Fetcher.Core.Entities;
+using SQLiteNetExtensionsAsync.Extensions;
+using artm.Fetcher.Core.Models;
 
 namespace artm.Fetcher.Core.Tests.Services.Stubs
 {
@@ -29,12 +31,24 @@ namespace artm.Fetcher.Core.Tests.Services.Stubs
             base.Initialize().Wait();
         }
 
+        public async Task<List<UrlCacheInfo>> AllCacheInfo()
+        {
+            var data = await this.GetAllWithChildrenAsync<UrlCacheInfo>(x => true);
+            return data.ToList();
+        }
+
+        public async Task<List<FetcherWebResponse>> AllWebResponse()
+        {
+            var data = await this.GetAllWithChildrenAsync<FetcherWebResponse>(x => true);
+            return data.ToList();
+        }
+
         private async Task ClearAllAsync()
         {
             try
             {
                 await DropTableAsync<UrlCacheInfo>();
-                await DropTableAsync<IFetcherWebResponse>();
+                await DropTableAsync<FetcherWebResponse>();
             }
             catch (Exception)
             {

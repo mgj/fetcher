@@ -14,7 +14,7 @@ namespace artm.Fetcher.Core.Entities
         [ForeignKey(typeof(FetcherWebResponse))]
         public int FetcherWebResponseId { get; set; }
 
-        [OneToOne(CascadeOperations = CascadeOperation.All)]
+        [OneToOne]
         public FetcherWebResponse FetcherWebResponse { get; set; }
 
         [Indexed(Name = "Url", Unique = true)]

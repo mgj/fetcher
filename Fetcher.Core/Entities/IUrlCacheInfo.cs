@@ -8,7 +8,6 @@ namespace artm.Fetcher.Core.Entities
         int Id { get; set; }
 
         int FetcherWebResponseId { get; set; }
-
         FetcherWebResponse FetcherWebResponse { get; set; }
 
         string Url { get; set; }
