@@ -7,7 +7,6 @@ using artm.Fetcher.Core.Services;
 using artm.Fetcher.Touch.Services;
 using artm.Fetcher.Core.Entities;
 using System.Threading.Tasks;
-using artm.Fetcher.Core.Services.Tosser;
 using System.Net;
 using artm.Fetcher.Core.Models;
 using SQLite.Net;
@@ -21,7 +20,6 @@ namespace Fetcher.Playground.Touch.Views
         private IFetcherRepositoryService _repository;
         private IFetcherWebService _web;
         private IFetcherService _fetcher;
-        private TosserService _tosser;
 
         public FirstViewController()
         {
@@ -48,27 +46,12 @@ namespace Fetcher.Playground.Touch.Views
             //Task.Run(() => DoToss());
         }
 
-        private void DoToss()
-        {
-            var url = new Uri("http://requestb.in/1mjfqsz1");
-            try
-            {
-                var response = _tosser.Toss(new FetcherWebRequest() { Url = url, Method = "POST" });
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-        }
-
         private void PrepareFetcher()
         {
             _path = new FetcherRepositoryStoragePathService();
             _repository = new FetcherRepositoryService(() => CreateConnection(_path));
             _web = new FetcherWebService();
             _fetcher = new FetcherService(_web, _repository);
-            _tosser = new TosserService(_web);
         }
 
         private static SQLiteConnectionWithLock CreateConnection(IFetcherRepositoryStoragePathService path)
@@ -86,7 +69,14 @@ namespace Fetcher.Playground.Touch.Views
             try
             {
 
-                IUrlCacheInfo response = await _fetcher.FetchAsync(url);
+                IUrlCacheInfo response = await _fetcher.FetchAsync(new FetcherWebRequest()
+                {
+                    Url = url,
+                    Method = "POST",
+                    Headers = new Dictionary<string, string>(),
+                    Body = @"[{ ""myData"": ""data"" }]",
+                    ContentType = string.Empty
+                }, TimeSpan.FromDays(1));
                 var debug = 42;
             }
             catch (Exception ex)

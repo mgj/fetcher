@@ -49,9 +49,12 @@ nuget install artm.fetcher
 
 ```
 // Instantiate these on Android / iOS
+// Instantiate these on Android / iOS
 IFetcherRepositoryStoragePathService path = new FetcherRepositoryStoragePathService();
-IFetcherRepositoryService repository = new FetcherRepositoryService(path);
 IFetcherWebService web = new FetcherWebService();
+
+// OBS: Use SQLitePlatformIOS on iOS
+IFetcherRepositoryService repository = new FetcherRepositoryService(() => new SQLiteConnectionWithLock(new SQLitePlatformAndroid(), new SQLiteConnectionString(path.GetPath(), false)));
 
 // Primary interface you should use from your Core/PCL project
 IFetcherService fetcher = new FetcherService(web, repository);
@@ -60,31 +63,27 @@ var url = new System.Uri("https://www.google.com");
 
 // (Optional) Cold start: You can ship with preloaded data, and thus avoid
 // an initial requirement for an active internet connection
-fetcher.Preload(url, "<html>Hello world!</html>");
+await fetcher.PreloadAsync(url, new FetcherWebResponse() { Body = "<html>Hello world!</html>" });
 
 // Try our hardest to give you *some* response for a given url. 
 // If an url has been recently created or updated we get the response from the local cache.
 // If an url has NOT recently been created or updated we try to update 
 // the response from the network. 
 // If we cannot get the url from the network, and no cached data is available, we try to use preloaded data.
-IUrlCacheInfo response = await fetcher.Fetch(url); 
+//IUrlCacheInfo response = await fetcher.FetchAsync(url);
+
+// Dont like HTTP GET? No problem!
+IUrlCacheInfo response = await fetcher.FetchAsync(new FetcherWebRequest()
+{
+    Url = url,
+    Method = "POST",
+    Headers = new System.Collections.Generic.Dictionary<string, string>(),
+    Body = @"[{ ""myData"": ""data"" }]",
+    ContentType = string.Empty
+}, TimeSpan.FromDays(1));
 ```
 
-## Tosser example
-Just as the IFetcherService can be used for doing HTTP GET requests, ITosserService can be used to do other types of requests such as HTTP POST
-
-```
-IFetcherWebService web = new FetcherWebService();
-ITosserService tosser = new TosserService(web);
-
-// Toss a POST to a given url
-FetcherWebResponse response = tosser.Toss(new FetcherWebRequest() { Url = new Uri("http://myurl.com") });
-```
-
-
-
-
-## For developers
+## For contributors
 
 Consider using the Playground.Touch and Playground.Droid projects if you want to experiment with the code. Both projects are set up with dependencies and references so that you can get started quicker - Pull requests are very welcome!
 

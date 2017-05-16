@@ -52,8 +52,6 @@
     <Compile Include="Services\Fetcher\IFetcherWebService.cs" />
     <Compile Include="Entities\IUrlCacheInfo.cs" />
     <Compile Include="Entities\UrlCacheInfo.cs" />
-    <Compile Include="Services\Tosser\ITosserService.cs" />
-    <Compile Include="Services\Tosser\TosserService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
