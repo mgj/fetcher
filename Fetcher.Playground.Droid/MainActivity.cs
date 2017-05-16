@@ -51,7 +51,6 @@ namespace Fetcher.Playground.Droid
         private async Task DoFetch()
         {
             await ((FetcherRepositoryService)_repository).Initialize();
-
             try
             {
                 var url = new System.Uri("http://requestb.in/1b9zkca1");
