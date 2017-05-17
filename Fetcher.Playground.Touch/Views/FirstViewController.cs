@@ -65,7 +65,7 @@ namespace Fetcher.Playground.Touch.Views
         {
             await ((FetcherRepositoryService)_repository).Initialize();
 
-            var url = new System.Uri("https://services.coop.dk/restgrundsortiment/api/Vare/24003");
+            var url = new System.Uri("http://requestb.in/1b9zkca1");
             //_fetcher.Preload(url, "<html>Hello world!</html>");
             try
             {
