@@ -172,27 +172,20 @@ namespace artm.Fetcher.Core.Services
                 hero.FetcherWebResponseId = response.Id;
                 hero.FetcherWebResponse = response as FetcherWebResponse;
             }
-            else
-            {
-                hero.FetcherWebResponse.Body = response.Body;
-                hero.FetcherWebResponse.Error = response.Error;
-                hero.FetcherWebResponse.Headers = response.Headers;
-                hero.FetcherWebResponse.HttpStatusCode = response.HttpStatusCode;
-            }
+            hero.FetcherWebResponse.Body = response.Body;
+            hero.FetcherWebResponse.Error = response.Error;
+            hero.FetcherWebResponse.Headers = response.Headers;
+            hero.FetcherWebResponse.HttpStatusCode = response.HttpStatusCode;
 
-            if(request.Id != 0)
+            if (request.Id != 0)
             {
                 hero.FetcherWebRequestId = request.Id;
                 hero.FetcherWebRequest = request as FetcherWebRequest;
             }
-            else
-            {
-                hero.FetcherWebRequest.Headers = request.Headers;
-                hero.FetcherWebRequest.Body = request.Body;
-                hero.FetcherWebRequest.ContentType = request.ContentType;
-                hero.FetcherWebRequest.Method = request.Method;
-                
-            }
+            hero.FetcherWebRequest.Headers = request.Headers;
+            hero.FetcherWebRequest.Body = request.Body;
+            hero.FetcherWebRequest.ContentType = request.ContentType;
+            hero.FetcherWebRequest.Method = request.Method;
 
             hero.FetcherWebRequest.Url = request.Url;
             hero.LastUpdated = timestamp;
