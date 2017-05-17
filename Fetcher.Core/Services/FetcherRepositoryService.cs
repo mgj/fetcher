@@ -21,8 +21,16 @@ namespace artm.Fetcher.Core.Services
                 .WaitAndRetryAsync(5, retryAttempt =>
                     TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
 
-        public FetcherRepositoryService(Func<SQLiteConnectionWithLock> mylock) : base(mylock, null, TaskCreationOptions.None)
+        protected IFetcherLoggerService Logger { get; set; }
+
+        public FetcherRepositoryService(IFetcherLoggerService loggerService, Func<SQLiteConnectionWithLock> mylock) : base(mylock, null, TaskCreationOptions.None)
         {
+            Logger = loggerService;
+        }
+
+        private void Log(string message)
+        {
+            Logger.Log("FETCHERREPOSITORYSERVICE: " + message);
         }
 
         public async Task Initialize()
@@ -59,6 +67,7 @@ namespace artm.Fetcher.Core.Services
             }
             catch(Exception ex)
             {
+                Log("Could not get entry: " + ex);
                 var debug = 42;
             }
 
@@ -97,6 +106,7 @@ namespace artm.Fetcher.Core.Services
             }
             catch (Exception ex)
             {
+                Log("Could not insert entry: " + ex);
                 var debug = 42;
             }
             finally

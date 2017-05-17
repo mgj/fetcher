@@ -50,7 +50,7 @@ namespace Fetcher.Playground.Touch.Views
         {
             _logger = new FetcherLoggerService();
             _path = new FetcherRepositoryStoragePathService();
-            _repository = new FetcherRepositoryService(() => CreateConnection(_path));
+            _repository = new FetcherRepositoryService(_logger, () => CreateConnection(_path));
             _web = new FetcherWebService();
             _fetcher = new FetcherService(_web, _repository, _logger);
         }

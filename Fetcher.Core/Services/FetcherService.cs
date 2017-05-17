@@ -14,13 +14,18 @@ namespace artm.Fetcher.Core.Services
 
         protected IFetcherWebService WebService { get; set; }
         protected IFetcherRepositoryService Repository { get; set; }
-        protected IFetcherLoggerService Logger { get; private set; }
+        protected IFetcherLoggerService Logger { get; set; }
 
         public FetcherService(IFetcherWebService webService, IFetcherRepositoryService repositoryService, IFetcherLoggerService loggerService)
         {
             WebService = webService;
             Repository = repositoryService;
             Logger = loggerService;
+        }
+
+        private void Log(string message)
+        {
+            Logger.Log("FETCHERSERVICE: " + message);
         }
 
         public async Task<IUrlCacheInfo> FetchAsync(Uri url)
