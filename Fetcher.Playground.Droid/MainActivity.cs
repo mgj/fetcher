@@ -22,6 +22,7 @@ namespace Fetcher.Playground.Droid
         private IFetcherRepositoryService _repository;
         private IFetcherWebService _web;
         private IFetcherService _fetcher;
+        private FetcherLoggerService _logger;
 
         protected override void OnCreate(Bundle bundle)
         {
@@ -36,10 +37,11 @@ namespace Fetcher.Playground.Droid
 
         private void PrepareFetcher()
         {
+            _logger = new FetcherLoggerService();
             _path = new FetcherRepositoryStoragePathService();
             _repository = new FetcherRepositoryService(() => CreateConnection(_path));
             _web = new FetcherWebService();
-            _fetcher = new FetcherService(_web, _repository);
+            _fetcher = new FetcherService(_web, _repository, _logger);
         }
 
         private static SQLiteConnectionWithLock CreateConnection(IFetcherRepositoryStoragePathService path)

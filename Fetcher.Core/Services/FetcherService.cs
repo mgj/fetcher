@@ -14,11 +14,13 @@ namespace artm.Fetcher.Core.Services
 
         protected IFetcherWebService WebService { get; set; }
         protected IFetcherRepositoryService Repository { get; set; }
+        protected IFetcherLoggerService Logger { get; private set; }
 
-        public FetcherService(IFetcherWebService webService, IFetcherRepositoryService repositoryService)
+        public FetcherService(IFetcherWebService webService, IFetcherRepositoryService repositoryService, IFetcherLoggerService loggerService)
         {
             WebService = webService;
             Repository = repositoryService;
+            Logger = loggerService;
         }
 
         public async Task<IUrlCacheInfo> FetchAsync(Uri url)
@@ -48,7 +50,7 @@ namespace artm.Fetcher.Core.Services
         {
             if (request == null) throw new ArgumentNullException("request");
 
-            System.Diagnostics.Debug.WriteLine("Fetching for uri: " + request.Url);
+            Logger.Log("Fetching for uri: " + request.Url);
 
             await _lock.WaitAsync();
             try
@@ -57,10 +59,10 @@ namespace artm.Fetcher.Core.Services
                 if (cacheHit != null)
                 {
                     cacheHit.FetchedFrom = CacheSourceType.Preload;
-                    System.Diagnostics.Debug.WriteLine("Cache hit");
+                    Logger.Log("Cache hit");
                     if (ShouldInvalidate(cacheHit, freshnessTreshold))
                     {
-                        System.Diagnostics.Debug.WriteLine("Refreshing cache");
+                        Logger.Log("Refreshing cache");
                         IFetcherWebResponse response = null;
                         try
                         {
@@ -70,7 +72,7 @@ namespace artm.Fetcher.Core.Services
                         }
                         catch (Exception)
                         {
-                            System.Diagnostics.Debug.WriteLine("Could not update from network, keep using old cache data");
+                            Logger.Log("Could not update from network, keep using old cache data");
                         }
                     }
                     else
@@ -82,7 +84,7 @@ namespace artm.Fetcher.Core.Services
                 }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine("Nothing found in cache, getting it fresh");
+                    Logger.Log("Nothing found in cache, getting it fresh");
                     IFetcherWebResponse response = null;
                     try
                     {
@@ -93,7 +95,7 @@ namespace artm.Fetcher.Core.Services
                     }
                     catch (Exception ex)
                     {
-                        System.Diagnostics.Debug.WriteLine("Could not insert from network - giving up");
+                        Logger.Log("Could not insert from network - giving up");
                         return null;
                     }
                 }
