@@ -20,6 +20,7 @@ namespace Fetcher.Playground.Touch.Views
         private IFetcherRepositoryService _repository;
         private IFetcherWebService _web;
         private IFetcherService _fetcher;
+        private FetcherLoggerService _logger;
 
         public FirstViewController()
         {
@@ -47,10 +48,11 @@ namespace Fetcher.Playground.Touch.Views
 
         private void PrepareFetcher()
         {
+            _logger = new FetcherLoggerService();
             _path = new FetcherRepositoryStoragePathService();
-            _repository = new FetcherRepositoryService(() => CreateConnection(_path));
+            _repository = new FetcherRepositoryService(_logger, () => CreateConnection(_path));
             _web = new FetcherWebService();
-            _fetcher = new FetcherService(_web, _repository);
+            _fetcher = new FetcherService(_web, _repository, _logger);
         }
 
         private static SQLiteConnectionWithLock CreateConnection(IFetcherRepositoryStoragePathService path)
@@ -68,14 +70,7 @@ namespace Fetcher.Playground.Touch.Views
             try
             {
 
-                IUrlCacheInfo response = await _fetcher.FetchAsync(new FetcherWebRequest()
-                {
-                    Url = url.OriginalString,
-                    Method = "POST",
-                    Headers = new Dictionary<string, string>(),
-                    Body = @"[{ ""myData"": ""data"" }]",
-                    ContentType = string.Empty
-                }, TimeSpan.FromDays(1));
+                IUrlCacheInfo response = await _fetcher.FetchAsync(url);
                 var debug = 42;
             }
             catch (Exception ex)

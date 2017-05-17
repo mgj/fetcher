@@ -1,5 +1,6 @@
 ﻿using artm.Fetcher.Core.Entities;
 using artm.Fetcher.Core.Models;
+using Newtonsoft.Json;
 using Polly;
 using System;
 using System.Threading;
@@ -14,11 +15,18 @@ namespace artm.Fetcher.Core.Services
 
         protected IFetcherWebService WebService { get; set; }
         protected IFetcherRepositoryService Repository { get; set; }
+        protected IFetcherLoggerService Logger { get; set; }
 
-        public FetcherService(IFetcherWebService webService, IFetcherRepositoryService repositoryService)
+        public FetcherService(IFetcherWebService webService, IFetcherRepositoryService repositoryService, IFetcherLoggerService loggerService)
         {
             WebService = webService;
             Repository = repositoryService;
+            Logger = loggerService;
+        }
+
+        private void Log(string message)
+        {
+            Logger.Log("FETCHERSERVICE: " + message);
         }
 
         public async Task<IUrlCacheInfo> FetchAsync(Uri url)
@@ -48,7 +56,7 @@ namespace artm.Fetcher.Core.Services
         {
             if (request == null) throw new ArgumentNullException("request");
 
-            System.Diagnostics.Debug.WriteLine("Fetching for uri: " + request.Url);
+            Logger.Log("Fetching for uri: " + request.Url);
 
             await _lock.WaitAsync();
             try
@@ -57,10 +65,10 @@ namespace artm.Fetcher.Core.Services
                 if (cacheHit != null)
                 {
                     cacheHit.FetchedFrom = CacheSourceType.Preload;
-                    System.Diagnostics.Debug.WriteLine("Cache hit");
+                    Logger.Log("Cache hit");
                     if (ShouldInvalidate(cacheHit, freshnessTreshold))
                     {
-                        System.Diagnostics.Debug.WriteLine("Refreshing cache");
+                        Logger.Log("Refreshing cache");
                         IFetcherWebResponse response = null;
                         try
                         {
@@ -70,7 +78,7 @@ namespace artm.Fetcher.Core.Services
                         }
                         catch (Exception)
                         {
-                            System.Diagnostics.Debug.WriteLine("Could not update from network, keep using old cache data");
+                            Logger.Log("Could not update from network, keep using old cache data");
                         }
                     }
                     else
@@ -82,7 +90,7 @@ namespace artm.Fetcher.Core.Services
                 }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine("Nothing found in cache, getting it fresh");
+                    Logger.Log("Nothing found in cache, getting it fresh");
                     IFetcherWebResponse response = null;
                     try
                     {
@@ -93,7 +101,7 @@ namespace artm.Fetcher.Core.Services
                     }
                     catch (Exception ex)
                     {
-                        System.Diagnostics.Debug.WriteLine("Could not insert from network - giving up");
+                        Logger.Log("Could not insert from network - giving up: " + ex);
                         return null;
                     }
                 }
@@ -123,7 +131,17 @@ namespace artm.Fetcher.Core.Services
 
         private async Task<IFetcherWebResponse> DoWebRequestAsync(IFetcherWebRequest request)
         {
-            return await Task.FromResult(WebService.DoPlatformRequest(request));
+            var response = await Task.FromResult(WebService.DoPlatformRequest(request));
+            string responseJson = string.Empty;
+            try
+            {
+                responseJson = JsonConvert.SerializeObject(response);
+            }
+            catch (Exception)
+            {
+            }
+            Log("Platform web response: " + responseJson);
+            return response;
         }
 
         public async Task PreloadAsync(IFetcherWebRequest request, IFetcherWebResponse response)

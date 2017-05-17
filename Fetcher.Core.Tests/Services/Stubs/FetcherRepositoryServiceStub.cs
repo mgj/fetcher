@@ -12,13 +12,14 @@ using System.IO;
 using artm.Fetcher.Core.Entities;
 using SQLiteNetExtensionsAsync.Extensions;
 using artm.Fetcher.Core.Models;
+using Moq;
 
 namespace artm.Fetcher.Core.Tests.Services.Stubs
 {
     public class FetcherRepositoryServiceStub : FetcherRepositoryService
     {
         public FetcherRepositoryServiceStub() 
-            : base(() => new SQLiteConnectionWithLock(
+            : base(Mock.Of<IFetcherLoggerService>(), () => new SQLiteConnectionWithLock(
                 new SQLitePlatformGeneric(),
                 new SQLiteConnectionString(
                     Path.Combine(

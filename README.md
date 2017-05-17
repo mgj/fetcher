@@ -70,7 +70,7 @@ await fetcher.PreloadAsync(url, new FetcherWebResponse() { Body = "<html>Hello w
 // If an url has NOT recently been created or updated we try to update 
 // the response from the network. 
 // If we cannot get the url from the network, and no cached data is available, we try to use preloaded data.
-//IUrlCacheInfo response = await fetcher.FetchAsync(url);
+IUrlCacheInfo response = await fetcher.FetchAsync(url);
 
 // Dont like HTTP GET? No problem!
 IUrlCacheInfo response = await fetcher.FetchAsync(new FetcherWebRequest()
