@@ -95,7 +95,7 @@ namespace artm.Fetcher.Core.Services
                     }
                     catch (Exception ex)
                     {
-                        Logger.Log("Could not insert from network - giving up");
+                        Logger.Log("Could not insert from network - giving up: " + ex);
                         return null;
                     }
                 }
