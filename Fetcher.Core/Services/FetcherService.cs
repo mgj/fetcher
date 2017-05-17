@@ -1,5 +1,6 @@
 ﻿using artm.Fetcher.Core.Entities;
 using artm.Fetcher.Core.Models;
+using Newtonsoft.Json;
 using Polly;
 using System;
 using System.Threading;
@@ -130,7 +131,17 @@ namespace artm.Fetcher.Core.Services
 
         private async Task<IFetcherWebResponse> DoWebRequestAsync(IFetcherWebRequest request)
         {
-            return await Task.FromResult(WebService.DoPlatformRequest(request));
+            var response = await Task.FromResult(WebService.DoPlatformRequest(request));
+            string responseJson = string.Empty;
+            try
+            {
+                responseJson = JsonConvert.SerializeObject(response);
+            }
+            catch (Exception)
+            {
+            }
+            Log("Platform web response: " + responseJson);
+            return response;
         }
 
         public async Task PreloadAsync(IFetcherWebRequest request, IFetcherWebResponse response)

@@ -170,8 +170,8 @@ namespace artm.Fetcher.Core.Services
             if(response.Id != 0)
             {
                 hero.FetcherWebResponseId = response.Id;
-                hero.FetcherWebResponse = response as FetcherWebResponse;
             }
+            hero.FetcherWebResponse = response as FetcherWebResponse;
             hero.FetcherWebResponse.Body = response.Body;
             hero.FetcherWebResponse.Error = response.Error;
             hero.FetcherWebResponse.Headers = response.Headers;
@@ -180,8 +180,8 @@ namespace artm.Fetcher.Core.Services
             if (request.Id != 0)
             {
                 hero.FetcherWebRequestId = request.Id;
-                hero.FetcherWebRequest = request as FetcherWebRequest;
             }
+            hero.FetcherWebRequest = request as FetcherWebRequest;
             hero.FetcherWebRequest.Headers = request.Headers;
             hero.FetcherWebRequest.Body = request.Body;
             hero.FetcherWebRequest.ContentType = request.ContentType;
