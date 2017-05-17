@@ -74,7 +74,7 @@ namespace artm.Fetcher.Core.Services
             if (data != null)
             {
                 data.LastAccessed = DateTimeOffset.UtcNow;
-                await _retryPolicy.ExecuteAsync(() => DatabaseUpdate(data));
+                await _retryPolicy.ExecuteAsync(() => this.UpdateWithChildrenAsync(data));
             }
 
             return data;
@@ -93,16 +93,15 @@ namespace artm.Fetcher.Core.Services
 
         private async Task<IUrlCacheInfo> InsertUrlAsync(IFetcherWebRequest request, IFetcherWebResponse response, DateTimeOffset timestamp)
         {
-            UrlCacheInfo hero = null;
+            IUrlCacheInfo hero = null;
             if (response == null || response as FetcherWebResponse == null)
             {
                 return hero;
             }
 
-            var existingUrlCacheInfo = await GetEntryForRequestAsync(request);
             try
             {
-                hero = await _retryPolicy.ExecuteAsync(() => DatabaseInsertUrlAsync(request, response, timestamp, hero, existingUrlCacheInfo));
+                hero = await _retryPolicy.ExecuteAsync(() => DatabaseInsertUrlAsync(request, response, timestamp));
             }
             catch (Exception ex)
             {
@@ -117,8 +116,10 @@ namespace artm.Fetcher.Core.Services
             return hero;
         }
 
-        private async Task<UrlCacheInfo> DatabaseInsertUrlAsync(IFetcherWebRequest request, IFetcherWebResponse response, DateTimeOffset timestamp, UrlCacheInfo hero, IUrlCacheInfo existingUrlCacheInfo)
+        private async Task<IUrlCacheInfo> DatabaseInsertUrlAsync(IFetcherWebRequest request, IFetcherWebResponse response, DateTimeOffset timestamp)
         {
+            var existingUrlCacheInfo = await GetEntryForRequestAsync(request);
+            UrlCacheInfo hero = null;
             await this.RunInTransactionAsync(tran =>
             {
                 if (existingUrlCacheInfo != null)
@@ -153,14 +154,9 @@ namespace artm.Fetcher.Core.Services
             return hero;
         }
 
-        private async Task DatabaseUpdate(object hero)
+        public async Task UpdateUrlAsync(IFetcherWebRequest request, IUrlCacheInfo toBeUpdated, IFetcherWebResponse response)
         {
-            await this.UpdateWithChildrenAsync(hero);
-        }
-
-        public async Task UpdateUrlAsync(IFetcherWebRequest request, IUrlCacheInfo hero, IFetcherWebResponse response)
-        {
-            if (request == null || hero == null || response == null || response as FetcherWebResponse == null)
+            if (request == null || toBeUpdated == null || response == null || response as FetcherWebResponse == null)
             {
                 return;
             }
@@ -169,28 +165,28 @@ namespace artm.Fetcher.Core.Services
 
             if(response.Id != 0)
             {
-                hero.FetcherWebResponseId = response.Id;
+                toBeUpdated.FetcherWebResponseId = response.Id;
+                toBeUpdated.FetcherWebResponse = response as FetcherWebResponse;
             }
-            hero.FetcherWebResponse = response as FetcherWebResponse;
-            hero.FetcherWebResponse.Body = response.Body;
-            hero.FetcherWebResponse.Error = response.Error;
-            hero.FetcherWebResponse.Headers = response.Headers;
-            hero.FetcherWebResponse.HttpStatusCode = response.HttpStatusCode;
+            toBeUpdated.FetcherWebResponse.Body = response.Body;
+            toBeUpdated.FetcherWebResponse.Error = response.Error;
+            toBeUpdated.FetcherWebResponse.Headers = response.Headers;
+            toBeUpdated.FetcherWebResponse.HttpStatusCode = response.HttpStatusCode;
 
             if (request.Id != 0)
             {
-                hero.FetcherWebRequestId = request.Id;
+                toBeUpdated.FetcherWebRequestId = request.Id;
+                toBeUpdated.FetcherWebRequest = request as FetcherWebRequest;
             }
-            hero.FetcherWebRequest = request as FetcherWebRequest;
-            hero.FetcherWebRequest.Headers = request.Headers;
-            hero.FetcherWebRequest.Body = request.Body;
-            hero.FetcherWebRequest.ContentType = request.ContentType;
-            hero.FetcherWebRequest.Method = request.Method;
+            toBeUpdated.FetcherWebRequest.Headers = request.Headers;
+            toBeUpdated.FetcherWebRequest.Body = request.Body;
+            toBeUpdated.FetcherWebRequest.ContentType = request.ContentType;
+            toBeUpdated.FetcherWebRequest.Method = request.Method;
 
-            hero.FetcherWebRequest.Url = request.Url;
-            hero.LastUpdated = timestamp;
+            toBeUpdated.FetcherWebRequest.Url = request.Url;
+            toBeUpdated.LastUpdated = timestamp;
 
-            await DatabaseUpdate(hero);
+            await this.UpdateWithChildrenAsync(toBeUpdated);
         }
     }
 }
