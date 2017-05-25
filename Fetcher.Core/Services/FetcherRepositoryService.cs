@@ -26,7 +26,7 @@ namespace artm.Fetcher.Core.Services
         public FetcherRepositoryService(IFetcherLoggerService loggerService, Func<SQLiteConnectionWithLock> mylock) : base(mylock, null, TaskCreationOptions.None)
         {
             Logger = loggerService;
-            var createdDB = Initialize().Wait(10000);
+            var createdDB = Initialize().Wait(1000);
             if(createdDB == false)
             {
                 Log("Catastrophic error: Couldnt create database tables");
