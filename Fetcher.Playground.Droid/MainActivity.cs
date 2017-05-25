@@ -62,7 +62,6 @@ namespace Fetcher.Playground.Droid
 
         private async Task DoFetch()
         {
-            await ((FetcherRepositoryService)_repository).Initialize();
             try
             {
                 var url = new System.Uri("https://lorempixel.com/200/400/");

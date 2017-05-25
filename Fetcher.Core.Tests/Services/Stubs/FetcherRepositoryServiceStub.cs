@@ -57,6 +57,8 @@ namespace artm.Fetcher.Core.Tests.Services.Stubs
                 await DropTableAsync<UrlCacheInfo>();
                 await DropTableAsync<FetcherWebResponse>();
                 await DropTableAsync<FetcherWebRequest>();
+
+                await Initialize();
             }
             catch (Exception)
             {

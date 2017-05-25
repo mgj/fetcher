@@ -26,6 +26,11 @@ namespace artm.Fetcher.Core.Services
         public FetcherRepositoryService(IFetcherLoggerService loggerService, Func<SQLiteConnectionWithLock> mylock) : base(mylock, null, TaskCreationOptions.None)
         {
             Logger = loggerService;
+            var createdDB = Initialize().Wait(10000);
+            if(createdDB == false)
+            {
+                Log("Catastrophic error: Couldnt create database tables");
+            }
         }
 
         private void Log(string message)
@@ -33,7 +38,7 @@ namespace artm.Fetcher.Core.Services
             Logger.Log("FETCHERREPOSITORYSERVICE: " + message);
         }
 
-        public async Task Initialize()
+        protected async Task Initialize()
         {
             await CreateTableAsync<UrlCacheInfo>();
             await CreateTableAsync<FetcherWebResponse>();
