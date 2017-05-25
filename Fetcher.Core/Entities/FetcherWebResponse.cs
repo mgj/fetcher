@@ -62,8 +62,9 @@ namespace artm.Fetcher.Core.Models
                 {
                     result = JsonConvert.DeserializeObject<Dictionary<string, string>>(HeadersSerialized);
                 }
-                catch (Exception)
+                catch (JsonException je)
                 {
+                    LogJsonException(je);
                 }
                 return result;
             }
@@ -75,11 +76,17 @@ namespace artm.Fetcher.Core.Models
                     {
                         HeadersSerialized = JsonConvert.SerializeObject(value);
                     }
-                    catch (Exception)
+                    catch (JsonException je)
                     {
+                        LogJsonException(je);
                     }
                 }
             }
+        }
+
+        private void LogJsonException(JsonException je)
+        {
+            System.Diagnostics.Debug.WriteLine("JSON parsing error: " + je);
         }
 
         [Ignore]
