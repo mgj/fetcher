@@ -469,6 +469,84 @@ namespace artm.Fetcher.Core.Tests.Services
             Assert.AreEqual(3, requests.Count);
         }
 
+        [Test]
+        public async Task Fetch_MultipleDifferentMethods_CorrectResponseForEach()
+        {
+            var sut = new FetcherServiceStub();
+
+            var postRequest = new FetcherWebRequest()
+            {
+                Url = URL.OriginalString,
+                Method = "POST",
+                Body = "My test request body"
+            };
+            var postResponse = new FetcherWebResponse()
+            {
+                HttpStatusCode = 200,
+                Body = "My test post response body"
+            };
+
+            var getRequest = new FetcherWebRequest()
+            {
+                Url = URL.OriginalString,
+                Method = "GET"
+            };
+            var getResponse = new FetcherWebResponse()
+            {
+                HttpStatusCode = 200,
+                Body = "My test post response body"
+            };
+
+            var repository = sut.RepositoryService as FetcherRepositoryService;
+            await repository.InsertUrlAsync(postRequest, postResponse);
+            await repository.InsertUrlAsync(getRequest, getResponse);
+
+            var getData = await sut.FetchAsync(getRequest);
+            var postData = await sut.FetchAsync(postRequest);
+
+            Assert.AreEqual(getResponse.Body, getData.FetcherWebResponse.Body);
+            Assert.AreEqual(postResponse.Body, postData.FetcherWebResponse.Body);
+        }
+
+        [Test]
+        public async Task Fetch_MultipleDifferentMethods_CorrectRequestMethodForEach()
+        {
+            var sut = new FetcherServiceStub();
+
+            var postRequest = new FetcherWebRequest()
+            {
+                Url = URL.OriginalString,
+                Method = "POST",
+                Body = "My test request body"
+            };
+            var postResponse = new FetcherWebResponse()
+            {
+                HttpStatusCode = 200,
+                Body = "My test post response body"
+            };
+
+            var getRequest = new FetcherWebRequest()
+            {
+                Url = URL.OriginalString,
+                Method = "GET"
+            };
+            var getResponse = new FetcherWebResponse()
+            {
+                HttpStatusCode = 200,
+                Body = "My test post response body"
+            };
+
+            var repository = sut.RepositoryService as FetcherRepositoryService;
+            await repository.InsertUrlAsync(postRequest, postResponse);
+            await repository.InsertUrlAsync(getRequest, getResponse);
+
+            var getData = await sut.FetchAsync(getRequest);
+            var postData = await sut.FetchAsync(postRequest);
+
+            Assert.AreEqual(getRequest.Method, getData.FetcherWebRequest.Method);
+            Assert.AreEqual(postRequest.Method, postData.FetcherWebRequest.Method);
+        }
+
         private List<Task<IUrlCacheInfo>> GenerateFetchTasks(FetcherService fetcher, int amount, Uri targeturl = null)
         {
             var result = new List<Task<IUrlCacheInfo>>();

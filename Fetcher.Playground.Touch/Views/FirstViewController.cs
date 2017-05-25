@@ -11,6 +11,7 @@ using System.Net;
 using artm.Fetcher.Core.Models;
 using SQLite.Net;
 using SQLite.Net.Platform.XamarinIOS;
+using Foundation;
 
 namespace Fetcher.Playground.Touch.Views
 {
@@ -21,6 +22,7 @@ namespace Fetcher.Playground.Touch.Views
         private IFetcherWebService _web;
         private IFetcherService _fetcher;
         private FetcherLoggerService _logger;
+        private UIImageView _image;
 
         public FirstViewController()
         {
@@ -35,13 +37,16 @@ namespace Fetcher.Playground.Touch.Views
 
             var label = PrepareDebugLabel();
             var button = PrepareDebugButton();
+            _image = PrepareImage();
 
             View.SubviewsDoNotTranslateAutoresizingMaskIntoConstraints();
             View.AddConstraints(
-                label.AtTopOf(View),
-                label.WithSameWidth(View),
-                label.Height().EqualTo(50)
+                _image.AtTopOf(View),
+                _image.Width().EqualTo(200),
+                _image.Height().EqualTo(200)
                 );
+
+
 
             Task.Run(() => DoFetch());
         }
@@ -61,16 +66,30 @@ namespace Fetcher.Playground.Touch.Views
             return new SQLiteConnectionWithLock(new SQLitePlatformIOS(), str);
         }
 
+        private UIImageView PrepareImage()
+        {
+            var image = new UIImageView();
+            Add(image);
+            return image;
+            
+        }
+
         private async Task DoFetch()
         {
-            await ((FetcherRepositoryService)_repository).Initialize();
-
-            var url = new System.Uri("http://requestb.in/1b9zkca1");
             //_fetcher.Preload(url, "<html>Hello world!</html>");
             try
             {
-
+                var url = new System.Uri("https://lorempixel.com/200/400/");
                 IUrlCacheInfo response = await _fetcher.FetchAsync(url);
+
+                InvokeOnMainThread(() => {
+                    using (var data = NSData.FromArray(response.FetcherWebResponse.BodyAsBytes))
+                    {
+                        _image.Image = UIImage.LoadFromData(data);
+
+                    }
+                });
+
                 var debug = 42;
             }
             catch (Exception ex)
@@ -78,6 +97,20 @@ namespace Fetcher.Playground.Touch.Views
 
                 throw;
             }
+        }
+
+        static byte[] GetBytes(string str)
+        {
+            byte[] bytes = new byte[str.Length * sizeof(char)];
+            System.Buffer.BlockCopy(str.ToCharArray(), 0, bytes, 0, bytes.Length);
+            return bytes;
+        }
+
+        static string GetString(byte[] bytes)
+        {
+            char[] chars = new char[bytes.Length / sizeof(char)];
+            System.Buffer.BlockCopy(bytes, 0, chars, 0, bytes.Length);
+            return new string(chars);
         }
 
         private UIButton PrepareDebugButton()

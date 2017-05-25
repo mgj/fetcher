@@ -49,7 +49,6 @@ nuget install artm.fetcher
 
 ```
 // Instantiate these on Android / iOS
-// Instantiate these on Android / iOS
 IFetcherRepositoryStoragePathService path = new FetcherRepositoryStoragePathService();
 IFetcherWebService web = new FetcherWebService();
 

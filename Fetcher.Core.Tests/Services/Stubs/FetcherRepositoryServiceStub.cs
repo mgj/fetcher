@@ -52,15 +52,11 @@ namespace artm.Fetcher.Core.Tests.Services.Stubs
 
         private async Task ClearAllAsync()
         {
-            try
-            {
-                await DropTableAsync<UrlCacheInfo>();
-                await DropTableAsync<FetcherWebResponse>();
-                await DropTableAsync<FetcherWebRequest>();
-            }
-            catch (Exception)
-            {
-            }
+            await DropTableAsync<UrlCacheInfo>();
+            await DropTableAsync<FetcherWebResponse>();
+            await DropTableAsync<FetcherWebRequest>();
+
+            await Initialize();
         }
     }
 }

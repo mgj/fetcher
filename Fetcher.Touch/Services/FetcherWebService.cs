@@ -7,6 +7,7 @@ using System.Net;
 using System.Linq;
 using artm.Fetcher.Core.Services.Fetcher;
 using artm.Fetcher.Core.Entities;
+using System.Text;
 
 namespace artm.Fetcher.Touch.Services
 {
@@ -63,13 +64,19 @@ namespace artm.Fetcher.Touch.Services
                             (data, response, error) =>
                             {
                                 var resp = response as NSHttpUrlResponse;
+                                byte[] dataBytes = new byte[data.Length];
+                                System.Runtime.InteropServices.Marshal.Copy(data.Bytes, dataBytes, 0, Convert.ToInt32(data.Length));
+
                                 tcs.SetResult(new FetcherWebResponse()
                                 {
                                     HttpStatusCode = (int)resp?.StatusCode,
                                     Error = new Exception(error?.ToString()),
-                                    Body = data?.ToString()
+                                    Body = Encoding.UTF8.GetString(dataBytes),
+                                    BodyAsBytes = dataBytes
                                 });
                             });
         }
+
+        
     }
 }

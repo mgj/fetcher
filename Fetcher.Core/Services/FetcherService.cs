@@ -123,26 +123,19 @@ namespace artm.Fetcher.Core.Services
             return response;
         }
 
+        private async Task<IFetcherWebResponse> DoWebRequestAsync(IFetcherWebRequest request)
+        {
+            var response = await Task.FromResult(WebService.DoPlatformRequest(request));
+            return response;
+        }
+
         public static bool ShouldInvalidate(IUrlCacheInfo hero, TimeSpan freshnessTreshold)
         {
             var delta = DateTimeOffset.UtcNow - hero.LastUpdated;
             return delta > freshnessTreshold;
         }
 
-        private async Task<IFetcherWebResponse> DoWebRequestAsync(IFetcherWebRequest request)
-        {
-            var response = await Task.FromResult(WebService.DoPlatformRequest(request));
-            string responseJson = string.Empty;
-            try
-            {
-                responseJson = JsonConvert.SerializeObject(response);
-            }
-            catch (Exception)
-            {
-            }
-            Log("Platform web response: " + responseJson);
-            return response;
-        }
+        
 
         public async Task PreloadAsync(IFetcherWebRequest request, IFetcherWebResponse response)
         {

@@ -16,20 +16,6 @@ namespace artm.Fetcher.Core.Models
         [Indexed]
         public string Url { get; set; }
 
-        //[Ignore]
-        //public Uri Url
-        //{
-        //    get
-        //    {
-        //        if (string.IsNullOrEmpty(UrlOriginalString) == true) return null;
-        //        return new Uri(UrlOriginalString);
-        //    }
-        //    set
-        //    {
-        //        UrlOriginalString = value?.OriginalString;
-        //    }
-        //}
-
         [Indexed]
         public string Method { get; set; }
         public string HeadersSerialized { get; set; }
@@ -49,8 +35,9 @@ namespace artm.Fetcher.Core.Models
                 {
                     result = JsonConvert.DeserializeObject<Dictionary<string, string>>(HeadersSerialized);
                 }
-                catch (Exception)
+                catch (JsonException je)
                 {
+                    LogJsonException(je);
                 }
                 return result;
             }
@@ -62,12 +49,19 @@ namespace artm.Fetcher.Core.Models
                     {
                         HeadersSerialized = JsonConvert.SerializeObject(value);
                     }
-                    catch (Exception)
+                    catch (JsonException je)
                     {
+                        LogJsonException(je);
                     }
                 }
             }
         }
+
+        private void LogJsonException(JsonException je)
+        {
+            System.Diagnostics.Debug.WriteLine("JSON parsing error: " + je);
+        }
+
         public string Body { get; set; }
         public string ContentType { get; set; }
     }

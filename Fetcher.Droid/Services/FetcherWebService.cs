@@ -55,17 +55,34 @@ namespace artm.Fetcher.Droid.Services
                 var response = Client.NewCall(requestBuilder.Build()).Execute();
                 if(response == null) return CreateFetcherWebResponseError(new Exception("DoPlatformRequest failed"));
 
+
+                ResponseBody responseBody = response.Body();
+                var source = responseBody.Source();
+                source.Request(Java.Lang.Long.MaxValue); // Buffer the entire body.
+                var buffer = source.Buffer;
+
+                var body = buffer.Clone().ReadString(Java.Nio.Charset.Charset.ForName("UTF-8"));
+                var bodyAsBytes = buffer.Clone().ReadByteArray();
                 return new FetcherWebResponse()
                 {
                     HttpStatusCode = response.Code(),
                     Error = new Exception(response.Message()),
-                    Body = response.Body()?.String()
+                    Body = body,
+                    BodyAsBytes = bodyAsBytes
                 };
             }
             catch (Exception ex)
             {
                 return CreateFetcherWebResponseError(ex);
             }
+        }
+
+        private ResponseBody CloneResponseBody(Response rawResponse)
+        {
+            ResponseBody responseBody = rawResponse.Body();
+
+            var bufferClone = responseBody.Source().Buffer.Clone();
+            return ResponseBody.Create(responseBody.ContentType(), responseBody.ContentLength(), bufferClone);
         }
 
         private void PrepareBody(IFetcherWebRequest request, Request.Builder requestBuilder)
