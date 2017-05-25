@@ -59,7 +59,8 @@ namespace artm.Fetcher.Droid.Services
                 {
                     HttpStatusCode = response.Code(),
                     Error = new Exception(response.Message()),
-                    Body = response.Body()?.String()
+                    Body = response.Body()?.String(),
+                    BodyAsBytes = response.Body()?.Bytes()
                 };
             }
             catch (Exception ex)

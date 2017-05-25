@@ -32,7 +32,14 @@ namespace Fetcher.Playground.Droid
             // Set our view from the "main" layout resource
             SetContentView(Resource.Layout.Main);
 
+            PrepareImage();
+
             Task.Run(() => DoFetch());
+        }
+
+        private void PrepareImage()
+        {
+            var image = FindViewById<ImageView>(Resources);
         }
 
         private void PrepareFetcher()

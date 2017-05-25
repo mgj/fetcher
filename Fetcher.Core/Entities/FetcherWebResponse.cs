@@ -5,6 +5,7 @@ using SQLite.Net.Attributes;
 using SQLiteNetExtensions.Attributes;
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace artm.Fetcher.Core.Models
 {
@@ -37,6 +38,12 @@ namespace artm.Fetcher.Core.Models
             }
         }
         public string Body { get; set; }
+        
+        public byte[] BodyAsBytes
+        {
+            get;
+            set;
+        }
 
         public string HeadersSerialized { get; set; }
 

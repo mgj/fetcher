@@ -133,6 +133,7 @@ namespace artm.Fetcher.Core.Services
                 var theResponse = new FetcherWebResponse()
                 {
                     Body = response.Body,
+                    BodyAsBytes = response.BodyAsBytes,
                     Error = response.Error,
                     Headers = response.Headers,
                     HttpStatusCode = response.HttpStatusCode,
@@ -169,6 +170,7 @@ namespace artm.Fetcher.Core.Services
                 toBeUpdated.FetcherWebResponse = response as FetcherWebResponse;
             }
             toBeUpdated.FetcherWebResponse.Body = response.Body;
+            toBeUpdated.FetcherWebResponse.BodyAsBytes = response.BodyAsBytes;
             toBeUpdated.FetcherWebResponse.Error = response.Error;
             toBeUpdated.FetcherWebResponse.Headers = response.Headers;
             toBeUpdated.FetcherWebResponse.HttpStatusCode = response.HttpStatusCode;
