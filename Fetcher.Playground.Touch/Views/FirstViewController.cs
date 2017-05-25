@@ -78,11 +78,10 @@ namespace Fetcher.Playground.Touch.Views
         {
             await ((FetcherRepositoryService)_repository).Initialize();
 
-            var url = new System.Uri("https://lorempixel.com/200/400/");
             //_fetcher.Preload(url, "<html>Hello world!</html>");
             try
             {
-
+                var url = new System.Uri("https://lorempixel.com/200/400/");
                 IUrlCacheInfo response = await _fetcher.FetchAsync(url);
 
                 InvokeOnMainThread(() => {

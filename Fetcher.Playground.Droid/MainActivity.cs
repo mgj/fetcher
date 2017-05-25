@@ -12,6 +12,7 @@ using artm.Fetcher.Core.Models;
 using SQLite.Net;
 using SQLite.Net.Platform.XamarinAndroid;
 using System.Collections.Generic;
+using Android.Graphics;
 
 namespace Fetcher.Playground.Droid
 {
@@ -23,6 +24,7 @@ namespace Fetcher.Playground.Droid
         private IFetcherWebService _web;
         private IFetcherService _fetcher;
         private FetcherLoggerService _logger;
+        private ImageView _image;
 
         protected override void OnCreate(Bundle bundle)
         {
@@ -39,7 +41,8 @@ namespace Fetcher.Playground.Droid
 
         private void PrepareImage()
         {
-            var image = FindViewById<ImageView>(Resources);
+            _image = FindViewById<ImageView>(Resource.Id.my_imageview);
+
         }
 
         private void PrepareFetcher()
@@ -62,18 +65,11 @@ namespace Fetcher.Playground.Droid
             await ((FetcherRepositoryService)_repository).Initialize();
             try
             {
-                var url = new System.Uri("http://requestb.in/1b9zkca1");
-                //_fetcher.Preload(url, "<html>Hello world!</html>");
+                var url = new System.Uri("https://lorempixel.com/200/400/");
+                IUrlCacheInfo response = await _fetcher.FetchAsync(url);
+                var bitmap = BitmapFactory.DecodeByteArray(response.FetcherWebResponse.BodyAsBytes, 0, response.FetcherWebResponse.BodyAsBytes.Length);
 
-                IUrlCacheInfo response = await _fetcher.FetchAsync(new FetcherWebRequest()
-                {
-                    Url = url.OriginalString,
-                    Method = "POST",
-                    Headers = new Dictionary<string, string>(),
-                    Body = @"[{ ""myData"": ""data"" }]",
-                    ContentType = string.Empty
-                }, TimeSpan.FromMilliseconds(1));
-                var debug = 42;
+                RunOnUiThread(() => _image.SetImageBitmap(bitmap));
             }
             catch (Exception)
             {
