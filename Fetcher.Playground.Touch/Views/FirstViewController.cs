@@ -76,8 +76,6 @@ namespace Fetcher.Playground.Touch.Views
 
         private async Task DoFetch()
         {
-            await ((FetcherRepositoryService)_repository).Initialize();
-
             //_fetcher.Preload(url, "<html>Hello world!</html>");
             try
             {
