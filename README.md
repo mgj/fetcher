@@ -52,8 +52,13 @@ nuget install artm.fetcher
 IFetcherRepositoryStoragePathService path = new FetcherRepositoryStoragePathService();
 IFetcherWebService web = new FetcherWebService();
 
-// OBS: Use SQLitePlatformIOS on iOS
+// On Android:
 IFetcherRepositoryService repository = new FetcherRepositoryService(() => new SQLiteConnectionWithLock(new SQLitePlatformAndroid(), new SQLiteConnectionString(path.GetPath(), false)));
+// On iOS:
+IFetcherRepositoryService repository = new FetcherRepositoryService(() => new SQLiteConnectionWithLock(new SQLitePlatformIOS(), new SQLiteConnectionString(path.GetPath(), false)));
+
+// This call will be removed in a future version but for now you still have to call
+await repository.Initialize();
 
 // Primary interface you should use from your Core/PCL project
 IFetcherService fetcher = new FetcherService(web, repository);
@@ -81,6 +86,12 @@ IUrlCacheInfo response = await fetcher.FetchAsync(new FetcherWebRequest()
     ContentType = string.Empty
 }, TimeSpan.FromDays(1));
 ```
+
+## Caching rules
+
+A new cache entry will be created (that is, a FetchAsync call is considered unique) if:
+* The URL does not exist in the cache
+* The specified method does not exist for the given url
 
 ## For contributors
 
