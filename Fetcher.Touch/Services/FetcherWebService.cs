@@ -27,6 +27,7 @@ namespace artm.Fetcher.Touch.Services
 
             NSUrlSessionDataTask task = CreateUrlSessionDataTask(tcs, _mutableRequest);
             task.Resume();
+
             return tcs.Task.Result;
         }
 
@@ -64,19 +65,30 @@ namespace artm.Fetcher.Touch.Services
                             (data, response, error) =>
                             {
                                 var resp = response as NSHttpUrlResponse;
-                                byte[] dataBytes = new byte[data.Length];
-                                System.Runtime.InteropServices.Marshal.Copy(data.Bytes, dataBytes, 0, Convert.ToInt32(data.Length));
 
-                                tcs.SetResult(new FetcherWebResponse()
+                                if (error != null)
                                 {
-                                    HttpStatusCode = (int)resp?.StatusCode,
-                                    Error = new Exception(error?.ToString()),
-                                    Body = Encoding.UTF8.GetString(dataBytes),
-                                    BodyAsBytes = dataBytes
-                                });
+                                    tcs.SetResult(new FetcherWebResponse()
+                                    {
+                                        HttpStatusCode = 0,
+                                        Error = new Exception(error.ToString()),
+                                        Body = string.Empty,
+                                        BodyAsBytes = new byte[0]
+                                    });
+                                }
+                                else
+                                {
+                                    byte[] dataBytes = new byte[data.Length];
+                                    System.Runtime.InteropServices.Marshal.Copy(data.Bytes, dataBytes, 0, Convert.ToInt32(data.Length));
+                                    tcs.SetResult(new FetcherWebResponse()
+                                    {
+                                        HttpStatusCode = (int)resp?.StatusCode,
+                                        Error = new Exception(error?.ToString()),
+                                        Body = Encoding.UTF8.GetString(dataBytes),
+                                        BodyAsBytes = dataBytes
+                                    });
+                                }
                             });
         }
-
-        
     }
 }
