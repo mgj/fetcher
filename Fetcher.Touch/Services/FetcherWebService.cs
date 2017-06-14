@@ -70,7 +70,7 @@ namespace artm.Fetcher.Touch.Services
                                 {
                                     tcs.SetResult(new FetcherWebResponse()
                                     {
-                                        HttpStatusCode = 0,
+                                        HttpStatusCode = 999,
                                         Error = new Exception(error.ToString()),
                                         Body = string.Empty,
                                         BodyAsBytes = new byte[0]
