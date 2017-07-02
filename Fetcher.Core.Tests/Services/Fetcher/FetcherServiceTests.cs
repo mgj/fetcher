@@ -301,21 +301,19 @@ namespace artm.Fetcher.Core.Tests.Services
             Assert.AreEqual(1, data.Count());
         }
 
-        //[Test]
-        //public async Task Fetch_MultithreadedToDifferentUrls_ConcurrentWebRequestsAreMade()
-        //{
-        //    //const int THREAD_COUNT = 10;
-
+        [Test]
+        public void Fetch_MultithreadedToDifferentUrls_ConcurrentWebRequestsAreMade()
+        {
+            const int THREAD_COUNT = 10;
             
+            var sut = new FetcherServiceStub(FetcherWebServiceMockFactory.IFetcherWebServiceSlowInternet());
 
-        //    //var sut = new FetcherServiceStub(new FetcherRepositoryServiceStub());
-        //    //var tasks = GenerateFetchTasks(sut, THREAD_COUNT, new Uri("https://www.google.com"));
+            var tasks = GenerateFetchTasks(sut, THREAD_COUNT, new Uri("https://www.google.com"));
 
-        //    //var results = await Task.WhenAll(tasks.ToArray());
-        //    //var data = await ((FetcherRepositoryServiceStub)sut.RepositoryService).AllCacheInfo();
+            var results = Task.WhenAll(tasks.ToArray()).Wait(1500); // Each call hits a simulated 1000ms network delay
 
-        //    //Assert.AreEqual(1, data.Count());
-        //}
+            Assert.IsTrue(results);
+        }
 
         [Test]
         public async Task Fetch_MultithreadedToDifferentUrls_EntriesCreatedInDatabase()
