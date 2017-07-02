@@ -23,8 +23,8 @@ namespace artm.Fetcher.Core.Tests.Services.Stubs
                 new SQLitePlatformGeneric(),
                 new SQLiteConnectionString(
                     Path.Combine(
-                        Environment.GetFolderPath(Environment.SpecialFolder.Personal), 
-                        "FetcherRepository.db3"), 
+                        Environment.GetFolderPath(Environment.SpecialFolder.Personal),
+                        "FetcherRepository.db3"),
                     false)
                 ))
         {

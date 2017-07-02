@@ -23,7 +23,7 @@ namespace artm.Fetcher.Core.Services
 
         protected IFetcherLoggerService Logger { get; set; }
 
-        public FetcherRepositoryService(IFetcherLoggerService loggerService, Func<SQLiteConnectionWithLock> mylock) : base(mylock, null, TaskCreationOptions.None)
+        public FetcherRepositoryService(IFetcherLoggerService loggerService, Func<SQLiteConnectionWithLock> mylock) : base(mylock)
         {
             Logger = loggerService;
         }
@@ -35,9 +35,9 @@ namespace artm.Fetcher.Core.Services
 
         public async Task Initialize()
         {
-            await CreateTableAsync<UrlCacheInfo>().ConfigureAwait(false);
-            await CreateTableAsync<FetcherWebResponse>().ConfigureAwait(false);
-            await CreateTableAsync<FetcherWebRequest>().ConfigureAwait(false);
+            await CreateTableAsync<UrlCacheInfo>();
+            await CreateTableAsync<FetcherWebResponse>();
+            await CreateTableAsync<FetcherWebRequest>();
         }
 
         public async Task<IUrlCacheInfo> GetEntryForRequestAsync(IFetcherWebRequest request)

@@ -10,29 +10,8 @@ using System.Threading.Tasks;
 
 namespace artm.Fetcher.Core.Tests.Services.Common
 {
-    public static class FetcherMockFactory
+    public static class FetcherRepositoryServiceMockFactory
     {
-        public static Mock<IFetcherRepositoryStoragePathService> IFetcherRepositoryStoragePathServiceMemory()
-        {
-            var mock = new Mock<IFetcherRepositoryStoragePathService>();
-            mock.Setup(x => x.GetPath(It.IsAny<string>())).Returns(() => ":memory:");
-            return mock;
-        }
-
-        public static Mock<IFetcherWebService> IFetcherWebServiceInternetOn()
-        {
-            var mock = new Mock<IFetcherWebService>();
-            mock.Setup(x => x.DoPlatformRequest(It.IsAny<FetcherWebRequest>())).Returns(() => new FetcherWebResponse() { HttpStatusCode = 200, Body = "DoPlatformWebRequest Default Test Body" });
-            return mock;
-        }
-
-        public static Mock<IFetcherWebService> IFetcherWebServiceInternetOff()
-        {
-            var mock = new Mock<IFetcherWebService>();
-            mock.Setup(x => x.DoPlatformRequest(It.IsAny<FetcherWebRequest>())).Throws(new Exception("IFetcherWebServiceInternetOff mock web exception"));
-            return mock;
-        }
-
         public static Mock<IFetcherRepositoryService> IFetcherRepositoryServiceWithOutdatedEntries()
         {
             var repository = new Mock<IFetcherRepositoryService>();
@@ -42,7 +21,7 @@ namespace artm.Fetcher.Core.Tests.Services.Common
                 .ReturnsAsync((IFetcherWebRequest request) =>
                 UrlCacheInfoFactory(created, request));
             repository.Setup(x => x.InsertUrlAsync(It.IsAny<IFetcherWebRequest>(), It.IsAny<IFetcherWebResponse>()))
-                .ReturnsAsync((IFetcherWebRequest request, IFetcherWebResponse response) => 
+                .ReturnsAsync((IFetcherWebRequest request, IFetcherWebResponse response) =>
                 UrlCacheInfoFactory(created, new Uri(request.Url)));
 
             return repository;
@@ -55,7 +34,7 @@ namespace artm.Fetcher.Core.Tests.Services.Common
                 .ReturnsAsync((IFetcherWebRequest request) =>
                 UrlCacheInfoFactory(DateTimeOffset.UtcNow, request));
             repository.Setup(x => x.InsertUrlAsync(It.IsAny<IFetcherWebRequest>(), It.IsAny<IFetcherWebResponse>()))
-                .ReturnsAsync((IFetcherWebRequest request, IFetcherWebResponse response) => 
+                .ReturnsAsync((IFetcherWebRequest request, IFetcherWebResponse response) =>
                 UrlCacheInfoFactory(DateTimeOffset.UtcNow, new Uri(request.Url)));
 
             return repository;
