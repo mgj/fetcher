@@ -125,8 +125,17 @@ namespace artm.Fetcher.Core.Services
 
         private async Task<IFetcherWebResponse> DoWebRequestAsync(IFetcherWebRequest request)
         {
-            var response = await Task.FromResult(WebService.DoPlatformRequest(request));
-            return response;
+            try
+            {
+
+                var response = await Task.FromResult(WebService.DoPlatformRequest(request));
+                return response;
+            }
+            catch (Exception e)
+            {
+
+                throw;
+            }
         }
 
         public static bool ShouldInvalidate(IUrlCacheInfo hero, TimeSpan freshnessTreshold)
