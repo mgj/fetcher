@@ -81,8 +81,13 @@ namespace Fetcher.Playground.Touch.Views
             //_fetcher.Preload(url, "<html>Hello world!</html>");
             try
             {
-                var url = new System.Uri("https://lorempixel.com/200/400/");
-                IUrlCacheInfo response = await _fetcher.FetchAsync(url);
+                var url = "https://www.google.com";
+                IUrlCacheInfo response = await _fetcher.FetchAsync(new FetcherWebRequest()
+                {
+                    Url = url,
+                    Method = "DELETE",
+                    Body = string.Empty
+                }, TimeSpan.FromMilliseconds(1));
 
                 InvokeOnMainThread(() => {
                     using (var data = NSData.FromArray(response.FetcherWebResponse.BodyAsBytes))

@@ -25,6 +25,7 @@ namespace artm.Fetcher.Touch.Services
             PrepareHeaders(request);
             PrepareBody(request);
 
+
             NSUrlSessionDataTask task = CreateUrlSessionDataTask(tcs, _mutableRequest);
             task.Resume();
 
@@ -79,7 +80,11 @@ namespace artm.Fetcher.Touch.Services
                                 else
                                 {
                                     byte[] dataBytes = new byte[data.Length];
-                                    System.Runtime.InteropServices.Marshal.Copy(data.Bytes, dataBytes, 0, Convert.ToInt32(data.Length));
+                                    if(data != null && data.Bytes != null && data.Count() > 0)
+                                    {
+                                        System.Runtime.InteropServices.Marshal.Copy(data.Bytes, dataBytes, 0, Convert.ToInt32(data.Length));
+                                    }
+
                                     tcs.SetResult(new FetcherWebResponse()
                                     {
                                         HttpStatusCode = (int)resp?.StatusCode,
