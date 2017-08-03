@@ -198,6 +198,19 @@ namespace artm.Fetcher.Core.Tests.Services
         }
 
         [Test]
+        public async Task Fetch_RecentlyUpdatedFromWeb_FetchedFromLocal()
+        {
+            var sut = new FetcherServiceStub();
+
+            await sut.FetchAsync(URL);
+            sut = new FetcherServiceStub(new FetcherRepositoryServiceStub(false), FetcherWebServiceMockFactory.IFetcherWebServiceInternetOff().Object);
+            var hero = await sut.FetchAsync(URL);
+
+            Assert.NotNull(hero);
+            Assert.AreEqual(CacheSourceType.Local, hero.FetchedFrom);
+        }
+
+        [Test]
         public async Task Fetch_RecentlyUpdated_FetchedFromLocalCache()
         {
             var sut = new FetcherServiceStub();
@@ -310,7 +323,7 @@ namespace artm.Fetcher.Core.Tests.Services
 
             var tasks = GenerateFetchTasks(sut, THREAD_COUNT, new Uri("https://www.google.com"));
 
-            var results = Task.WhenAll(tasks.ToArray()).Wait(1500); // Each call hits a simulated 1000ms network delay
+            var results = Task.WhenAll(tasks.ToArray()).Wait(2000); // Each call hits a simulated 1000ms network delay
 
             Assert.IsTrue(results);
         }
