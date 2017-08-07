@@ -66,13 +66,9 @@ namespace artm.Fetcher.Droid.Services
         {
             if (request == null || requestBuilder == null ) return;
 
-            RequestBody body = null;
-            if (string.IsNullOrEmpty(request.Body) == false)
-            {
-                body = RequestBody.Create(MediaType.Parse(BODY_FORMAT), request.Body);
-            }
+            var body = string.IsNullOrEmpty(request.Body) ? string.Empty : request.Body;
 
-            requestBuilder.Method(request.Method, body);
+            requestBuilder.Method(request.Method, RequestBody.Create(MediaType.Parse(BODY_FORMAT), body));
         }
 
         private static MediaType PrepareContentType(IFetcherWebRequest request)
