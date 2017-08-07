@@ -65,6 +65,7 @@ namespace Fetcher.Playground.Droid
             await ((FetcherRepositoryService)_repository).Initialize();
             try
             {
+
                 var url = new System.Uri("https://lorempixel.com/200/400/");
                 IUrlCacheInfo response = await _fetcher.FetchAsync(url);
                 var bitmap = BitmapFactory.DecodeByteArray(response.FetcherWebResponse.BodyAsBytes, 0, response.FetcherWebResponse.BodyAsBytes.Length);
