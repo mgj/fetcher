@@ -1,5 +1,5 @@
 #tool "nuget:?package=GitVersion.CommandLine"
-#tool "nuget:?package=gitlink"
+#tool "nuget:?package=gitlink&version=2.4.0.0"
 #tool "nuget:?package=vswhere"
 
 var sln = new FilePath("Fetcher.sln");
@@ -65,7 +65,6 @@ Task("GitLink")
 	.Does(() => {
 	GitLink(sln.GetDirectory(), new GitLinkSettings {
 		RepositoryUrl = "https://github.com/mgj/fetcher",
-		SolutionFileName = "Fetcher.sln",
 		ArgumentCustomization = args => args.Append(
 			"-ignore fetcher.core.tests,fetcher.playground.core,fetcher.playground.droid,fetcher.playground.touch")
 	});
