@@ -323,7 +323,7 @@ namespace artm.Fetcher.Core.Tests.Services
 
             var tasks = GenerateFetchTasks(sut, THREAD_COUNT, new Uri("https://www.google.com"));
 
-            var results = Task.WhenAll(tasks.ToArray()).Wait(2000); // Each call hits a simulated 1000ms network delay
+            var results = Task.WhenAll(tasks.ToArray()).Wait(3000); // Each call hits a simulated 1000ms network delay
 
             Assert.IsTrue(results);
         }

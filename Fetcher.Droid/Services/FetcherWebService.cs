@@ -24,21 +24,6 @@ namespace artm.Fetcher.Droid.Services
             }
         }
 
-        private static IFetcherWebResponse CreateFetcherWebResponseError(string message)
-        {
-            return CreateFetcherWebResponseError(new Exception(message));
-        }
-
-        private static IFetcherWebResponse CreateFetcherWebResponseError(Exception exception)
-        {
-            return new FetcherWebResponse()
-            {
-                HttpStatusCode = 999,
-                Error = exception,
-                Body = string.Empty
-            };
-        }
-
         public override IFetcherWebResponse DoPlatformRequest(IFetcherWebRequest request)
         {
             var requestBuilder = new Request.Builder();
@@ -50,31 +35,23 @@ namespace artm.Fetcher.Droid.Services
 
             PrepareBody(request, requestBuilder);
 
-            try
+            var response = Client.NewCall(requestBuilder.Build()).Execute();
+            if (response == null) throw new WebException("DoPlatformRequest failed");
+
+            ResponseBody responseBody = response.Body();
+            var source = responseBody.Source();
+            source.Request(Java.Lang.Long.MaxValue); // Buffer the entire body.
+            var buffer = source.Buffer;
+
+            var body = buffer.Clone().ReadString(Java.Nio.Charset.Charset.ForName("UTF-8"));
+            var bodyAsBytes = buffer.Clone().ReadByteArray();
+            return new FetcherWebResponse()
             {
-                var response = Client.NewCall(requestBuilder.Build()).Execute();
-                if(response == null) return CreateFetcherWebResponseError(new Exception("DoPlatformRequest failed"));
-
-
-                ResponseBody responseBody = response.Body();
-                var source = responseBody.Source();
-                source.Request(Java.Lang.Long.MaxValue); // Buffer the entire body.
-                var buffer = source.Buffer;
-
-                var body = buffer.Clone().ReadString(Java.Nio.Charset.Charset.ForName("UTF-8"));
-                var bodyAsBytes = buffer.Clone().ReadByteArray();
-                return new FetcherWebResponse()
-                {
-                    HttpStatusCode = response.Code(),
-                    Error = new Exception(response.Message()),
-                    Body = body,
-                    BodyAsBytes = bodyAsBytes
-                };
-            }
-            catch (Exception ex)
-            {
-                return CreateFetcherWebResponseError(ex);
-            }
+                HttpStatusCode = response.Code(),
+                Error = new Exception(response.Message()),
+                Body = body,
+                BodyAsBytes = bodyAsBytes
+            };
         }
 
         private ResponseBody CloneResponseBody(Response rawResponse)
