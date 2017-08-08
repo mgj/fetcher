@@ -57,7 +57,7 @@ namespace Fetcher.Playground.Droid
         private static SQLiteConnectionWithLock CreateConnection(IFetcherRepositoryStoragePathService path)
         {
             var str = new SQLiteConnectionString(path.GetPath(), false);
-            return new SQLiteConnectionWithLock(new SQLitePlatformAndroid(), str);
+            return new SQLiteConnectionWithLock(new SQLitePlatformAndroidN(), str);
         }
 
         private async Task DoFetch()
