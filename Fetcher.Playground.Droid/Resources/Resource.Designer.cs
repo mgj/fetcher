@@ -28,6 +28,8 @@ namespace Fetcher.Playground.Droid
 		{
 			global::SQLite.Net.Platform.XamarinAndroid.Resource.String.ApplicationName = global::Fetcher.Playground.Droid.Resource.String.ApplicationName;
 			global::SQLite.Net.Platform.XamarinAndroid.Resource.String.Hello = global::Fetcher.Playground.Droid.Resource.String.Hello;
+			global::SQLite.Net.Platform.XamarinAndroidN.Resource.String.ApplicationName = global::Fetcher.Playground.Droid.Resource.String.ApplicationName;
+			global::SQLite.Net.Platform.XamarinAndroidN.Resource.String.Hello = global::Fetcher.Playground.Droid.Resource.String.Hello;
 		}
 		
 		public partial class Attribute

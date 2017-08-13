@@ -69,13 +69,7 @@ namespace artm.Fetcher.Touch.Services
 
                                 if (error != null)
                                 {
-                                    tcs.SetResult(new FetcherWebResponse()
-                                    {
-                                        HttpStatusCode = 999,
-                                        Error = new Exception(error.ToString()),
-                                        Body = string.Empty,
-                                        BodyAsBytes = new byte[0]
-                                    });
+                                    tcs.SetException(new Exception(error.ToString()));
                                 }
                                 else
                                 {

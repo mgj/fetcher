@@ -53,7 +53,7 @@ IFetcherRepositoryStoragePathService path = new FetcherRepositoryStoragePathServ
 IFetcherWebService web = new FetcherWebService();
 
 // On Android:
-IFetcherRepositoryService repository = new FetcherRepositoryService(() => new SQLiteConnectionWithLock(new SQLitePlatformAndroid(), new SQLiteConnectionString(path.GetPath(), false)));
+IFetcherRepositoryService repository = new FetcherRepositoryService(() => new SQLiteConnectionWithLock(new SQLitePlatformAndroidN(), new SQLiteConnectionString(path.GetPath(), false)));
 // On iOS:
 IFetcherRepositoryService repository = new FetcherRepositoryService(() => new SQLiteConnectionWithLock(new SQLitePlatformIOS(), new SQLiteConnectionString(path.GetPath(), false)));
 
@@ -92,6 +92,10 @@ IUrlCacheInfo response = await fetcher.FetchAsync(new FetcherWebRequest()
 A new cache entry will be created (that is, a FetchAsync call is considered unique) if:
 * The URL does not exist in the cache
 * The specified method does not exist for the given url
+
+## FAQ
+
+Add a reference to System.Data.SQLite in your Android project to avoid an error popping up at startup (Temporary workaround, proper fix on the way!)
 
 ## For contributors
 

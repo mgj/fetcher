@@ -18,7 +18,7 @@ namespace artm.Fetcher.Core.Tests.Services.Stubs
 {
     public class FetcherRepositoryServiceStub : FetcherRepositoryService
     {
-        public FetcherRepositoryServiceStub() 
+        public FetcherRepositoryServiceStub(bool recreateDB = true) 
             : base(Mock.Of<IFetcherLoggerService>(), () => new SQLiteConnectionWithLock(
                 new SQLitePlatformGeneric(),
                 new SQLiteConnectionString(
@@ -28,8 +28,11 @@ namespace artm.Fetcher.Core.Tests.Services.Stubs
                     false)
                 ))
         {
-            ClearAllAsync().Wait();
-            base.Initialize().Wait();
+            if(recreateDB == true)
+            {
+                ClearAllAsync().Wait();
+                base.Initialize().Wait();
+            }
         }
 
         public async Task<List<UrlCacheInfo>> AllCacheInfo()

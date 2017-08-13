@@ -22,6 +22,7 @@ namespace artm.Fetcher.Core.Tests.Services.Common
         {
             var mock = new Mock<IFetcherWebService>();
             mock.Setup(x => x.DoPlatformRequest(It.IsAny<FetcherWebRequest>())).Throws(new Exception("IFetcherWebServiceInternetOff mock web exception"));
+            //mock.Setup(x => x.DoPlatformRequest(It.IsAny<FetcherWebRequest>())).Returns(() => null);
             return mock;
         }
 

@@ -1,5 +1,6 @@
 #tool "nuget:?package=GitVersion.CommandLine"
-#tool "nuget:?package=gitlink"
+#tool "nuget:?package=gitlink&version=2.4.0.0"
+#tool "nuget:?package=vswhere"
 
 var sln = new FilePath("Fetcher.sln");
 var binDir = new DirectoryPath("bin");
@@ -15,6 +16,16 @@ Task("Clean").Does(() =>
     CleanDirectories("./**/obj");
 	CleanDirectories(binDir.FullPath);
 	CleanDirectories(outputDir.FullPath);
+});
+
+FilePath msBuildPath;
+Task("ResolveBuildTools")
+	.Does(() => 
+{
+	var vsLatest = VSWhereLatest();
+	msBuildPath = (vsLatest == null)
+		? null
+		: vsLatest.CombineWithFilePath("./MSBuild/15.0/Bin/MSBuild.exe");
 });
 
 GitVersion versionInfo = null;
@@ -36,18 +47,22 @@ Task("Build")
 	.IsDependentOn("Clean")
 	.IsDependentOn("Version")
 	.IsDependentOn("Restore")
+	.IsDependentOn("ResolveBuildTools")
 	.Does(() =>  {
+
+	var settings = new MSBuildSettings 
+	{
+		Configuration = "Release",
+		ToolPath = msBuildPath
+	};
 	
-	DotNetBuild(sln, 
-		settings => settings.SetConfiguration("Release")
-	);
+	MSBuild(sln, settings);
 });
 
 Task("GitLink")
 	.WithCriteria(() => IsRunningOnWindows())
 	.IsDependentOn("Build")
 	.Does(() => {
-
 	GitLink(sln.GetDirectory(), new GitLinkSettings {
 		RepositoryUrl = "https://github.com/mgj/fetcher",
 		ArgumentCustomization = args => args.Append(
@@ -80,7 +95,6 @@ Task("PackageAll")
 	NuGetPack("./nuspec/artm.fetcher.nuspec", nugetSettings);
 });
 
-
 Task("UploadAppVeyorArtifact")
 	.IsDependentOn("PackageAll")
 	.WithCriteria(() => !isPullRequest)
@@ -95,6 +109,8 @@ Task("UploadAppVeyorArtifact")
 	}
 });
 
-Task("Default").IsDependentOn("UploadAppVeyorArtifact").Does(() => {});
+Task("Default")
+	.IsDependentOn("UploadAppVeyorArtifact")
+	.Does(() => {});
 
 RunTarget(target);

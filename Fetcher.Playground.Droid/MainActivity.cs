@@ -57,7 +57,7 @@ namespace Fetcher.Playground.Droid
         private static SQLiteConnectionWithLock CreateConnection(IFetcherRepositoryStoragePathService path)
         {
             var str = new SQLiteConnectionString(path.GetPath(), false);
-            return new SQLiteConnectionWithLock(new SQLitePlatformAndroid(), str);
+            return new SQLiteConnectionWithLock(new SQLitePlatformAndroidN(), str);
         }
 
         private async Task DoFetch()
@@ -65,6 +65,13 @@ namespace Fetcher.Playground.Droid
             await ((FetcherRepositoryService)_repository).Initialize();
             try
             {
+                var urlCacheInfo = await _fetcher.FetchAsync(new FetcherWebRequest()
+                {
+                    Url = "https://jsonplaceholder.typicode.com/posts",
+                    Method = "POST",
+                    Body = string.Empty
+                }, TimeSpan.FromTicks(1));
+
                 var url = new System.Uri("https://lorempixel.com/200/400/");
                 IUrlCacheInfo response = await _fetcher.FetchAsync(url);
                 var bitmap = BitmapFactory.DecodeByteArray(response.FetcherWebResponse.BodyAsBytes, 0, response.FetcherWebResponse.BodyAsBytes.Length);

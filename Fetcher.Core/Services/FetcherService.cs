@@ -116,6 +116,7 @@ namespace artm.Fetcher.Core.Services
         {
             var policy = Policy
                 .HandleResult<IFetcherWebResponse>(r => r.IsSuccess == false)
+                .Or<Exception>()
                 .WaitAndRetryAsync(5, retryAttempt =>
                     TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
             var response = await policy.ExecuteAsync(() => DoWebRequestAsync(request));
@@ -133,7 +134,6 @@ namespace artm.Fetcher.Core.Services
             }
             catch (Exception e)
             {
-
                 throw;
             }
         }
