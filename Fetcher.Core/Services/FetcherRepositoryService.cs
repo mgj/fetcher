@@ -16,11 +16,6 @@ namespace artm.Fetcher.Core.Services
 {
     public class FetcherRepositoryService : SQLiteAsyncConnection, IFetcherRepositoryService
     {
-        private RetryPolicy _retryPolicy = Policy
-                .Handle<SQLiteException>()
-                .WaitAndRetryAsync(5, retryAttempt =>
-                    TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
-
         protected IFetcherLoggerService Logger { get; set; }
 
         public FetcherRepositoryService(IFetcherLoggerService loggerService, Func<SQLiteConnectionWithLock> mylock) : base(mylock)
@@ -74,7 +69,7 @@ namespace artm.Fetcher.Core.Services
             if (data != null)
             {
                 data.LastAccessed = DateTimeOffset.UtcNow;
-                await _retryPolicy.ExecuteAsync(() => this.UpdateWithChildrenAsync(data));
+                await this.UpdateWithChildrenAsync(data);
             }
 
             return data;
@@ -101,12 +96,13 @@ namespace artm.Fetcher.Core.Services
 
             try
             {
-                hero = await _retryPolicy.ExecuteAsync(() => DatabaseInsertUrlAsync(request, response, timestamp));
+                hero = await DatabaseInsertUrlAsync(request, response, timestamp);
             }
             catch (Exception ex)
             {
                 Log("Could not insert entry: " + ex);
                 var debug = 42;
+                throw;
             }
             finally
             {

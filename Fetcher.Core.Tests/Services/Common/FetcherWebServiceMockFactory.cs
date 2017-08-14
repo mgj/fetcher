@@ -26,12 +26,12 @@ namespace artm.Fetcher.Core.Tests.Services.Common
             return mock;
         }
 
-        public static Mock<IFetcherWebService> IFetcherWebServiceSlowInternet()
+        public static Mock<IFetcherWebService> IFetcherWebServiceSlowInternet(int delay)
         {
             var mock = new Mock<IFetcherWebService>();
             mock.Setup(x => x.DoPlatformRequest(It.IsAny<FetcherWebRequest>()))
                 .Returns(() => {
-                    Task.Delay(1000).Wait();
+                    Task.Delay(delay).Wait();
                     return new FetcherWebResponse() { HttpStatusCode = 200, Body = "DoPlatformWebRequest Default Test Body" };
                 });
             return mock;
