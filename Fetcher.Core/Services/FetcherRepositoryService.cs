@@ -40,30 +40,18 @@ namespace artm.Fetcher.Core.Services
             IUrlCacheInfo data = null;
             if (request == null) return data;
 
-            try
-            {
-                var dbRequest = await this.Table<FetcherWebRequest>()
+            var dbRequest = await this.Table<FetcherWebRequest>()
                     .Where(x => x.Url == request.Url &&
                         x.Method == request.Method)
                     .FirstOrDefaultAsync();
 
-                if (dbRequest != null)
-                {
-                    var dbCache = await this.Table<UrlCacheInfo>().Where(x => x.FetcherWebRequestId == dbRequest.Id).FirstOrDefaultAsync();
-                    if (dbCache != null)
-                    {
-                        data = await this.GetWithChildrenAsync<UrlCacheInfo>(dbCache.Id);
-                    }
-                    else
-                    {
-                        data = dbCache;
-                    }
-                }
-            }
-            catch(Exception ex)
+            if (dbRequest != null)
             {
-                Log("Could not get entry: " + ex);
-                var debug = 42;
+                var dbCache = await this.Table<UrlCacheInfo>().Where(x => x.FetcherWebRequestId == dbRequest.Id).FirstOrDefaultAsync();
+                if (dbCache != null)
+                {
+                    data = await this.GetWithChildrenAsync<UrlCacheInfo>(dbCache.Id);
+                }
             }
 
             if (data != null)
