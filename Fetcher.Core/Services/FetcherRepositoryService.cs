@@ -47,7 +47,9 @@ namespace artm.Fetcher.Core.Services
 
             if (dbRequest != null)
             {
-                var dbCache = await this.Table<UrlCacheInfo>().Where(x => x.FetcherWebRequestId == dbRequest.Id).FirstOrDefaultAsync();
+                var dbCache = await this.Table<UrlCacheInfo>()
+                    .Where(x => x.FetcherWebRequestId == dbRequest.Id)
+                    .FirstOrDefaultAsync();
                 if (dbCache != null)
                 {
                     data = await this.GetWithChildrenAsync<UrlCacheInfo>(dbCache.Id);

@@ -41,6 +41,23 @@ namespace artm.Fetcher.Core.Tests.Services
         }
 
         [Test]
+        public async Task GetEntryForUrl_EntryExistsNewRequest_EntryReturned()
+        {
+            var sut = new FetcherRepositoryServiceStub();
+
+            await sut.InsertUrlAsync(new FetcherWebRequest()
+            {
+                Url = URL.OriginalString
+            }, FetcherStubFactory.FetcherWebResponseSuccessFactory());
+            var entry = sut.GetEntryForRequestAsync(new FetcherWebRequest()
+            {
+                Url = URL.OriginalString
+            });
+
+            Assert.IsNotNull(entry);
+        }
+
+        [Test]
         public async Task UpdateUrl_UrlExists_UrlEntryIsUpdated()
         {
             var response = FetcherStubFactory.FetcherWebResponseSuccessFactory();
