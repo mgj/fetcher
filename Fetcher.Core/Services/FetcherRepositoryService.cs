@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Polly.Retry;
+using System.Collections.Generic;
 
 namespace artm.Fetcher.Core.Services
 {
@@ -175,6 +176,40 @@ namespace artm.Fetcher.Core.Services
             toBeUpdated.LastUpdated = timestamp;
 
             await this.UpdateWithChildrenAsync(toBeUpdated);
+        }
+
+        public async Task<bool> DeleteEntry(IUrlCacheInfo hero)
+        {
+            try
+            {
+                await this.RunInTransactionAsync(tran =>
+                {
+                    tran.Delete<FetcherWebRequest>(hero.FetcherWebRequestId);
+                    tran.Delete<FetcherWebResponse>(hero.FetcherWebResponseId);
+                    tran.Delete<UrlCacheInfo>(hero.Id);
+                });
+            }
+            catch (Exception e)
+            {
+                Logger.Log("Error deleting entry: " + e);
+                return false;
+            }
+            return true;
+        }
+
+        public async Task<IEnumerable<UrlCacheInfo>> GetAllUrlCacheInfo()
+        {
+            return await this.Table<UrlCacheInfo>().ToListAsync();
+        }
+
+        public async Task<IEnumerable<FetcherWebResponse>> GetAllWebResponses()
+        {
+            return await this.Table<FetcherWebResponse>().ToListAsync();
+        }
+
+        public async Task<IEnumerable<FetcherWebRequest>> GetAllWebRequests()
+        {
+            return await this.Table<FetcherWebRequest>().ToListAsync();
         }
     }
 }
