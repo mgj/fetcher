@@ -69,10 +69,9 @@ namespace artm.Fetcher.Core.Services
                     if (ShouldInvalidate(cacheHit, freshnessTreshold))
                     {
                         Logger.Log("Refreshing cache");
-                        IFetcherWebResponse response = null;
                         try
                         {
-                            response = await FetchFromWebAsync(request);
+                            var response = await FetchFromWebAsync(request);
                             await Repository.UpdateUrlAsync(request, cacheHit, response);
                             cacheHit.FetchedFrom = CacheSourceType.Web;
                         }

@@ -319,10 +319,9 @@ namespace artm.Fetcher.Core.Tests.Services
         {
             const int THREAD_COUNT = 10;
             
-            var sut = new FetcherServiceStub(FetcherWebServiceMockFactory.IFetcherWebServiceSlowInternet());
+            var sut = new FetcherServiceStub(FetcherWebServiceMockFactory.IFetcherWebServiceSlowInternet(1000));
 
             var tasks = GenerateFetchTasks(sut, THREAD_COUNT, new Uri("https://www.google.com"));
-
             var results = Task.WhenAll(tasks.ToArray()).Wait(3000); // Each call hits a simulated 1000ms network delay
 
             Assert.IsTrue(results);

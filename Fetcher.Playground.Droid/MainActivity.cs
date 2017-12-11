@@ -65,16 +65,14 @@ namespace Fetcher.Playground.Droid
             await ((FetcherRepositoryService)_repository).Initialize();
             try
             {
-                var urlCacheInfo = await _fetcher.FetchAsync(new FetcherWebRequest()
-                {
-                    Url = "https://jsonplaceholder.typicode.com/posts",
-                    Method = "POST",
-                    Body = string.Empty
-                }, TimeSpan.FromTicks(1));
-
                 var url = new System.Uri("https://lorempixel.com/200/400/");
+
+                var pixel = await _fetcher.FetchAsync(url);
+                var pixel2 = await _fetcher.FetchAsync(url);
+                var pixel3 = await _fetcher.FetchAsync(url);
+
                 IUrlCacheInfo response = await _fetcher.FetchAsync(url);
-                var bitmap = BitmapFactory.DecodeByteArray(response.FetcherWebResponse.BodyAsBytes, 0, response.FetcherWebResponse.BodyAsBytes.Length);
+                var bitmap = BitmapFactory.DecodeByteArray(response.FetcherWebResponse.BodyAsBytes, 0, pixel.FetcherWebResponse.BodyAsBytes.Length);
 
                 RunOnUiThread(() => _image.SetImageBitmap(bitmap));
             }

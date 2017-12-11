@@ -11,16 +11,12 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Polly.Retry;
+using System.Collections.Generic;
 
 namespace artm.Fetcher.Core.Services
 {
     public class FetcherRepositoryService : SQLiteAsyncConnection, IFetcherRepositoryService
     {
-        private RetryPolicy _retryPolicy = Policy
-                .Handle<SQLiteException>()
-                .WaitAndRetryAsync(5, retryAttempt =>
-                    TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
-
         protected IFetcherLoggerService Logger { get; set; }
 
         public FetcherRepositoryService(IFetcherLoggerService loggerService, Func<SQLiteConnectionWithLock> mylock) : base(mylock)
@@ -45,36 +41,26 @@ namespace artm.Fetcher.Core.Services
             IUrlCacheInfo data = null;
             if (request == null) return data;
 
-            try
-            {
-                var dbRequest = await this.Table<FetcherWebRequest>()
+            var dbRequest = await this.Table<FetcherWebRequest>()
                     .Where(x => x.Url == request.Url &&
                         x.Method == request.Method)
                     .FirstOrDefaultAsync();
 
-                if (dbRequest != null)
-                {
-                    var dbCache = await this.Table<UrlCacheInfo>().Where(x => x.FetcherWebRequestId == dbRequest.Id).FirstOrDefaultAsync();
-                    if (dbCache != null)
-                    {
-                        data = await this.GetWithChildrenAsync<UrlCacheInfo>(dbCache.Id);
-                    }
-                    else
-                    {
-                        data = dbCache;
-                    }
-                }
-            }
-            catch(Exception ex)
+            if (dbRequest != null)
             {
-                Log("Could not get entry: " + ex);
-                var debug = 42;
+                var dbCache = await this.Table<UrlCacheInfo>()
+                    .Where(x => x.FetcherWebRequestId == dbRequest.Id)
+                    .FirstOrDefaultAsync();
+                if (dbCache != null)
+                {
+                    data = await this.GetWithChildrenAsync<UrlCacheInfo>(dbCache.Id);
+                }
             }
 
             if (data != null)
             {
                 data.LastAccessed = DateTimeOffset.UtcNow;
-                await _retryPolicy.ExecuteAsync(() => this.UpdateWithChildrenAsync(data));
+                await this.UpdateWithChildrenAsync(data);
             }
 
             return data;
@@ -101,12 +87,13 @@ namespace artm.Fetcher.Core.Services
 
             try
             {
-                hero = await _retryPolicy.ExecuteAsync(() => DatabaseInsertUrlAsync(request, response, timestamp));
+                hero = await DatabaseInsertUrlAsync(request, response, timestamp);
             }
             catch (Exception ex)
             {
                 Log("Could not insert entry: " + ex);
                 var debug = 42;
+                throw;
             }
             finally
             {
@@ -189,6 +176,40 @@ namespace artm.Fetcher.Core.Services
             toBeUpdated.LastUpdated = timestamp;
 
             await this.UpdateWithChildrenAsync(toBeUpdated);
+        }
+
+        public async Task<bool> DeleteEntry(IUrlCacheInfo hero)
+        {
+            try
+            {
+                await this.RunInTransactionAsync(tran =>
+                {
+                    tran.Delete<FetcherWebRequest>(hero.FetcherWebRequestId);
+                    tran.Delete<FetcherWebResponse>(hero.FetcherWebResponseId);
+                    tran.Delete<UrlCacheInfo>(hero.Id);
+                });
+            }
+            catch (Exception e)
+            {
+                Logger.Log("Error deleting entry: " + e);
+                return false;
+            }
+            return true;
+        }
+
+        public async Task<IEnumerable<UrlCacheInfo>> GetAllUrlCacheInfo()
+        {
+            return await this.Table<UrlCacheInfo>().ToListAsync();
+        }
+
+        public async Task<IEnumerable<FetcherWebResponse>> GetAllWebResponses()
+        {
+            return await this.Table<FetcherWebResponse>().ToListAsync();
+        }
+
+        public async Task<IEnumerable<FetcherWebRequest>> GetAllWebRequests()
+        {
+            return await this.Table<FetcherWebRequest>().ToListAsync();
         }
     }
 }

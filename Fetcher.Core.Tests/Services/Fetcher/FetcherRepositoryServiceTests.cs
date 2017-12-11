@@ -15,8 +15,6 @@ namespace artm.Fetcher.Core.Tests.Services
     {
         private readonly Uri URL = new Uri("https://www.google.com");
 
-        
-
         [Test]
         public async Task GetEntryForUrl_NoEntryExists_NullIsReturned()
         {
@@ -36,6 +34,23 @@ namespace artm.Fetcher.Core.Tests.Services
 
             await sut.InsertUrlAsync(request, FetcherStubFactory.FetcherWebResponseSuccessFactory());
             var entry = sut.GetEntryForRequestAsync(request);
+
+            Assert.IsNotNull(entry);
+        }
+
+        [Test]
+        public async Task GetEntryForUrl_EntryExistsNewRequest_EntryReturned()
+        {
+            var sut = new FetcherRepositoryServiceStub();
+
+            await sut.InsertUrlAsync(new FetcherWebRequest()
+            {
+                Url = URL.OriginalString
+            }, FetcherStubFactory.FetcherWebResponseSuccessFactory());
+            var entry = sut.GetEntryForRequestAsync(new FetcherWebRequest()
+            {
+                Url = URL.OriginalString
+            });
 
             Assert.IsNotNull(entry);
         }
@@ -105,5 +120,35 @@ namespace artm.Fetcher.Core.Tests.Services
             Assert.AreNotEqual(lastUpdated1, lastUpdated2);
         }
         
+        [Test]
+        public async Task DeleteEntry_ContainsElements_ValidResponse()
+        {
+            IFetcherRepositoryService sut = new FetcherRepositoryServiceStub();
+            var request = FetcherStubFactory.FetcherWebRequestGetFactory(URL);
+
+            IUrlCacheInfo hero = await sut.PreloadUrlAsync(request, FetcherStubFactory.FetcherWebResponseSuccessFactory());
+
+            bool response = await sut.DeleteEntry(hero);
+
+            Assert.IsTrue(response);
+        }
+
+        [Test]
+        public async Task DeleteEntry_ContainsElements_ElementsAreRemoved()
+        {
+            FetcherRepositoryServiceStub sut = new FetcherRepositoryServiceStub(true);
+            var request = FetcherStubFactory.FetcherWebRequestGetFactory(URL);
+
+            IUrlCacheInfo hero = await sut.PreloadUrlAsync(request, FetcherStubFactory.FetcherWebResponseSuccessFactory());
+            bool response = await sut.DeleteEntry(hero);
+
+            var requests = await sut.AllWebRequests();
+            var responses = await sut.AllWebResponse();
+            var caches = await sut.AllCacheInfo();
+
+            Assert.AreEqual(0, requests.Count);
+            Assert.AreEqual(0, responses.Count);
+            Assert.AreEqual(0, caches.Count);
+        }
     }
 }
