@@ -5,4 +5,4 @@ build_script:
 deploy:
 - provider: NuGet
   api_key:
-    secure: CLlvxILVD81use5kelg4ltghYgDlGHWszffiwGwKc1fYSi3k9POLzwEpodroDjRf
+    secure: ZIK/ZHZE8HHgbFgfGJ2P6yHxA+XgchydDPMsiY0CXMikU//6PCqpyFKtavcW3hPE
