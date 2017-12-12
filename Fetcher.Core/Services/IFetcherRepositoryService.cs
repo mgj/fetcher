@@ -19,6 +19,8 @@ namespace artm.Fetcher.Core.Services
 
         Task<bool> DeleteEntry(IUrlCacheInfo hero);
 
+        Task<bool> DeleteEntriesOlderThan(int days);
+
         Task<IEnumerable<UrlCacheInfo>> GetAllUrlCacheInfo();
 
         Task<IEnumerable<FetcherWebResponse>> GetAllWebResponses();

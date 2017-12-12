@@ -6,6 +6,7 @@ using artm.Fetcher.Core.Tests.Services.Mocks;
 using artm.Fetcher.Core.Tests.Services.Stubs;
 using NUnit.Framework;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace artm.Fetcher.Core.Tests.Services
@@ -119,7 +120,7 @@ namespace artm.Fetcher.Core.Tests.Services
             Assert.AreEqual(lastAccess1, lastAccess2);
             Assert.AreNotEqual(lastUpdated1, lastUpdated2);
         }
-        
+
         [Test]
         public async Task DeleteEntry_ContainsElements_ValidResponse()
         {
@@ -149,6 +150,32 @@ namespace artm.Fetcher.Core.Tests.Services
             Assert.AreEqual(0, requests.Count);
             Assert.AreEqual(0, responses.Count);
             Assert.AreEqual(0, caches.Count);
+        }
+
+        [Test]
+        public async Task DeleteEntriesOlderThan_DbContainsOldAndNew_OnlyOldsAreRemoved()
+        {
+            FetcherRepositoryServiceStub sut = new FetcherRepositoryServiceStub(true);
+            var request1 = FetcherStubFactory.FetcherWebRequestGetFactory(new Uri("https://www.google.com"));
+            var request2 = FetcherStubFactory.FetcherWebRequestGetFactory(new Uri("https://lorempixel.com/200/400/"));
+
+            IUrlCacheInfo hero1 = await sut.PreloadUrlAsync(request1, FetcherStubFactory.FetcherWebResponseSuccessFactory());
+            IUrlCacheInfo hero2 = await sut.PreloadUrlAsync(request2, FetcherStubFactory.FetcherWebResponseSuccessFactory());
+            hero1.LastAccessed = DateTimeOffset.MinValue;
+            await sut.UpdateAsync(hero1);
+
+            await sut.DeleteEntriesOlderThan(400);
+
+            var requests = await sut.AllWebRequests();
+            var responses = await sut.AllWebResponse();
+            var caches = await sut.AllCacheInfo();
+
+            UrlCacheInfo cacheHero = caches.FirstOrDefault();
+
+            Assert.AreEqual(1, requests.Count);
+            Assert.AreEqual(1, responses.Count);
+            Assert.AreEqual(1, caches.Count);
+            Assert.IsTrue(cacheHero.FetcherWebRequest.Url.Contains("lorempixel.com"));
         }
     }
 }
