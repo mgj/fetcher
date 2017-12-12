@@ -197,6 +197,34 @@ namespace artm.Fetcher.Core.Services
             return true;
         }
 
+        public async Task<bool> DeleteEntriesOlderThan(int days)
+        {
+            try
+            {
+                var querylist = await Table<UrlCacheInfo>().ToListAsync();
+                var query = (from x in querylist
+                             where DaysBetween(x.LastAccessed, DateTime.UtcNow) >= days
+                             select x).ToList();
+
+                foreach (var item in query)
+                {
+                    await DeleteEntry(item);
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Log($"Error deleting entries older than {days}: {e}");
+                return false;
+            }
+            return true;
+        }
+
+        private static int DaysBetween(DateTimeOffset d1, DateTimeOffset d2)
+        {
+            TimeSpan span = d2.Subtract(d1);
+            return (int)span.TotalDays;
+        }
+
         public async Task<IEnumerable<UrlCacheInfo>> GetAllUrlCacheInfo()
         {
             return await this.Table<UrlCacheInfo>().ToListAsync();
