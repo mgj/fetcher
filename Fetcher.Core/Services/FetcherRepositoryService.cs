@@ -66,6 +66,11 @@ namespace artm.Fetcher.Core.Services
             return data;
         }
 
+        public async Task<IUrlCacheInfo> GetEntryForId(int id)
+        {
+            return await this.GetWithChildrenAsync<UrlCacheInfo>(id);
+        }
+
         public async Task<IUrlCacheInfo> PreloadUrlAsync(IFetcherWebRequest request, IFetcherWebResponse response)
         {
             var timestamp = DateTimeOffset.UtcNow.AddYears(-1);
