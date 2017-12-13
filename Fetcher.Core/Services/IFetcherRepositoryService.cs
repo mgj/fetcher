@@ -10,6 +10,8 @@ namespace artm.Fetcher.Core.Services
     public interface IFetcherRepositoryService
     {
         Task<IUrlCacheInfo> GetEntryForRequestAsync(IFetcherWebRequest request);
+
+        Task<IUrlCacheInfo> GetEntryForId(int id);
         
         Task UpdateUrlAsync(IFetcherWebRequest request, IUrlCacheInfo hero, IFetcherWebResponse response);
 
