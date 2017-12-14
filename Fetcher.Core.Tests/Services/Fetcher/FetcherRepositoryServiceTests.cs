@@ -4,6 +4,7 @@ using artm.Fetcher.Core.Services;
 using artm.Fetcher.Core.Tests.Services.Common;
 using artm.Fetcher.Core.Tests.Services.Mocks;
 using artm.Fetcher.Core.Tests.Services.Stubs;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
 using System.Linq;
@@ -176,6 +177,82 @@ namespace artm.Fetcher.Core.Tests.Services
             Assert.AreEqual(1, responses.Count);
             Assert.AreEqual(1, caches.Count);
             Assert.IsTrue(cacheHero.FetcherWebRequest.Url.Contains("lorempixel.com"));
+        }
+
+        [Test]
+        public async Task GetEntryForRequestAsync_PostRequestWithBody_MatchingBodyIsReturned()
+        {
+            var request1 = new FetcherWebRequest
+            {
+                Url = "https://jsonplaceholder.typicode.com/posts",
+                Method = "POST",
+                Body = JsonPlaceholderPostFactory()
+            };
+
+            var request2 = new FetcherWebRequest
+            {
+                Url = "https://jsonplaceholder.typicode.com/posts",
+                Method = "POST",
+                Body = "OtherRequestBody"
+            };
+
+            IFetcherService fetcherService = new FetcherServiceStub();
+            IFetcherRepositoryService sut = new FetcherRepositoryServiceStub();
+
+            await fetcherService.FetchAsync(request1);
+            await fetcherService.FetchAsync(request2);
+
+            IUrlCacheInfo hero = await sut.GetEntryForRequestAsync(request1);
+
+            Assert.NotNull(hero);
+            Assert.IsTrue(hero.FetcherWebRequest.Body == request1.Body);
+        }
+
+        [Test]
+        public async Task GetEntryForRequestAsync_TwoRequestsWithSameMethodAndUrl_TwoUrlCacheInfoCreated()
+        {
+            var request1 = new FetcherWebRequest
+            {
+                Url = "https://jsonplaceholder.typicode.com/posts",
+                Method = "POST",
+                Body = JsonPlaceholderPostFactory()
+            };
+
+            var request2 = new FetcherWebRequest
+            {
+                Url = "https://jsonplaceholder.typicode.com/posts",
+                Method = "POST",
+                Body = "OtherRequestBody"
+            };
+
+            IFetcherService fetcherService = new FetcherServiceStub();
+            IFetcherRepositoryService sut = new FetcherRepositoryServiceStub();
+
+            await fetcherService.FetchAsync(request1);
+            await fetcherService.FetchAsync(request2);
+
+            var allCaches = await sut.GetAllUrlCacheInfo();
+
+            Assert.AreEqual(2, allCaches.Count());
+        }
+
+        private static string JsonPlaceholderPostFactory()
+        {
+            var hero = new JsonPlaceholderPostDto
+            {
+                title = "MyTitle",
+                body = "MyBody",
+                userId = "1"
+            };
+
+            return JsonConvert.SerializeObject(hero);
+        }
+
+        private class JsonPlaceholderPostDto
+        {
+            public string title { get; set; }
+            public string body { get; set; }
+            public string userId { get; set; }
         }
     }
 }

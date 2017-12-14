@@ -43,7 +43,8 @@ namespace artm.Fetcher.Core.Services
 
             var dbRequest = await this.Table<FetcherWebRequest>()
                     .Where(x => x.Url == request.Url &&
-                        x.Method == request.Method)
+                        x.Method == request.Method &&
+                        x.Body == request.Body)
                     .FirstOrDefaultAsync();
 
             if (dbRequest != null)
