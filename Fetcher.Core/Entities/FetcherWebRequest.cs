@@ -18,6 +18,7 @@ namespace artm.Fetcher.Core.Models
 
         [Indexed]
         public string Method { get; set; }
+
         public string HeadersSerialized { get; set; }
 
         [Ignore]
@@ -63,6 +64,7 @@ namespace artm.Fetcher.Core.Models
         }
 
         public string Body { get; set; }
+
         public string ContentType { get; set; }
     }
 }
