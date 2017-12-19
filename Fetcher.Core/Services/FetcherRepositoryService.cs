@@ -209,7 +209,7 @@ namespace artm.Fetcher.Core.Services
             {
                 var querylist = await Table<UrlCacheInfo>().ToListAsync();
                 var query = (from x in querylist
-                             where DaysBetween(x.LastAccessed, DateTime.UtcNow) >= days
+                             where DaysBetween(x.LastUpdated, DateTime.UtcNow) >= days
                              select x).ToList();
 
                 foreach (var item in query)
