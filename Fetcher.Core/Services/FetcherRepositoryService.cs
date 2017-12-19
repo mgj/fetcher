@@ -209,7 +209,7 @@ namespace artm.Fetcher.Core.Services
             {
                 var querylist = await Table<UrlCacheInfo>().ToListAsync();
                 var query = (from x in querylist
-                             where DaysBetween(x.LastAccessed, DateTime.UtcNow) >= days
+                             where DaysBetween(x.LastUpdated, DateTime.UtcNow) >= days
                              select x).ToList();
 
                 foreach (var item in query)
@@ -233,17 +233,17 @@ namespace artm.Fetcher.Core.Services
 
         public async Task<IEnumerable<UrlCacheInfo>> GetAllUrlCacheInfo()
         {
-            return await this.Table<UrlCacheInfo>().ToListAsync();
+            return await this.GetAllWithChildrenAsync<UrlCacheInfo>();
         }
 
         public async Task<IEnumerable<FetcherWebResponse>> GetAllWebResponses()
         {
-            return await this.Table<FetcherWebResponse>().ToListAsync();
+            return await this.GetAllWithChildrenAsync<FetcherWebResponse>();
         }
 
         public async Task<IEnumerable<FetcherWebRequest>> GetAllWebRequests()
         {
-            return await this.Table<FetcherWebRequest>().ToListAsync();
+            return await this.GetAllWithChildrenAsync<FetcherWebRequest>();
         }
     }
 }
