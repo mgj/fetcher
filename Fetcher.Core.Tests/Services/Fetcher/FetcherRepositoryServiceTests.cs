@@ -162,7 +162,7 @@ namespace artm.Fetcher.Core.Tests.Services
 
             IUrlCacheInfo hero1 = await sut.PreloadUrlAsync(request1, FetcherStubFactory.FetcherWebResponseSuccessFactory());
             IUrlCacheInfo hero2 = await sut.PreloadUrlAsync(request2, FetcherStubFactory.FetcherWebResponseSuccessFactory());
-            hero1.LastAccessed = DateTimeOffset.MinValue;
+            hero1.LastUpdated = DateTimeOffset.MinValue;
             await sut.UpdateAsync(hero1);
 
             await sut.DeleteEntriesOlderThan(400);
