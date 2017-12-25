@@ -2,8 +2,6 @@
 using artm.Fetcher.Core.Models;
 using Polly;
 using SQLite;
-using SQLite.Net;
-using SQLite.Net.Async;
 using SQLiteNetExtensions.Extensions;
 using SQLiteNetExtensionsAsync.Extensions;
 using System;
@@ -18,8 +16,8 @@ namespace artm.Fetcher.Core.Services
     public class FetcherRepositoryService : SQLiteAsyncConnection, IFetcherRepositoryService
     {
         protected IFetcherLoggerService Logger { get; set; }
-
-        public FetcherRepositoryService(IFetcherLoggerService loggerService, Func<SQLiteConnectionWithLock> mylock) : base(mylock)
+        
+        public FetcherRepositoryService(IFetcherLoggerService loggerService, IFetcherRepositoryStoragePathService pathService) : base(pathService.GetPath(), false)
         {
             Logger = loggerService;
         }
@@ -67,7 +65,7 @@ namespace artm.Fetcher.Core.Services
             return data;
         }
 
-        public async Task<IUrlCacheInfo> GetEntryForId(int id)
+        public async Task<IUrlCacheInfo> GetUrlCacheInfoForId(int id)
         {
             return await this.GetWithChildrenAsync<UrlCacheInfo>(id);
         }
@@ -244,6 +242,37 @@ namespace artm.Fetcher.Core.Services
         public async Task<IEnumerable<FetcherWebRequest>> GetAllWebRequests()
         {
             return await this.GetAllWithChildrenAsync<FetcherWebRequest>();
+        }
+
+        public async Task<IEnumerable<IUrlCacheInfo>> GetUrlCacheInfoCompareOnAll(IFetcherWebRequest needle)
+        {
+            var webRequests = await this.GetAllWithChildrenAsync<FetcherWebRequest>((FetcherWebRequest request) => request.Url == needle.Url && request.ContentType == needle.ContentType && request.Headers == needle.Headers && request.Method == needle.Method && request.Body == needle.Body,  
+                true);
+
+            List<IUrlCacheInfo> result = new List<IUrlCacheInfo>();
+            foreach (var item in webRequests)
+            {
+                var hero = await GetUrlCacheInfoForId(item.UrlCacheInfoId);
+                result.Add(hero);
+            };
+            return result;
+        }
+
+
+        public async Task<IEnumerable<IUrlCacheInfo>> GetUrlCacheInfoWhere(FetcherWebRequest needle, bool method = true, bool headers = true, bool contentType = true, bool body = true)
+        {
+            string sql = "SELECT * "
+                + "FROM UrlCacheInfo ";
+                sql += "WHERE FetcherWebRequest.Url = ? ";
+            if (method == true)
+                sql += "AND FetcherWebRequest.Method = ? ";
+            if (body == true)
+                sql += "AND FetcherWebRequest.Body = ? ";
+            if (headers == true)
+                sql += "AND FetcherWebRequest.HeadersSerialized = ? ";
+            if (contentType == true)
+                sql += "AND FetcherWebRequest.ContentType = ? ";
+            return await this.QueryAsync<UrlCacheInfo>(sql, new[] { needle.Url, needle.Method, needle.Body, needle.HeadersSerialized, needle.ContentType } );
         }
     }
 }

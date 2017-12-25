@@ -7,6 +7,7 @@ using artm.Fetcher.Core.Tests.Services.Stubs;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -225,8 +226,8 @@ namespace artm.Fetcher.Core.Tests.Services
                 Body = "OtherRequestBody"
             };
 
-            IFetcherService fetcherService = new FetcherServiceStub();
-            IFetcherRepositoryService sut = new FetcherRepositoryServiceStub();
+            FetcherServiceStub fetcherService = new FetcherServiceStub();
+            IFetcherRepositoryService sut = fetcherService.RepositoryService;
 
             await fetcherService.FetchAsync(request1);
             await fetcherService.FetchAsync(request2);
@@ -234,6 +235,26 @@ namespace artm.Fetcher.Core.Tests.Services
             var allCaches = await sut.GetAllUrlCacheInfo();
 
             Assert.AreEqual(2, allCaches.Count());
+        }
+
+        [Test]
+        public async Task GetUrlCacheInfoCompareOnAll_Sunshine_ValidResponse()
+        {
+            var request1 = new FetcherWebRequest
+            {
+                Url = "https://jsonplaceholder.typicode.com/posts",
+                Method = "POST",
+                Body = JsonPlaceholderPostFactory()
+            };
+
+            FetcherServiceStub fetcherService = new FetcherServiceStub();
+            IFetcherRepositoryService sut = fetcherService.RepositoryService;
+
+            await fetcherService.FetchAsync(request1);
+            IEnumerable<IUrlCacheInfo> data = await sut.GetUrlCacheInfoWhere(request1);
+
+            Assert.NotNull(data);
+            Assert.Greater(data.Count(), 0);
         }
 
         private static string JsonPlaceholderPostFactory()

@@ -11,7 +11,7 @@ namespace artm.Fetcher.Core.Services
     {
         Task<IUrlCacheInfo> GetEntryForRequestAsync(IFetcherWebRequest request);
 
-        Task<IUrlCacheInfo> GetEntryForId(int id);
+        Task<IUrlCacheInfo> GetUrlCacheInfoForId(int id);
         
         Task UpdateUrlAsync(IFetcherWebRequest request, IUrlCacheInfo hero, IFetcherWebResponse response);
 
@@ -28,5 +28,7 @@ namespace artm.Fetcher.Core.Services
         Task<IEnumerable<FetcherWebResponse>> GetAllWebResponses();
 
         Task<IEnumerable<FetcherWebRequest>> GetAllWebRequests();
+        //Task<IEnumerable<IUrlCacheInfo>> GetUrlCacheInfoCompareOnAll(FetcherWebRequest needle);
+        Task<IEnumerable<IUrlCacheInfo>> GetUrlCacheInfoWhere(FetcherWebRequest needle, bool method = true, bool headers = true, bool contentType = true, bool body = true);
     }
 }

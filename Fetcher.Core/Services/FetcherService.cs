@@ -116,7 +116,7 @@ namespace artm.Fetcher.Core.Services
             var policy = Policy
                 .HandleResult<IFetcherWebResponse>(r => r.IsSuccess == false)
                 .Or<Exception>()
-                .WaitAndRetryAsync(5, retryAttempt =>
+                .WaitAndRetryAsync(3, retryAttempt =>
                     TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
             var response = await policy.ExecuteAsync(() => DoWebRequestAsync(request));
 
@@ -127,7 +127,6 @@ namespace artm.Fetcher.Core.Services
         {
             try
             {
-
                 var response = await Task.FromResult(WebService.DoPlatformRequest(request));
                 return response;
             }
