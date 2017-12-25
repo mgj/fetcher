@@ -78,7 +78,7 @@ namespace Fetcher.Playground.Touch.Views
                 IUrlCacheInfo response = await _fetcher.FetchAsync(new FetcherWebRequest()
                 {
                     Url = url,
-                    Method = "DELETE",
+                    Method = "GET",
                     Body = string.Empty
                 }, TimeSpan.FromMilliseconds(1));
 

@@ -21,6 +21,7 @@ namespace artm.Fetcher.Touch.Services
 
             _mutableRequest = new NSMutableUrlRequest(new Uri(request.Url));
 
+            PrepareContentType(request);
             PrepareMethod(request);
             PrepareHeaders(request);
             PrepareBody(request);
@@ -42,7 +43,9 @@ namespace artm.Fetcher.Touch.Services
 
         protected override void AddHeader(string key, string value)
         {
-            _mutableRequest.SetValueForKey(new NSString(key), new NSString(value));
+            NSMutableDictionary headers = new NSMutableDictionary (_mutableRequest.Headers);
+            headers.SetValueForKey(new NSString(value),  new NSString(key));
+            _mutableRequest.Headers = headers;
         }
 
         private void PrepareMethod(IFetcherWebRequest request)
@@ -57,7 +60,7 @@ namespace artm.Fetcher.Touch.Services
         {
             if (request == null || string.IsNullOrEmpty(request.ContentType)) return;
 
-            _mutableRequest.SetValueForKey(new NSString("content-type"), new NSString(request.ContentType));
+            _mutableRequest.Headers["content-type"] = new NSString(request.ContentType);
         }
 
         private static NSUrlSessionDataTask CreateUrlSessionDataTask(TaskCompletionSource<IFetcherWebResponse> tcs, NSMutableUrlRequest request)
@@ -73,18 +76,20 @@ namespace artm.Fetcher.Touch.Services
                                 }
                                 else
                                 {
-                                    byte[] dataBytes = new byte[data.Length];
+                                    byte[] bodyBytes = new byte[data.Length];
                                     if(data != null && data.Bytes != null && data.Count() > 0)
                                     {
-                                        System.Runtime.InteropServices.Marshal.Copy(data.Bytes, dataBytes, 0, Convert.ToInt32(data.Length));
+                                        System.Runtime.InteropServices.Marshal.Copy(data.Bytes, bodyBytes, 0, Convert.ToInt32(data.Length));
                                     }
+                                    var mimetype = response.MimeType;
+                                    string bodyString = string.Empty;
 
                                     tcs.SetResult(new FetcherWebResponse()
                                     {
                                         HttpStatusCode = (int)resp?.StatusCode,
                                         Error = new Exception(error?.ToString()),
-                                        Body = Encoding.UTF8.GetString(dataBytes),
-                                        BodyAsBytes = dataBytes
+                                        Body = Encoding.UTF8.GetString(bodyBytes),
+                                        BodyAsBytes = bodyBytes
                                     });
                                 }
                             });
