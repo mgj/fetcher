@@ -9,9 +9,8 @@ using artm.Fetcher.Core.Entities;
 using System.Threading.Tasks;
 using System.Net;
 using artm.Fetcher.Core.Models;
-using SQLite.Net;
-using SQLite.Net.Platform.XamarinIOS;
 using Foundation;
+using SQLite;
 
 namespace Fetcher.Playground.Touch.Views
 {
@@ -55,15 +54,9 @@ namespace Fetcher.Playground.Touch.Views
         {
             _logger = new FetcherLoggerService();
             _path = new FetcherRepositoryStoragePathService();
-            _repository = new FetcherRepositoryService(_logger, () => CreateConnection(_path));
+            _repository = new FetcherRepositoryService(_logger, _path);
             _web = new FetcherWebService();
             _fetcher = new FetcherService(_web, _repository, _logger);
-        }
-
-        private static SQLiteConnectionWithLock CreateConnection(IFetcherRepositoryStoragePathService path)
-        {
-            var str = new SQLiteConnectionString(path.GetPath(), false);
-            return new SQLiteConnectionWithLock(new SQLitePlatformIOS(), str);
         }
 
         private UIImageView PrepareImage()
