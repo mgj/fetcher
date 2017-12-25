@@ -243,36 +243,22 @@ namespace artm.Fetcher.Core.Services
         {
             return await this.GetAllWithChildrenAsync<FetcherWebRequest>();
         }
-
-        public async Task<IEnumerable<IUrlCacheInfo>> GetUrlCacheInfoCompareOnAll(IFetcherWebRequest needle)
-        {
-            var webRequests = await this.GetAllWithChildrenAsync<FetcherWebRequest>((FetcherWebRequest request) => request.Url == needle.Url && request.ContentType == needle.ContentType && request.Headers == needle.Headers && request.Method == needle.Method && request.Body == needle.Body,  
-                true);
-
-            List<IUrlCacheInfo> result = new List<IUrlCacheInfo>();
-            foreach (var item in webRequests)
-            {
-                var hero = await GetUrlCacheInfoForId(item.UrlCacheInfoId);
-                result.Add(hero);
-            };
-            return result;
-        }
-
+        
 
         public async Task<IEnumerable<IUrlCacheInfo>> GetUrlCacheInfoWhere(FetcherWebRequest needle, bool method = true, bool headers = true, bool contentType = true, bool body = true)
         {
-            string sql = "SELECT * "
-                + "FROM UrlCacheInfo ";
-                sql += "WHERE FetcherWebRequest.Url = ? ";
+            IEnumerable<IUrlCacheInfo> result = await this.GetAllWithChildrenAsync<UrlCacheInfo>();
+
             if (method == true)
-                sql += "AND FetcherWebRequest.Method = ? ";
+                result = result.Where(x => x.FetcherWebRequest.Method == needle.Method);
             if (body == true)
-                sql += "AND FetcherWebRequest.Body = ? ";
+                result = result.Where(x => x.FetcherWebRequest.Body == needle.Body);
             if (headers == true)
-                sql += "AND FetcherWebRequest.HeadersSerialized = ? ";
+                result = result.Where(x => x.FetcherWebRequest.HeadersSerialized == needle.HeadersSerialized);
             if (contentType == true)
-                sql += "AND FetcherWebRequest.ContentType = ? ";
-            return await this.QueryAsync<UrlCacheInfo>(sql, new[] { needle.Url, needle.Method, needle.Body, needle.HeadersSerialized, needle.ContentType } );
+                result = result.Where(x => x.FetcherWebRequest.ContentType == needle.ContentType);
+
+            return result;
         }
     }
 }
