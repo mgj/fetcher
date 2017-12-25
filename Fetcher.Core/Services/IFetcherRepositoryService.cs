@@ -28,7 +28,6 @@ namespace artm.Fetcher.Core.Services
         Task<IEnumerable<FetcherWebResponse>> GetAllWebResponses();
 
         Task<IEnumerable<FetcherWebRequest>> GetAllWebRequests();
-        //Task<IEnumerable<IUrlCacheInfo>> GetUrlCacheInfoCompareOnAll(FetcherWebRequest needle);
-        Task<IEnumerable<IUrlCacheInfo>> GetUrlCacheInfoWhere(FetcherWebRequest needle, bool method = true, bool headers = true, bool contentType = true, bool body = true);
+        Task<IEnumerable<IUrlCacheInfo>> GetUrlCacheInfoForRequest(FetcherWebRequest needle, bool url = true, bool method = true, bool headers = true, bool contentType = true, bool body = true);
     }
 }

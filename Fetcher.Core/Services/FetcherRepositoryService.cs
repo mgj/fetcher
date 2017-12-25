@@ -243,12 +243,13 @@ namespace artm.Fetcher.Core.Services
         {
             return await this.GetAllWithChildrenAsync<FetcherWebRequest>();
         }
-        
 
-        public async Task<IEnumerable<IUrlCacheInfo>> GetUrlCacheInfoWhere(FetcherWebRequest needle, bool method = true, bool headers = true, bool contentType = true, bool body = true)
+        public async Task<IEnumerable<IUrlCacheInfo>> GetUrlCacheInfoForRequest(FetcherWebRequest needle, bool url = true, bool method = true, bool headers = true, bool contentType = true, bool body = true)
         {
             IEnumerable<IUrlCacheInfo> result = await this.GetAllWithChildrenAsync<UrlCacheInfo>();
 
+            if (url == true)
+                result = result.Where(x => x.FetcherWebRequest.Url == needle.Url);
             if (method == true)
                 result = result.Where(x => x.FetcherWebRequest.Method == needle.Method);
             if (body == true)

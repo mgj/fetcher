@@ -251,7 +251,7 @@ namespace artm.Fetcher.Core.Tests.Services
             IFetcherRepositoryService sut = fetcherService.RepositoryService;
 
             await fetcherService.FetchAsync(request1);
-            IEnumerable<IUrlCacheInfo> data = await sut.GetUrlCacheInfoWhere(request1);
+            IEnumerable<IUrlCacheInfo> data = await sut.GetUrlCacheInfoForRequest(request1);
 
             Assert.NotNull(data);
             Assert.Greater(data.Count(), 0);
