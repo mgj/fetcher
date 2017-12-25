@@ -89,22 +89,7 @@ namespace artm.Fetcher.Core.Services
                 return hero;
             }
 
-            try
-            {
-                hero = await DatabaseInsertUrlAsync(request, response, timestamp);
-            }
-            catch (Exception ex)
-            {
-                Log("Could not insert entry: " + ex);
-                var debug = 42;
-                throw;
-            }
-            finally
-            {
-                //_lock.Release();
-            }
-
-            return hero;
+            return await DatabaseInsertUrlAsync(request, response, timestamp);
         }
 
         private async Task<IUrlCacheInfo> DatabaseInsertUrlAsync(IFetcherWebRequest request, IFetcherWebResponse response, DateTimeOffset timestamp)

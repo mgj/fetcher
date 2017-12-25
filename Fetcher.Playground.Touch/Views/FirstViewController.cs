@@ -74,7 +74,7 @@ namespace Fetcher.Playground.Touch.Views
             //_fetcher.Preload(url, "<html>Hello world!</html>");
             try
             {
-                var url = "https://www.google.com";
+                var url = "https://lorempixel.com/200/400/";
                 IUrlCacheInfo response = await _fetcher.FetchAsync(new FetcherWebRequest()
                 {
                     Url = url,
