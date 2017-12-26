@@ -9,6 +9,7 @@ namespace artm.Fetcher.Core.Entities
     public interface IFetcherWebResponse
     {
         int Id { get; set; }
+        int UrlCacheInfoId { get; set; }
         int HttpStatusCode { get; set; }
         Exception Error { get; set; }
         string Body { get; set; }

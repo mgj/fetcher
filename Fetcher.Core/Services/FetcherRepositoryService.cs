@@ -114,7 +114,7 @@ namespace artm.Fetcher.Core.Services
                     Error = response.Error,
                     Headers = response.Headers,
                     HttpStatusCode = response.HttpStatusCode,
-                    ContentType = response.ContentType
+                    ContentType = response.ContentType,
                 };
                 tran.InsertWithChildren(theResponse, false);
 
@@ -129,6 +129,9 @@ namespace artm.Fetcher.Core.Services
                     LastAccessed = timestamp
                 };
                 tran.InsertWithChildren(hero, true);
+
+                //theResponse.UrlCacheInfoId = hero.Id;
+                //tran.UpdateWithChildren(response);
             });
             return hero;
         }

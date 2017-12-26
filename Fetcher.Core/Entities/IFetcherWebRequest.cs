@@ -6,6 +6,7 @@ namespace artm.Fetcher.Core.Models
     public interface IFetcherWebRequest
     {
         int Id { get; set; }
+        int UrlCacheInfoId { get; set; }
         string Body { get; set; }
         string ContentType { get; set; }
         Dictionary<string, string> Headers { get; set; }
