@@ -34,7 +34,24 @@ namespace Fetcher.Playground.Droid
             IFetcherRepositoryStoragePathService path = new FetcherRepositoryStoragePathService();
             IFetcherWebService web = new FetcherWebService();
             FetcherRepositoryService repository = new FetcherRepositoryService(loggerService, path);
-            
+
+            // Search cached entries by Url...
+            IUrlCacheInfo info = await repository.GetEntryForRequestAsync(new FetcherWebRequest
+            {
+                Url = "https://www.google.com"
+            });
+
+            // ... or anything else
+            IUrlCacheInfo info2 = await repository.GetEntryForRequestAsync(new FetcherWebRequest
+            {
+                Url = "https://www.google.com",
+                Method = "POST",
+                Headers = new Dictionary<string, string>
+                {
+                    {"X-ZUMO-APPLICATION" , "Hello world!" }
+                }
+            });
+
             // This call will be removed in a future version but for now you still have to call
             await repository.Initialize();
 

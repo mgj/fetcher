@@ -91,7 +91,34 @@ IUrlCacheInfo response = await fetcher.FetchAsync(new FetcherWebRequest()
 
 ## Caching rules
 
-A new cache entry will be created (that is, a FetchAsync call is considered unique) if the FetcherWebRequest and accompanying UrlCacheInfo does not already exist. You can search through the cached items using the `IFetcherRepositoryService` interface
+A new cache entry will be created (that is, a FetchAsync call is considered unique) if the FetcherWebRequest and accompanying UrlCacheInfo does not already exist. You can search through the cached items using the `IFetcherRepositoryService` interface. Example:
+
+```
+await repository.DeleteEntriesOlderThan(14); // Days
+```
+
+`IFetcherRepositoryService` also exposes basic search features:
+
+```
+// Search cached entries by Url...
+IUrlCacheInfo info = await repository.GetEntryForRequestAsync(new FetcherWebRequest
+{
+    Url = "https://www.google.com"
+});
+
+// ... or anything else
+IUrlCacheInfo info2 = await repository.GetEntryForRequestAsync(new FetcherWebRequest
+{
+    Url = "https://www.google.com",
+    Method = "POST",
+    Headers = new Dictionary<string, string>
+    {
+        {"X-ZUMO-APPLICATION" , "Hello world!" }
+    }
+});
+```
+
+If these are not sufficient, you can retrieve all cached items and do the search yourself
 
 ## FAQ
 
