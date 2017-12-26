@@ -14,7 +14,7 @@ Doing network such as downloading a JSON file from a webserver can be difficult 
   * On Android this means [OkHttp](http://square.github.io/okhttp/)
 * You need to have a retry mechanism if the server is unresponsive
 * You need to have a caching layer to
-  * Minimize network usage, as connections are often metered
+  * Minimize network usage by caching redundant requests, as connections are often metered
   * Improve performance
   * Handle unresponive servers / endpoints / no internet connection
 * You need to handle the Cold Start problem: the very first time an app is started and there is no internet available. You should be able to ship your app with preloaded data for a given url.
@@ -22,12 +22,9 @@ Doing network such as downloading a JSON file from a webserver can be difficult 
 ## Goals
 Goals for this project:
 
- * Simple and easy to use - Prefer reasonable opinionated defaults over complex interfaces or configuration. We worry about the details so you dont have to. Examples: 
-   * We use a SQLite database as backsing store. 
-   * We use exponential backoff with polly. 
-   * We store data in the temporary directory on iOS and Android. On iOS backup is disabled for the cache.
+ * Simple and easy to use - Prefer reasonable opinionated defaults over complex interfaces or configuration
  * Stable and predictable - Unit tests helps with this, but please open an issue or pull request if you experience crashes or surprising behavior
- * Minimal dependencies - Keep the library as small as possible. Dont add dependencies (E.g. Realm database backing store) unless we have to
+ * Minimal dependencies - Keep the library as small as possible. Dont add big dependencies (E.g. Realm database backing store) unless we have to
  * Distribution and easy installation - CI builds and publishes the library using NuGet. Include the library in all your projects and you should be good to go
 
 ## Install
@@ -56,7 +53,6 @@ IFetcherRepositoryStoragePathService path = new FetcherRepositoryStoragePathServ
 IFetcherWebService web = new FetcherWebService();
 FetcherRepositoryService repository = new FetcherRepositoryService(loggerService, path);
 
-// This call will be removed in a future version but for now you still have to call
 await repository.Initialize();
 ```
 
@@ -91,7 +87,46 @@ IUrlCacheInfo response = await fetcher.FetchAsync(new FetcherWebRequest()
 
 ## Caching rules
 
-A new cache entry will be created (that is, a FetchAsync call is considered unique) if the FetcherWebRequest and accompanying UrlCacheInfo does not already exist. You can search through the cached items using the `IFetcherRepositoryService` interface
+A new cache entry will be created (that is, a FetchAsync call is considered unique) if the FetcherWebRequest and accompanying UrlCacheInfo does not already exist. You can search through the cached items using the `IFetcherRepositoryService` interface. Example:
+
+```
+// Search cached entries by Url...
+IUrlCacheInfo info = await repository.GetEntryForRequestAsync(new FetcherWebRequest
+{
+    Url = "https://www.google.com"
+});
+
+// ... or anything else
+IUrlCacheInfo info2 = await repository.GetEntryForRequestAsync(new FetcherWebRequest
+{
+    Url = "https://www.google.com",
+    Method = "POST",
+    Headers = new Dictionary<string, string>
+    {
+        {"X-ZUMO-APPLICATION" , "Hello world!" }
+    }
+});
+```
+
+Finally you can use the ID's from the underlying SQLite database:
+
+```
+IUrlCacheInfo info = await repository.GetUrlCacheInfoForId(15);
+```
+
+If these are not sufficient, you can retrieve all cached items and do the search yourself:
+
+```
+IEnumerable<IUrlCacheInfo> info = await repository.GetAllUrlCacheInfo();
+IEnumerable<IFetcherWebRequest> request = await repository.GetAllWebRequests();
+IEnumerable<IFetcherWebResponse> response = await repository.GetAllWebResponses();
+```
+
+Cleanup:
+
+```
+await repository.DeleteEntriesOlderThan(14); // Days
+```
 
 ## FAQ
 
