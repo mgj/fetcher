@@ -411,6 +411,57 @@ namespace artm.Fetcher.Core.Tests.Services
             Assert.AreEqual(dbRequest.Method, request1.Method);
         }
 
+        [Test]
+        public async Task GetUrlCacheInfoForRequest_RequestContentTypeNotSet_NoContentTypeReturned()
+        {
+            var request1 = new FetcherWebRequest
+            {
+                Url = "https://jsonplaceholder.typicode.com/posts",
+                Body = JsonPlaceholderPostFactory(),
+                Headers = new Dictionary<string, string>
+                {
+                    { "X-ZUMO-APPLICATION", "hello world" }
+                }
+            };
+
+            FetcherServiceStub fetcherService = new FetcherServiceStub();
+            IFetcherRepositoryService sut = fetcherService.RepositoryService;
+
+            await fetcherService.FetchAsync(request1);
+            IEnumerable<IUrlCacheInfo> data = await sut.GetUrlCacheInfoForRequest(request1);
+            FetcherWebRequest dbRequest = data.FirstOrDefault().FetcherWebRequest;
+
+            Assert.NotNull(data);
+            Assert.NotNull(dbRequest);
+            Assert.IsTrue(string.IsNullOrEmpty(dbRequest.ContentType));
+            Assert.AreEqual(dbRequest.ContentType, request1.ContentType);
+        }
+
+        [Test]
+        public async Task GetUrlCacheInfoForRequest_RequestBodyNotSet_NoBodyReturned()
+        {
+            var request1 = new FetcherWebRequest
+            {
+                Url = "https://jsonplaceholder.typicode.com/posts",
+                Headers = new Dictionary<string, string>
+                {
+                    { "X-ZUMO-APPLICATION", "hello world" }
+                }
+            };
+
+            FetcherServiceStub fetcherService = new FetcherServiceStub();
+            IFetcherRepositoryService sut = fetcherService.RepositoryService;
+
+            await fetcherService.FetchAsync(request1);
+            IEnumerable<IUrlCacheInfo> data = await sut.GetUrlCacheInfoForRequest(request1);
+            FetcherWebRequest dbRequest = data.FirstOrDefault().FetcherWebRequest;
+
+            Assert.NotNull(data);
+            Assert.NotNull(dbRequest);
+            Assert.IsTrue(string.IsNullOrEmpty(dbRequest.Body));
+            Assert.AreEqual(dbRequest.Body, request1.Body);
+        }
+
         private static string JsonPlaceholderPostFactory()
         {
             var hero = new JsonPlaceholderPostDto
