@@ -108,6 +108,12 @@ IUrlCacheInfo info2 = await repository.GetEntryForRequestAsync(new FetcherWebReq
 });
 ```
 
+Finally you can use the ID's from the underlying SQLite database:
+
+```
+IUrlCacheInfo info = await repository.GetUrlCacheInfoForId(15);
+```
+
 If these are not sufficient, you can retrieve all cached items and do the search yourself:
 
 ```
