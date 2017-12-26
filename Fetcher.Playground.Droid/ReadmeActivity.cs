@@ -36,10 +36,9 @@ namespace Fetcher.Playground.Droid
             FetcherRepositoryService repository = new FetcherRepositoryService(loggerService, path);
 
             // Search cached entries by Url...
-            IUrlCacheInfo info = await repository.GetEntryForRequestAsync(new FetcherWebRequest
-            {
-                Url = "https://www.google.com"
-            });
+            IEnumerable<IUrlCacheInfo> info = await repository.GetAllUrlCacheInfo();
+            IEnumerable<IFetcherWebRequest> request = await repository.GetAllWebRequests();
+            IEnumerable<IFetcherWebResponse> response = await repository.GetAllWebResponses();
 
             // ... or anything else
             IUrlCacheInfo info2 = await repository.GetEntryForRequestAsync(new FetcherWebRequest
