@@ -257,6 +257,79 @@ namespace artm.Fetcher.Core.Tests.Services
             Assert.Greater(data.Count(), 0);
         }
 
+        [Test]
+        public async Task GetEntryForUrl_RequestContentTypeIsSet_ContentTypeIsReturned()
+        {
+            var request1 = new FetcherWebRequest
+            {
+                Url = "https://jsonplaceholder.typicode.com/posts",
+                Method = "POST",
+                Body = JsonPlaceholderPostFactory(),
+                ContentType = "application/json"
+            };
+
+            FetcherServiceStub fetcherService = new FetcherServiceStub();
+            IFetcherRepositoryService sut = fetcherService.RepositoryService;
+
+            await fetcherService.FetchAsync(request1);
+            IEnumerable<IUrlCacheInfo> data = await sut.GetUrlCacheInfoForRequest(request1);
+            FetcherWebRequest dbRequest = data.FirstOrDefault().FetcherWebRequest;
+
+            Assert.NotNull(data);
+            Assert.NotNull(dbRequest);
+            Assert.AreEqual(dbRequest.ContentType, request1.ContentType);
+        }
+
+        [Test]
+        public async Task GetEntryForUrl_RequestBodyIsSet_BodyIsReturned()
+        {
+            var request1 = new FetcherWebRequest
+            {
+                Url = "https://jsonplaceholder.typicode.com/posts",
+                Method = "POST",
+                Body = JsonPlaceholderPostFactory(),
+                ContentType = "application/json"
+            };
+
+            FetcherServiceStub fetcherService = new FetcherServiceStub();
+            IFetcherRepositoryService sut = fetcherService.RepositoryService;
+
+            await fetcherService.FetchAsync(request1);
+            IEnumerable<IUrlCacheInfo> data = await sut.GetUrlCacheInfoForRequest(request1);
+            FetcherWebRequest dbRequest = data.FirstOrDefault().FetcherWebRequest;
+
+            Assert.NotNull(data);
+            Assert.NotNull(dbRequest);
+            Assert.AreEqual(dbRequest.Body, request1.Body);
+        }
+
+        [Test]
+        public async Task GetEntryForUrl_RequestHeadersIsSet_HeadersIsReturned()
+        {
+            var request1 = new FetcherWebRequest
+            {
+                Url = "https://jsonplaceholder.typicode.com/posts",
+                Method = "POST",
+                Body = JsonPlaceholderPostFactory(),
+                Headers = new Dictionary<string, string>
+                {
+                    { "X-ZUMO-APPLICATION", "hello world" }
+                },
+                ContentType = "application/json"
+            };
+
+            FetcherServiceStub fetcherService = new FetcherServiceStub();
+            IFetcherRepositoryService sut = fetcherService.RepositoryService;
+
+            await fetcherService.FetchAsync(request1);
+            IEnumerable<IUrlCacheInfo> data = await sut.GetUrlCacheInfoForRequest(request1);
+            FetcherWebRequest dbRequest = data.FirstOrDefault().FetcherWebRequest;
+
+            Assert.NotNull(data);
+            Assert.NotNull(dbRequest);
+            Assert.AreEqual(dbRequest.Headers, request1.Headers);
+        }
+
         private static string JsonPlaceholderPostFactory()
         {
             var hero = new JsonPlaceholderPostDto
