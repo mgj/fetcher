@@ -462,6 +462,48 @@ namespace artm.Fetcher.Core.Tests.Services
             Assert.AreEqual(dbRequest.Body, request1.Body);
         }
 
+        [Test]
+        public async Task GetUrlCacheInfoForRequest_Sunshine_ReturnedRequestContainsUrlCacheInfoId()
+        {
+            var request1 = new FetcherWebRequest
+            {
+                Url = "https://jsonplaceholder.typicode.com/posts",
+                Method = "GET"
+            };
+
+            FetcherServiceStub fetcherService = new FetcherServiceStub();
+            IFetcherRepositoryService sut = fetcherService.RepositoryService;
+
+            await fetcherService.FetchAsync(request1);
+            IEnumerable<IUrlCacheInfo> data = await sut.GetUrlCacheInfoForRequest(request1);
+            FetcherWebRequest dbRequest = data.FirstOrDefault().FetcherWebRequest;
+
+            Assert.NotNull(data);
+            Assert.NotNull(dbRequest);
+            Assert.AreEqual(1, dbRequest.UrlCacheInfoId);
+        }
+
+        [Test]
+        public async Task GetUrlCacheInfoForRequest_Sunshine_ReturnedResponseContainsUrlCacheInfoId()
+        {
+            var request1 = new FetcherWebRequest
+            {
+                Url = "https://jsonplaceholder.typicode.com/posts",
+                Method = "GET"
+            };
+
+            FetcherServiceStub fetcherService = new FetcherServiceStub();
+            IFetcherRepositoryService sut = fetcherService.RepositoryService;
+
+            await fetcherService.FetchAsync(request1);
+            IEnumerable<IUrlCacheInfo> data = await sut.GetUrlCacheInfoForRequest(request1);
+            FetcherWebResponse dbResponse = data.FirstOrDefault().FetcherWebResponse;
+
+            Assert.NotNull(data);
+            Assert.NotNull(dbResponse);
+            Assert.AreEqual(1, dbResponse.UrlCacheInfoId);
+        }
+
         private static string JsonPlaceholderPostFactory()
         {
             var hero = new JsonPlaceholderPostDto
