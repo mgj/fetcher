@@ -36,15 +36,18 @@ namespace artm.Fetcher.Core.Models
                 }
             }
         }
+
+        public string HeadersSerialized { get; set; }
+
         public string Body { get; set; }
-        
+
         public byte[] BodyAsBytes
         {
             get;
             set;
         }
 
-        public string HeadersSerialized { get; set; }
+        public string ContentType { get; set; }
 
         [ForeignKey(typeof(UrlCacheInfo))]
         public int UrlCacheInfoId { get; set; }

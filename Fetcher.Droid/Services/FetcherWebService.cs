@@ -13,7 +13,7 @@ namespace artm.Fetcher.Droid.Services
     {
         private OkHttpClient _client;
         private Headers.Builder _headerBuilder;
-        public const string BODY_FORMAT = "application/json; charset=utf-8";
+        //public const string BODY_FORMAT = "application/json; charset=utf-8";
 
         protected OkHttpClient Client
         {
@@ -43,15 +43,16 @@ namespace artm.Fetcher.Droid.Services
             source.Request(Java.Lang.Long.MaxValue); // Buffer the entire body.
             var buffer = source.Buffer;
 
-            var body = buffer.Clone().ReadString(Java.Nio.Charset.Charset.ForName("UTF-8"));
-            var bodyAsBytes = buffer.Clone().ReadByteArray();
-
-            FetcherWebResponse result = new FetcherWebResponse()
+            string contentTypeString = responseBody.ContentType().ToString();
+            string bodyString = buffer.Clone().ReadString(Java.Nio.Charset.Charset.ForName("UTF-8"));
+            byte[]bodyAsBytes = buffer.Clone().ReadByteArray();
+            FetcherWebResponse result = new FetcherWebResponse
             {
                 HttpStatusCode = response.Code(),
                 Error = new Exception(response.Message()),
-                Body = body,
-                BodyAsBytes = bodyAsBytes
+                Body = bodyString,
+                BodyAsBytes = bodyAsBytes,
+                ContentType = contentTypeString
             };
             responseBody.Close();
             return result;
@@ -62,15 +63,18 @@ namespace artm.Fetcher.Droid.Services
             if (request == null || requestBuilder == null ) return;
 
             RequestBody body = null;
+            
             if (string.IsNullOrEmpty(request.Body) == false)
             {
-                body = RequestBody.Create(MediaType.Parse(BODY_FORMAT), request.Body);
+                body = RequestBody.Create(PrepareContentType(request), request.Body);
             }
             else if(request.Method.Equals("POST", StringComparison.OrdinalIgnoreCase))
             {
                 // POST's without body is not allowed
-                body = RequestBody.Create(MediaType.Parse(BODY_FORMAT), string.Empty);
+                body = RequestBody.Create(MediaType.Parse(request.ContentType), string.Empty);
             }
+
+            if (string.IsNullOrEmpty(request.Method)) request.Method = "GET";
 
             requestBuilder.Method(request.Method, body);
         }
@@ -81,6 +85,10 @@ namespace artm.Fetcher.Droid.Services
             if (request != null && string.IsNullOrEmpty(request.ContentType) == false)
             {
                 contentType = MediaType.Parse(request.ContentType);
+            }
+            else
+            {
+                contentType = MediaType.Parse(DEFAULT_CONTENTTYPE);
             }
 
             return contentType;

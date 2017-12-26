@@ -113,6 +113,7 @@ namespace artm.Fetcher.Core.Services
                     Error = response.Error,
                     Headers = response.Headers,
                     HttpStatusCode = response.HttpStatusCode,
+                    ContentType = response.ContentType
                 };
                 tran.InsertWithChildren(theResponse, false);
 
@@ -145,11 +146,13 @@ namespace artm.Fetcher.Core.Services
                 toBeUpdated.FetcherWebResponseId = response.Id;
                 toBeUpdated.FetcherWebResponse = response as FetcherWebResponse;
             }
+            toBeUpdated.FetcherWebResponse.Headers = response.Headers;
             toBeUpdated.FetcherWebResponse.Body = response.Body;
             toBeUpdated.FetcherWebResponse.BodyAsBytes = response.BodyAsBytes;
             toBeUpdated.FetcherWebResponse.Error = response.Error;
-            toBeUpdated.FetcherWebResponse.Headers = response.Headers;
             toBeUpdated.FetcherWebResponse.HttpStatusCode = response.HttpStatusCode;
+            toBeUpdated.FetcherWebResponse.ContentType = response.ContentType;
+            toBeUpdated.LastUpdated = timestamp;
 
             if (request.Id != 0)
             {
@@ -160,7 +163,6 @@ namespace artm.Fetcher.Core.Services
             toBeUpdated.FetcherWebRequest.Body = request.Body;
             toBeUpdated.FetcherWebRequest.ContentType = request.ContentType;
             toBeUpdated.FetcherWebRequest.Method = request.Method;
-
             toBeUpdated.FetcherWebRequest.Url = request.Url;
             toBeUpdated.LastUpdated = timestamp;
 

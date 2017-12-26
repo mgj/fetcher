@@ -51,16 +51,23 @@ namespace artm.Fetcher.Touch.Services
         private void PrepareMethod(IFetcherWebRequest request)
         {
             if (request == null || _mutableRequest == null) return;
-            _mutableRequest.HttpMethod = request.Method;
 
-            PrepareContentType(request);
+            if (string.IsNullOrEmpty(request.Method)) request.Method = "GET";
+            _mutableRequest.HttpMethod = request.Method;
         }
 
         private void PrepareContentType(IFetcherWebRequest request)
         {
             if (request == null || string.IsNullOrEmpty(request.ContentType)) return;
 
-            _mutableRequest.Headers["content-type"] = new NSString(request.ContentType);
+            if (string.IsNullOrEmpty(request.ContentType))
+            {
+                AddHeader("content-type", DEFAULT_CONTENTTYPE);
+            }
+            else
+            {
+                AddHeader("content-type", request.ContentType);
+            }
         }
 
         private static NSUrlSessionDataTask CreateUrlSessionDataTask(TaskCompletionSource<IFetcherWebResponse> tcs, NSMutableUrlRequest request)
@@ -81,15 +88,15 @@ namespace artm.Fetcher.Touch.Services
                                     {
                                         System.Runtime.InteropServices.Marshal.Copy(data.Bytes, bodyBytes, 0, Convert.ToInt32(data.Length));
                                     }
-                                    var mimetype = response.MimeType;
-                                    string bodyString = string.Empty;
-
+                                    
+                                    string bodyString = Encoding.UTF8.GetString(bodyBytes);
                                     tcs.SetResult(new FetcherWebResponse()
                                     {
                                         HttpStatusCode = (int)resp?.StatusCode,
                                         Error = new Exception(error?.ToString()),
-                                        Body = Encoding.UTF8.GetString(bodyBytes),
-                                        BodyAsBytes = bodyBytes
+                                        Body = bodyString,
+                                        BodyAsBytes = bodyBytes,
+                                        ContentType = response.MimeType
                                     });
                                 }
                             });
