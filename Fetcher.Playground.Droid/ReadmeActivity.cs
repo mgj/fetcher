@@ -38,7 +38,7 @@ namespace Fetcher.Playground.Droid
             // Search cached entries by Url...
             IEnumerable<IUrlCacheInfo> info = await repository.GetAllUrlCacheInfo();
             IEnumerable<IFetcherWebRequest> request = await repository.GetAllWebRequests();
-            IEnumerable<IFetcherWebResponse> response = await repository.GetAllWebResponses();
+            IEnumerable<IFetcherWebResponse> responses = await repository.GetAllWebResponses();
 
             // ... or anything else
             IUrlCacheInfo info2 = await repository.GetEntryForRequestAsync(new FetcherWebRequest
@@ -50,6 +50,8 @@ namespace Fetcher.Playground.Droid
                     {"X-ZUMO-APPLICATION" , "Hello world!" }
                 }
             });
+
+            IUrlCacheInfo info3 = await repository.GetUrlCacheInfoForId(15);
 
             // This call will be removed in a future version but for now you still have to call
             await repository.Initialize();
