@@ -45,22 +45,25 @@ namespace artm.Fetcher.Droid.Services
 
             var body = buffer.Clone().ReadString(Java.Nio.Charset.Charset.ForName("UTF-8"));
             var bodyAsBytes = buffer.Clone().ReadByteArray();
-            return new FetcherWebResponse()
+
+            FetcherWebResponse result = new FetcherWebResponse()
             {
                 HttpStatusCode = response.Code(),
                 Error = new Exception(response.Message()),
                 Body = body,
                 BodyAsBytes = bodyAsBytes
             };
+            responseBody.Close();
+            return result;
         }
 
-        private ResponseBody CloneResponseBody(Response rawResponse)
-        {
-            ResponseBody responseBody = rawResponse.Body();
+        //private ResponseBody CloneResponseBody(Response rawResponse)
+        //{
+        //    ResponseBody responseBody = rawResponse.Body();
 
-            var bufferClone = responseBody.Source().Buffer.Clone();
-            return ResponseBody.Create(responseBody.ContentType(), responseBody.ContentLength(), bufferClone);
-        }
+        //    var bufferClone = responseBody.Source().Buffer.Clone();
+        //    return ResponseBody.Create(responseBody.ContentType(), responseBody.ContentLength(), bufferClone);
+        //}
 
         private void PrepareBody(IFetcherWebRequest request, Request.Builder requestBuilder)
         {
