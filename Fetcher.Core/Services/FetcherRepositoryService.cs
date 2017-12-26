@@ -2,8 +2,6 @@
 using artm.Fetcher.Core.Models;
 using Polly;
 using SQLite;
-using SQLite.Net;
-using SQLite.Net.Async;
 using SQLiteNetExtensions.Extensions;
 using SQLiteNetExtensionsAsync.Extensions;
 using System;
@@ -18,8 +16,8 @@ namespace artm.Fetcher.Core.Services
     public class FetcherRepositoryService : SQLiteAsyncConnection, IFetcherRepositoryService
     {
         protected IFetcherLoggerService Logger { get; set; }
-
-        public FetcherRepositoryService(IFetcherLoggerService loggerService, Func<SQLiteConnectionWithLock> mylock) : base(mylock)
+        
+        public FetcherRepositoryService(IFetcherLoggerService loggerService, IFetcherRepositoryStoragePathService pathService) : base(pathService.GetPath(), false)
         {
             Logger = loggerService;
         }
@@ -67,7 +65,7 @@ namespace artm.Fetcher.Core.Services
             return data;
         }
 
-        public async Task<IUrlCacheInfo> GetEntryForId(int id)
+        public async Task<IUrlCacheInfo> GetUrlCacheInfoForId(int id)
         {
             return await this.GetWithChildrenAsync<UrlCacheInfo>(id);
         }
@@ -91,22 +89,7 @@ namespace artm.Fetcher.Core.Services
                 return hero;
             }
 
-            try
-            {
-                hero = await DatabaseInsertUrlAsync(request, response, timestamp);
-            }
-            catch (Exception ex)
-            {
-                Log("Could not insert entry: " + ex);
-                var debug = 42;
-                throw;
-            }
-            finally
-            {
-                //_lock.Release();
-            }
-
-            return hero;
+            return await DatabaseInsertUrlAsync(request, response, timestamp);
         }
 
         private async Task<IUrlCacheInfo> DatabaseInsertUrlAsync(IFetcherWebRequest request, IFetcherWebResponse response, DateTimeOffset timestamp)
@@ -130,6 +113,7 @@ namespace artm.Fetcher.Core.Services
                     Error = response.Error,
                     Headers = response.Headers,
                     HttpStatusCode = response.HttpStatusCode,
+                    ContentType = response.ContentType
                 };
                 tran.InsertWithChildren(theResponse, false);
 
@@ -162,11 +146,13 @@ namespace artm.Fetcher.Core.Services
                 toBeUpdated.FetcherWebResponseId = response.Id;
                 toBeUpdated.FetcherWebResponse = response as FetcherWebResponse;
             }
+            toBeUpdated.FetcherWebResponse.Headers = response.Headers;
             toBeUpdated.FetcherWebResponse.Body = response.Body;
             toBeUpdated.FetcherWebResponse.BodyAsBytes = response.BodyAsBytes;
             toBeUpdated.FetcherWebResponse.Error = response.Error;
-            toBeUpdated.FetcherWebResponse.Headers = response.Headers;
             toBeUpdated.FetcherWebResponse.HttpStatusCode = response.HttpStatusCode;
+            toBeUpdated.FetcherWebResponse.ContentType = response.ContentType;
+            toBeUpdated.LastUpdated = timestamp;
 
             if (request.Id != 0)
             {
@@ -177,7 +163,6 @@ namespace artm.Fetcher.Core.Services
             toBeUpdated.FetcherWebRequest.Body = request.Body;
             toBeUpdated.FetcherWebRequest.ContentType = request.ContentType;
             toBeUpdated.FetcherWebRequest.Method = request.Method;
-
             toBeUpdated.FetcherWebRequest.Url = request.Url;
             toBeUpdated.LastUpdated = timestamp;
 
@@ -244,6 +229,24 @@ namespace artm.Fetcher.Core.Services
         public async Task<IEnumerable<FetcherWebRequest>> GetAllWebRequests()
         {
             return await this.GetAllWithChildrenAsync<FetcherWebRequest>();
+        }
+
+        public async Task<IEnumerable<IUrlCacheInfo>> GetUrlCacheInfoForRequest(FetcherWebRequest needle, bool url = true, bool method = true, bool headers = true, bool contentType = true, bool body = true)
+        {
+            IEnumerable<IUrlCacheInfo> result = await this.GetAllWithChildrenAsync<UrlCacheInfo>();
+
+            if (url == true)
+                result = result.Where(x => x.FetcherWebRequest.Url == needle.Url);
+            if (method == true)
+                result = result.Where(x => x.FetcherWebRequest.Method == needle.Method);
+            if (body == true)
+                result = result.Where(x => x.FetcherWebRequest.Body == needle.Body);
+            if (headers == true)
+                result = result.Where(x => x.FetcherWebRequest.HeadersSerialized == needle.HeadersSerialized);
+            if (contentType == true)
+                result = result.Where(x => x.FetcherWebRequest.ContentType == needle.ContentType);
+
+            return result;
         }
     }
 }

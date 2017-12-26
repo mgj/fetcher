@@ -1,6 +1,5 @@
 ﻿using artm.Fetcher.Core.Models;
 using SQLite;
-using SQLite.Net.Attributes;
 using SQLiteNetExtensions.Attributes;
 using System;
 

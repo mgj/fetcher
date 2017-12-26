@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.6
+VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fetcher.Core", "Fetcher.Core\Fetcher.Core.csproj", "{4921B331-6A28-4DB9-8A1A-DE947C033E2E}"
 EndProject
@@ -178,5 +178,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {14627C36-B491-4EC7-8CD3-C2022F0D35C6}
 	EndGlobalSection
 EndGlobal

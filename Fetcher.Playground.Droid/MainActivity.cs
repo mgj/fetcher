@@ -9,10 +9,9 @@ using System.Diagnostics;
 using System;
 using System.Net;
 using artm.Fetcher.Core.Models;
-using SQLite.Net;
-using SQLite.Net.Platform.XamarinAndroid;
 using System.Collections.Generic;
 using Android.Graphics;
+using SQLite;
 
 namespace Fetcher.Playground.Droid
 {
@@ -49,15 +48,9 @@ namespace Fetcher.Playground.Droid
         {
             _logger = new FetcherLoggerService();
             _path = new FetcherRepositoryStoragePathService();
-            _repository = new FetcherRepositoryService(_logger, () => CreateConnection(_path));
+            _repository = new FetcherRepositoryService(_logger, _path);
             _web = new FetcherWebService();
             _fetcher = new FetcherService(_web, _repository, _logger);
-        }
-
-        private static SQLiteConnectionWithLock CreateConnection(IFetcherRepositoryStoragePathService path)
-        {
-            var str = new SQLiteConnectionString(path.GetPath(), false);
-            return new SQLiteConnectionWithLock(new SQLitePlatformAndroidN(), str);
         }
 
         private async Task DoFetch()
@@ -66,13 +59,9 @@ namespace Fetcher.Playground.Droid
             try
             {
                 var url = new System.Uri("https://lorempixel.com/200/400/");
-
-                var pixel = await _fetcher.FetchAsync(url);
-                var pixel2 = await _fetcher.FetchAsync(url);
-                var pixel3 = await _fetcher.FetchAsync(url);
-
-                IUrlCacheInfo response = await _fetcher.FetchAsync(url);
-                var bitmap = BitmapFactory.DecodeByteArray(response.FetcherWebResponse.BodyAsBytes, 0, pixel.FetcherWebResponse.BodyAsBytes.Length);
+                
+                IUrlCacheInfo response = await _fetcher.FetchAsync(url, TimeSpan.FromMilliseconds(1));
+                var bitmap = BitmapFactory.DecodeByteArray(response.FetcherWebResponse.BodyAsBytes, 0, response.FetcherWebResponse.BodyAsBytes.Length);
 
                 RunOnUiThread(() => _image.SetImageBitmap(bitmap));
             }

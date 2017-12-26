@@ -1,5 +1,7 @@
-﻿using Newtonsoft.Json;
-using SQLite.Net.Attributes;
+﻿using artm.Fetcher.Core.Entities;
+using Newtonsoft.Json;
+using SQLite;
+using SQLiteNetExtensions.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,6 +59,9 @@ namespace artm.Fetcher.Core.Models
                 }
             }
         }
+
+        [ForeignKey(typeof(UrlCacheInfo))]
+        public int UrlCacheInfoId { get; set; }
 
         private void LogJsonException(JsonException je)
         {

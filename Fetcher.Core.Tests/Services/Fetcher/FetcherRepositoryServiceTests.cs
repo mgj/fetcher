@@ -7,6 +7,7 @@ using artm.Fetcher.Core.Tests.Services.Stubs;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -225,8 +226,8 @@ namespace artm.Fetcher.Core.Tests.Services
                 Body = "OtherRequestBody"
             };
 
-            IFetcherService fetcherService = new FetcherServiceStub();
-            IFetcherRepositoryService sut = new FetcherRepositoryServiceStub();
+            FetcherServiceStub fetcherService = new FetcherServiceStub();
+            IFetcherRepositoryService sut = fetcherService.RepositoryService;
 
             await fetcherService.FetchAsync(request1);
             await fetcherService.FetchAsync(request2);
@@ -234,6 +235,180 @@ namespace artm.Fetcher.Core.Tests.Services
             var allCaches = await sut.GetAllUrlCacheInfo();
 
             Assert.AreEqual(2, allCaches.Count());
+        }
+
+        [Test]
+        public async Task GetUrlCacheInfoCompareOnAll_Sunshine_ValidResponse()
+        {
+            var request1 = new FetcherWebRequest
+            {
+                Url = "https://jsonplaceholder.typicode.com/posts",
+                Method = "POST",
+                Body = JsonPlaceholderPostFactory()
+            };
+
+            FetcherServiceStub fetcherService = new FetcherServiceStub();
+            IFetcherRepositoryService sut = fetcherService.RepositoryService;
+
+            await fetcherService.FetchAsync(request1);
+            IEnumerable<IUrlCacheInfo> data = await sut.GetUrlCacheInfoForRequest(request1);
+
+            Assert.NotNull(data);
+            Assert.Greater(data.Count(), 0);
+        }
+
+        [Test]
+        public async Task GetUrlCacheInfoForRequest_RequestContentTypeIsSet_ContentTypeIsReturned()
+        {
+            var request1 = new FetcherWebRequest
+            {
+                Url = "https://jsonplaceholder.typicode.com/posts",
+                Method = "POST",
+                Body = JsonPlaceholderPostFactory(),
+                ContentType = "application/json"
+            };
+
+            FetcherServiceStub fetcherService = new FetcherServiceStub();
+            IFetcherRepositoryService sut = fetcherService.RepositoryService;
+
+            await fetcherService.FetchAsync(request1);
+            IEnumerable<IUrlCacheInfo> data = await sut.GetUrlCacheInfoForRequest(request1);
+            FetcherWebRequest dbRequest = data.FirstOrDefault().FetcherWebRequest;
+
+            Assert.NotNull(data);
+            Assert.NotNull(dbRequest);
+            Assert.AreEqual(dbRequest.ContentType, request1.ContentType);
+        }
+
+        [Test]
+        public async Task GetUrlCacheInfoForRequest_RequestBodyIsSet_BodyIsReturned()
+        {
+            var request1 = new FetcherWebRequest
+            {
+                Url = "https://jsonplaceholder.typicode.com/posts",
+                Method = "POST",
+                Body = JsonPlaceholderPostFactory(),
+                ContentType = "application/json"
+            };
+
+            FetcherServiceStub fetcherService = new FetcherServiceStub();
+            IFetcherRepositoryService sut = fetcherService.RepositoryService;
+
+            await fetcherService.FetchAsync(request1);
+            IEnumerable<IUrlCacheInfo> data = await sut.GetUrlCacheInfoForRequest(request1);
+            FetcherWebRequest dbRequest = data.FirstOrDefault().FetcherWebRequest;
+
+            Assert.NotNull(data);
+            Assert.NotNull(dbRequest);
+            Assert.AreEqual(dbRequest.Body, request1.Body);
+        }
+
+        [Test]
+        public async Task GetUrlCacheInfoForRequest_RequestHeadersIsSet_HeadersIsReturned()
+        {
+            var request1 = new FetcherWebRequest
+            {
+                Url = "https://jsonplaceholder.typicode.com/posts",
+                Method = "POST",
+                Body = JsonPlaceholderPostFactory(),
+                Headers = new Dictionary<string, string>
+                {
+                    { "X-ZUMO-APPLICATION", "hello world" }
+                },
+                ContentType = "application/json"
+            };
+
+            FetcherServiceStub fetcherService = new FetcherServiceStub();
+            IFetcherRepositoryService sut = fetcherService.RepositoryService;
+
+            await fetcherService.FetchAsync(request1);
+            IEnumerable<IUrlCacheInfo> data = await sut.GetUrlCacheInfoForRequest(request1);
+            FetcherWebRequest dbRequest = data.FirstOrDefault().FetcherWebRequest;
+
+            Assert.NotNull(data);
+            Assert.NotNull(dbRequest);
+            Assert.AreEqual(dbRequest.Headers, request1.Headers);
+        }
+
+        [Test]
+        public async Task GetUrlCacheInfoForRequest_RequestMethodIsSet_MethodIsReturned()
+        {
+            var request1 = new FetcherWebRequest
+            {
+                Url = "https://jsonplaceholder.typicode.com/posts",
+                Method = "POST",
+                Body = JsonPlaceholderPostFactory(),
+                Headers = new Dictionary<string, string>
+                {
+                    { "X-ZUMO-APPLICATION", "hello world" }
+                },
+                ContentType = "application/json"
+            };
+
+            FetcherServiceStub fetcherService = new FetcherServiceStub();
+            IFetcherRepositoryService sut = fetcherService.RepositoryService;
+
+            await fetcherService.FetchAsync(request1);
+            IEnumerable<IUrlCacheInfo> data = await sut.GetUrlCacheInfoForRequest(request1);
+            FetcherWebRequest dbRequest = data.FirstOrDefault().FetcherWebRequest;
+
+            Assert.NotNull(data);
+            Assert.NotNull(dbRequest);
+            Assert.AreEqual(dbRequest.Method, request1.Method);
+        }
+
+        [Test]
+        public async Task GetUrlCacheInfoForRequest_RequestUrlIsSet_UrlIsReturned()
+        {
+            var request1 = new FetcherWebRequest
+            {
+                Url = "https://jsonplaceholder.typicode.com/posts",
+                Method = "POST",
+                Body = JsonPlaceholderPostFactory(),
+                Headers = new Dictionary<string, string>
+                {
+                    { "X-ZUMO-APPLICATION", "hello world" }
+                },
+                ContentType = "application/json"
+            };
+
+            FetcherServiceStub fetcherService = new FetcherServiceStub();
+            IFetcherRepositoryService sut = fetcherService.RepositoryService;
+
+            await fetcherService.FetchAsync(request1);
+            IEnumerable<IUrlCacheInfo> data = await sut.GetUrlCacheInfoForRequest(request1);
+            FetcherWebRequest dbRequest = data.FirstOrDefault().FetcherWebRequest;
+
+            Assert.NotNull(data);
+            Assert.NotNull(dbRequest);
+            Assert.AreEqual(dbRequest.Url, request1.Url);
+        }
+
+        [Test]
+        public async Task GetUrlCacheInfoForRequest_RequestMethodNotSet_NoMethodReturned()
+        {
+            var request1 = new FetcherWebRequest
+            {
+                Url = "https://jsonplaceholder.typicode.com/posts",
+                Body = JsonPlaceholderPostFactory(),
+                Headers = new Dictionary<string, string>
+                {
+                    { "X-ZUMO-APPLICATION", "hello world" }
+                },
+                ContentType = "application/json"
+            };
+
+            FetcherServiceStub fetcherService = new FetcherServiceStub();
+            IFetcherRepositoryService sut = fetcherService.RepositoryService;
+
+            await fetcherService.FetchAsync(request1);
+            IEnumerable<IUrlCacheInfo> data = await sut.GetUrlCacheInfoForRequest(request1);
+            FetcherWebRequest dbRequest = data.FirstOrDefault().FetcherWebRequest;
+
+            Assert.NotNull(data);
+            Assert.NotNull(dbRequest);
+            Assert.IsTrue(string.IsNullOrEmpty(dbRequest.Method));
+            Assert.AreEqual(dbRequest.Method, request1.Method);
         }
 
         private static string JsonPlaceholderPostFactory()

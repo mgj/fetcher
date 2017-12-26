@@ -21,6 +21,7 @@ namespace artm.Fetcher.Touch.Services
 
             _mutableRequest = new NSMutableUrlRequest(new Uri(request.Url));
 
+            PrepareContentType(request);
             PrepareMethod(request);
             PrepareHeaders(request);
             PrepareBody(request);
@@ -42,22 +43,31 @@ namespace artm.Fetcher.Touch.Services
 
         protected override void AddHeader(string key, string value)
         {
-            _mutableRequest.SetValueForKey(new NSString(key), new NSString(value));
+            NSMutableDictionary headers = new NSMutableDictionary (_mutableRequest.Headers);
+            headers.SetValueForKey(new NSString(value),  new NSString(key));
+            _mutableRequest.Headers = headers;
         }
 
         private void PrepareMethod(IFetcherWebRequest request)
         {
             if (request == null || _mutableRequest == null) return;
-            _mutableRequest.HttpMethod = request.Method;
 
-            PrepareContentType(request);
+            if (string.IsNullOrEmpty(request.Method)) request.Method = "GET";
+            _mutableRequest.HttpMethod = request.Method;
         }
 
         private void PrepareContentType(IFetcherWebRequest request)
         {
             if (request == null || string.IsNullOrEmpty(request.ContentType)) return;
 
-            _mutableRequest.SetValueForKey(new NSString("content-type"), new NSString(request.ContentType));
+            if (string.IsNullOrEmpty(request.ContentType))
+            {
+                AddHeader("content-type", DEFAULT_CONTENTTYPE);
+            }
+            else
+            {
+                AddHeader("content-type", request.ContentType);
+            }
         }
 
         private static NSUrlSessionDataTask CreateUrlSessionDataTask(TaskCompletionSource<IFetcherWebResponse> tcs, NSMutableUrlRequest request)
@@ -73,18 +83,20 @@ namespace artm.Fetcher.Touch.Services
                                 }
                                 else
                                 {
-                                    byte[] dataBytes = new byte[data.Length];
+                                    byte[] bodyBytes = new byte[data.Length];
                                     if(data != null && data.Bytes != null && data.Count() > 0)
                                     {
-                                        System.Runtime.InteropServices.Marshal.Copy(data.Bytes, dataBytes, 0, Convert.ToInt32(data.Length));
+                                        System.Runtime.InteropServices.Marshal.Copy(data.Bytes, bodyBytes, 0, Convert.ToInt32(data.Length));
                                     }
-
+                                    
+                                    string bodyString = Encoding.UTF8.GetString(bodyBytes);
                                     tcs.SetResult(new FetcherWebResponse()
                                     {
                                         HttpStatusCode = (int)resp?.StatusCode,
                                         Error = new Exception(error?.ToString()),
-                                        Body = Encoding.UTF8.GetString(dataBytes),
-                                        BodyAsBytes = dataBytes
+                                        Body = bodyString,
+                                        BodyAsBytes = bodyBytes,
+                                        ContentType = response.MimeType
                                     });
                                 }
                             });

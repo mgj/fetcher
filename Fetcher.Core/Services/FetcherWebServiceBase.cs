@@ -10,6 +10,7 @@ namespace artm.Fetcher.Core.Services.Fetcher
 {
     public abstract class FetcherWebServiceBase : IFetcherWebService
     {
+        protected const string DEFAULT_CONTENTTYPE = "application/json; charset=utf-8";
 
         protected virtual void PrepareHeaders(IFetcherWebRequest request)
         {

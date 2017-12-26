@@ -1,7 +1,6 @@
 ﻿using artm.Fetcher.Core.Entities;
 using Newtonsoft.Json;
 using SQLite;
-using SQLite.Net.Attributes;
 using SQLiteNetExtensions.Attributes;
 using System;
 using System.Collections.Generic;
@@ -37,15 +36,21 @@ namespace artm.Fetcher.Core.Models
                 }
             }
         }
+
+        public string HeadersSerialized { get; set; }
+
         public string Body { get; set; }
-        
+
         public byte[] BodyAsBytes
         {
             get;
             set;
         }
 
-        public string HeadersSerialized { get; set; }
+        public string ContentType { get; set; }
+
+        [ForeignKey(typeof(UrlCacheInfo))]
+        public int UrlCacheInfoId { get; set; }
 
         [Ignore]
         public Dictionary<string, string> Headers

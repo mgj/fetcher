@@ -9,54 +9,48 @@
     <tags>mvvm mvvmcross xamarin monodroid monotouch wp wpdev windowsphone xamarin wpa81 win81 mvx</tags>
     <dependencies>
     <group targetFramework ="net">
-      <dependency id="Polly-Signed" version="5.1.0"/>
-      <dependency id="SQLite.Net-PCL" version="3.1.1"/>
-      <dependency id="SQLite.Net.Async-PCL" version="3.1.1"/>
-      <dependency id="SQLiteNetExtensions" version="1.3.0"/>
-      <dependency id="SQLiteNetExtensions.Async" version="1.3.0"/>
+      <dependency id="Polly-Signed" version="5.6.1"/>
+      <dependency id="sqlite-net-pcl" version="1.4.118"/>
+      <dependency id="SQLiteNetExtensions" version="2.0.0"/>
+      <dependency id="SQLiteNetExtensions.Async" version="2.0.0"/>
     </group>
     <group targetFramework ="portable-net45+win8+wpa81+wp8">
-      <dependency id="Polly-Signed" version="5.1.0"/>
-      <dependency id="SQLite.Net-PCL" version="3.1.1"/>
-      <dependency id="SQLite.Net.Async-PCL" version="3.1.1"/>
-      <dependency id="SQLiteNetExtensions" version="1.3.0"/>
-      <dependency id="SQLiteNetExtensions.Async" version="1.3.0"/>
+      <dependency id="Polly-Signed" version="5.6.1"/>
+      <dependency id="sqlite-net-pcl" version="1.4.118"/>
+      <dependency id="SQLiteNetExtensions" version="2.0.0"/>
+      <dependency id="SQLiteNetExtensions.Async" version="2.0.0"/>
     </group>
     <group targetFramework ="dotnet">
-      <dependency id="Polly-Signed" version="5.1.0"/>
-      <dependency id="SQLite.Net-PCL" version="3.1.1"/>
-      <dependency id="SQLite.Net.Async-PCL" version="3.1.1"/>
-      <dependency id="SQLiteNetExtensions" version="1.3.0"/>
-      <dependency id="SQLiteNetExtensions.Async" version="1.3.0"/>
+      <dependency id="Polly-Signed" version="5.6.1"/>
+      <dependency id="sqlite-net-pcl" version="1.4.118"/>
+      <dependency id="SQLiteNetExtensions" version="2.0.0"/>
+      <dependency id="SQLiteNetExtensions.Async" version="2.0.0"/>
     </group>
     <group targetFramework ="MonoAndroid">
-      <dependency id="Polly-Signed" version="5.1.0"/>
-      <dependency id="Square.OkHttp" version="2.7.5.0"/>
-      <dependency id="SQLite.Net-PCL" version="3.1.1"/>
-      <dependency id="SQLite.Net.Async-PCL" version="3.1.1"/>
-      <dependency id="SQLite.Net.Platform.XamarinAndroidN" version="3.1.1"/>
-      <dependency id="SQLiteNetExtensions" version="1.3.0"/>
-      <dependency id="SQLiteNetExtensions.Async" version="1.3.0"/>
+      <dependency id="Polly-Signed" version="5.6.1"/>
+      <dependency id="sqlite-net-pcl" version="1.4.118"/>
+      <dependency id="SQLiteNetExtensions" version="2.0.0"/>
+      <dependency id="SQLiteNetExtensions.Async" version="2.0.0"/>
     </group>
     <group targetFramework ="Xamarin.iOS">
-      <dependency id="Polly-Signed" version="5.1.0"/>
-      <dependency id="SQLite.Net-PCL" version="3.1.1"/>
-      <dependency id="SQLite.Net.Async-PCL" version="3.1.1"/>
-      <dependency id="SQLiteNetExtensions" version="1.3.0"/>
-      <dependency id="SQLiteNetExtensions.Async" version="1.3.0"/>
+      <dependency id="Polly-Signed" version="5.6.1"/>
+      <dependency id="sqlite-net-pcl" version="1.4.118"/>
+      <dependency id="SQLiteNetExtensions" version="2.0.0"/>
+      <dependency id="SQLiteNetExtensions.Async" version="2.0.0"/>
     </group>
     <group targetFramework ="MonoTouch">
-      <dependency id="Polly-Signed" version="5.1.0"/>
-      <dependency id="SQLite.Net-PCL" version="3.1.1"/>
-      <dependency id="SQLite.Net.Async-PCL" version="3.1.1"/>
-      <dependency id="SQLiteNetExtensions" version="1.3.0"/>
-      <dependency id="SQLiteNetExtensions.Async" version="1.3.0"/>
+      <dependency id="Polly-Signed" version="5.6.1"/>
+      <dependency id="sqlite-net-pcl" version="1.4.118"/>
+      <dependency id="SQLiteNetExtensions" version="2.0.0"/>
+      <dependency id="SQLiteNetExtensions.Async" version="2.0.0"/>
     </group>
     </dependencies>
   </metadata>
   <files>     
     <!-- PCL -->
     <file src="..\Fetcher.Core\bin\Release\artm.Fetcher.Core.*" target="lib\portable-net45+win+wpa81" exclude="**\*.mdb"/>
+    <file src="..\Fetcher.Core\bin\Release\artm.Fetcher.Core.*" target="lib\net" exclude="**\*.mdb"/>
+    <file src="..\Fetcher.Core\bin\Release\artm.Fetcher.Core.*" target="lib\dotnet" exclude="**\*.mdb"/>
 
     <!-- DROID -->
     <file src="..\Fetcher.Droid\bin\Release\artm.Fetcher.Core.*" target="lib\MonoAndroid10" exclude="**\*.mdb"/>
