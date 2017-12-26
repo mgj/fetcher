@@ -21,7 +21,7 @@ namespace artm.Fetcher.Core.Models
         [Indexed]
         public string Method { get; set; }
 
-        public string HeadersSerialized { get; set; }
+        public string HeadersSerialized { get; set; } = string.Empty;
 
         [Ignore]
         public Dictionary<string, string> Headers

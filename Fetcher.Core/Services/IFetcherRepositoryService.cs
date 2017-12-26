@@ -23,11 +23,11 @@ namespace artm.Fetcher.Core.Services
 
         Task<bool> DeleteEntriesOlderThan(int days);
 
-        Task<IEnumerable<UrlCacheInfo>> GetAllUrlCacheInfo();
+        Task<IEnumerable<IUrlCacheInfo>> GetAllUrlCacheInfo();
 
-        Task<IEnumerable<FetcherWebResponse>> GetAllWebResponses();
+        Task<IEnumerable<IFetcherWebResponse>> GetAllWebResponses();
 
-        Task<IEnumerable<FetcherWebRequest>> GetAllWebRequests();
-        Task<IEnumerable<IUrlCacheInfo>> GetUrlCacheInfoForRequest(FetcherWebRequest needle, bool url = true, bool method = true, bool headers = true, bool contentType = true, bool body = true);
+        Task<IEnumerable<IFetcherWebRequest>> GetAllWebRequests();
+        Task<IEnumerable<IUrlCacheInfo>> GetUrlCacheInfoForRequest(IFetcherWebRequest needle, bool url = true, bool method = true, bool headers = true, bool contentType = true, bool body = true);
     }
 }

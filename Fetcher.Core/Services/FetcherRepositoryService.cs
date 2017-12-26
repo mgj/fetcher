@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Polly.Retry;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace artm.Fetcher.Core.Services
 {
@@ -216,22 +217,22 @@ namespace artm.Fetcher.Core.Services
             return (int)span.TotalDays;
         }
 
-        public async Task<IEnumerable<UrlCacheInfo>> GetAllUrlCacheInfo()
+        public async Task<IEnumerable<IUrlCacheInfo>> GetAllUrlCacheInfo()
         {
             return await this.GetAllWithChildrenAsync<UrlCacheInfo>();
         }
 
-        public async Task<IEnumerable<FetcherWebResponse>> GetAllWebResponses()
+        public async Task<IEnumerable<IFetcherWebResponse>> GetAllWebResponses()
         {
             return await this.GetAllWithChildrenAsync<FetcherWebResponse>();
         }
 
-        public async Task<IEnumerable<FetcherWebRequest>> GetAllWebRequests()
+        public async Task<IEnumerable<IFetcherWebRequest>> GetAllWebRequests()
         {
             return await this.GetAllWithChildrenAsync<FetcherWebRequest>();
         }
 
-        public async Task<IEnumerable<IUrlCacheInfo>> GetUrlCacheInfoForRequest(FetcherWebRequest needle, bool url = true, bool method = true, bool headers = true, bool contentType = true, bool body = true)
+        public async Task<IEnumerable<IUrlCacheInfo>> GetUrlCacheInfoForRequest(IFetcherWebRequest needle, bool url = true, bool method = true, bool headers = true, bool contentType = true, bool body = true)
         {
             IEnumerable<IUrlCacheInfo> result = await this.GetAllWithChildrenAsync<UrlCacheInfo>();
 
@@ -242,7 +243,12 @@ namespace artm.Fetcher.Core.Services
             if (body == true)
                 result = result.Where(x => x.FetcherWebRequest.Body == needle.Body);
             if (headers == true)
-                result = result.Where(x => x.FetcherWebRequest.HeadersSerialized == needle.HeadersSerialized);
+            {
+                string serialized = string.Empty;
+                if (needle.Headers.Count > 0) serialized = JsonConvert.SerializeObject(needle.Headers);
+
+                result = result.Where(x => x.FetcherWebRequest.HeadersSerialized == serialized);
+            }
             if (contentType == true)
                 result = result.Where(x => x.FetcherWebRequest.ContentType == needle.ContentType);
 
