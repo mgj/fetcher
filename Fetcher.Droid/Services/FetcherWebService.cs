@@ -57,14 +57,6 @@ namespace artm.Fetcher.Droid.Services
             return result;
         }
 
-        //private ResponseBody CloneResponseBody(Response rawResponse)
-        //{
-        //    ResponseBody responseBody = rawResponse.Body();
-
-        //    var bufferClone = responseBody.Source().Buffer.Clone();
-        //    return ResponseBody.Create(responseBody.ContentType(), responseBody.ContentLength(), bufferClone);
-        //}
-
         private void PrepareBody(IFetcherWebRequest request, Request.Builder requestBuilder)
         {
             if (request == null || requestBuilder == null ) return;
