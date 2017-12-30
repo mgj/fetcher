@@ -91,13 +91,13 @@ A new cache entry will be created (that is, a FetchAsync call is considered uniq
 
 ```
 // Search cached entries by Url...
-IUrlCacheInfo info = await repository.GetEntryForRequestAsync(new FetcherWebRequest
+IEnumerable<IUrlCacheInfo> info = await repository.GetUrlCacheInfoForRequest(new FetcherWebRequest
 {
     Url = "https://www.google.com"
 });
 
 // ... or anything else
-IUrlCacheInfo info2 = await repository.GetEntryForRequestAsync(new FetcherWebRequest
+IEnumerable<IUrlCacheInfo> info2 = await repository.GetUrlCacheInfoForRequest(new FetcherWebRequest
 {
     Url = "https://www.google.com",
     Method = "POST",

@@ -19,30 +19,31 @@ namespace artm.Fetcher.Core.Tests.Services
         private readonly Uri URL = new Uri("https://www.google.com");
 
         [Test]
-        public async Task GetEntryForUrl_NoEntryExists_NullIsReturned()
+        public async Task GetUrlCacheInfoForRequest_NoEntryExists_NoEntriesReturned()
         {
             var sut = new FetcherRepositoryServiceStub();
             var request = FetcherStubFactory.FetcherWebRequestGetFactory(URL);
 
-            var entry = await sut.GetEntryForRequestAsync(request);
+            var entry = await sut.GetUrlCacheInfoForRequest(request);
 
-            Assert.IsNull(entry);
+            Assert.AreEqual(0, entry.Count());
         }
 
         [Test]
-        public async Task GetEntryForUrl_EntryExists_EntryReturned()
+        public async Task GetUrlCacheInfoForRequest_EntryExists_EntryReturned()
         {
             var sut = new FetcherRepositoryServiceStub();
             var request = FetcherStubFactory.FetcherWebRequestGetFactory(URL);
 
             await sut.InsertUrlAsync(request, FetcherStubFactory.FetcherWebResponseSuccessFactory());
-            var entry = sut.GetEntryForRequestAsync(request);
+            var entry = await sut.GetUrlCacheInfoForRequest(request);
 
             Assert.IsNotNull(entry);
+            Assert.Greater(entry.Count(), 0);
         }
 
         [Test]
-        public async Task GetEntryForUrl_EntryExistsNewRequest_EntryReturned()
+        public async Task GetUrlCacheInfoForRequest_EntryExistsNewRequest_EntryReturned()
         {
             var sut = new FetcherRepositoryServiceStub();
 
@@ -50,12 +51,13 @@ namespace artm.Fetcher.Core.Tests.Services
             {
                 Url = URL.OriginalString
             }, FetcherStubFactory.FetcherWebResponseSuccessFactory());
-            var entry = sut.GetEntryForRequestAsync(new FetcherWebRequest()
+            var entry = await sut.GetUrlCacheInfoForRequest(new FetcherWebRequest()
             {
                 Url = URL.OriginalString
             });
 
             Assert.IsNotNull(entry);
+            Assert.Greater(entry.Count(), 0);
         }
 
         [Test]
@@ -66,11 +68,11 @@ namespace artm.Fetcher.Core.Tests.Services
             var request = FetcherStubFactory.FetcherWebRequestGetFactory(URL);
 
             await sut.InsertUrlAsync(request, response);
-            var original = await sut.GetEntryForRequestAsync(request);
+            var original = (await sut.GetUrlCacheInfoForRequest(request)).FirstOrDefault();
             var originalResponse = original.FetcherWebResponse;
 
             await sut.UpdateUrlAsync(request, original, FetcherStubFactory.FetcherWebResponseSuccessFactory("UpdatedTestResponse"));
-            var second = await sut.GetEntryForRequestAsync(request);
+            var second = (await sut.GetUrlCacheInfoForRequest(request)).FirstOrDefault();
 
             Assert.AreNotEqual(originalResponse.Body, second.FetcherWebResponse.Body);
         }
@@ -81,9 +83,9 @@ namespace artm.Fetcher.Core.Tests.Services
             var sut = new FetcherRepositoryServiceStub();
             var request = FetcherStubFactory.FetcherWebRequestGetFactory(URL);
 
-            var isNull = await sut.GetEntryForRequestAsync(request);
+            var isNull = (await sut.GetUrlCacheInfoForRequest(request)).FirstOrDefault();
             await sut.InsertUrlAsync(request, FetcherStubFactory.FetcherWebResponseSuccessFactory());
-            var notNull = await sut.GetEntryForRequestAsync(request);
+            var notNull = (await sut.GetUrlCacheInfoForRequest(request)).FirstOrDefault();
 
             Assert.IsNull(isNull);
             Assert.NotNull(notNull);
@@ -95,9 +97,9 @@ namespace artm.Fetcher.Core.Tests.Services
             var sut = new FetcherRepositoryServiceStub();
             var request = FetcherStubFactory.FetcherWebRequestGetFactory(URL);
 
-            var isNull = await sut.GetEntryForRequestAsync(request);
+            var isNull = (await sut.GetUrlCacheInfoForRequest(request)).FirstOrDefault();
             await sut.PreloadUrlAsync(request, FetcherStubFactory.FetcherWebResponseSuccessFactory());
-            var notNull = await sut.GetEntryForRequestAsync(request);
+            var notNull = (await sut.GetUrlCacheInfoForRequest(request)).FirstOrDefault();
 
             Assert.IsNull(isNull);
             Assert.NotNull(notNull);
@@ -110,7 +112,7 @@ namespace artm.Fetcher.Core.Tests.Services
             var request = FetcherStubFactory.FetcherWebRequestGetFactory(URL);
 
             await sut.PreloadUrlAsync(request, FetcherStubFactory.FetcherWebResponseSuccessFactory());
-            var data = await sut.GetEntryForRequestAsync(request);
+            var data = (await sut.GetUrlCacheInfoForRequest(request)).FirstOrDefault();
 
             var lastAccess1 = data.LastAccessed;
             var lastUpdated1 = data.LastUpdated;
@@ -203,7 +205,7 @@ namespace artm.Fetcher.Core.Tests.Services
             await fetcherService.FetchAsync(request1);
             await fetcherService.FetchAsync(request2);
 
-            IUrlCacheInfo hero = await sut.GetEntryForRequestAsync(request1);
+            IUrlCacheInfo hero = (await sut.GetUrlCacheInfoForRequest(request1)).FirstOrDefault();
 
             Assert.NotNull(hero);
             Assert.IsTrue(hero.FetcherWebRequest.Body == request1.Body);
