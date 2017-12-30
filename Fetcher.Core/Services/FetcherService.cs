@@ -3,6 +3,7 @@ using artm.Fetcher.Core.Models;
 using Newtonsoft.Json;
 using Polly;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -61,7 +62,8 @@ namespace artm.Fetcher.Core.Services
             await _lock.WaitAsync();
             try
             {
-                var cacheHit = await Repository.GetEntryForRequestAsync(request);
+                var cacheHits = await Repository.GetUrlCacheInfoForRequest(request);
+                var cacheHit = cacheHits.FirstOrDefault();
                 if (cacheHit != null)
                 {
                     cacheHit.FetchedFrom = CacheSourceType.Preload;
@@ -150,7 +152,7 @@ namespace artm.Fetcher.Core.Services
             try
             {
                 // Ignore if already exists in db
-                var exists = await Repository.GetEntryForRequestAsync(request);
+                var exists = (await Repository.GetUrlCacheInfoForRequest(request)).FirstOrDefault();
                 if (exists != null)
                 {
                     return;

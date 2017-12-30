@@ -17,8 +17,8 @@ namespace artm.Fetcher.Core.Tests.Services.Common
             var repository = new Mock<IFetcherRepositoryService>();
             var created = DateTimeOffset.UtcNow - TimeSpan.FromDays(100);
 
-            repository.Setup(x => x.GetEntryForRequestAsync(It.IsAny<IFetcherWebRequest>()))
-                .ReturnsAsync((IFetcherWebRequest request) =>
+            repository.Setup(x => x.GetUrlCacheInfoForRequest(It.IsAny<IFetcherWebRequest>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
+                .ReturnsAsync((IFetcherWebRequest request, bool url, bool method, bool headers, bool contenttype, bool body) =>
                 UrlCacheInfoFactory(created, request));
             repository.Setup(x => x.InsertUrlAsync(It.IsAny<IFetcherWebRequest>(), It.IsAny<IFetcherWebResponse>()))
                 .ReturnsAsync((IFetcherWebRequest request, IFetcherWebResponse response) =>
@@ -30,8 +30,8 @@ namespace artm.Fetcher.Core.Tests.Services.Common
         public static Mock<IFetcherRepositoryService> IFetcherRepositoryServiceWitUpToDateEntries()
         {
             var repository = new Mock<IFetcherRepositoryService>();
-            repository.Setup(x => x.GetEntryForRequestAsync(It.IsAny<IFetcherWebRequest>()))
-                .ReturnsAsync((IFetcherWebRequest request) =>
+            repository.Setup(x => x.GetUrlCacheInfoForRequest(It.IsAny<IFetcherWebRequest>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
+                .ReturnsAsync((IFetcherWebRequest request, bool url, bool method, bool headers, bool contenttype, bool body) =>
                 UrlCacheInfoFactory(DateTimeOffset.UtcNow, request));
             repository.Setup(x => x.InsertUrlAsync(It.IsAny<IFetcherWebRequest>(), It.IsAny<IFetcherWebResponse>()))
                 .ReturnsAsync((IFetcherWebRequest request, IFetcherWebResponse response) =>
@@ -40,9 +40,9 @@ namespace artm.Fetcher.Core.Tests.Services.Common
             return repository;
         }
 
-        private static UrlCacheInfo UrlCacheInfoFactory(DateTimeOffset created, IFetcherWebRequest request)
+        private static List<UrlCacheInfo> UrlCacheInfoFactory(DateTimeOffset created, IFetcherWebRequest request)
         {
-            return UrlCacheInfoFactory(created, new Uri(request.Url));
+            return new List<UrlCacheInfo> { UrlCacheInfoFactory(created, new Uri(request.Url)) };
         }
 
         private static UrlCacheInfo UrlCacheInfoFactory(DateTimeOffset created, Uri url)

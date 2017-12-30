@@ -35,37 +35,6 @@ namespace artm.Fetcher.Core.Services
             await CreateTableAsync<FetcherWebRequest>();
         }
 
-        public async Task<IUrlCacheInfo> GetEntryForRequestAsync(IFetcherWebRequest request)
-        {
-            IUrlCacheInfo data = null;
-            if (request == null) return data;
-
-            var dbRequest = await this.Table<FetcherWebRequest>()
-                    .Where(x => x.Url == request.Url &&
-                        x.Method == request.Method &&
-                        x.Body == request.Body)
-                    .FirstOrDefaultAsync();
-
-            if (dbRequest != null)
-            {
-                var dbCache = await this.Table<UrlCacheInfo>()
-                    .Where(x => x.FetcherWebRequestId == dbRequest.Id)
-                    .FirstOrDefaultAsync();
-                if (dbCache != null)
-                {
-                    data = await this.GetWithChildrenAsync<UrlCacheInfo>(dbCache.Id);
-                }
-            }
-
-            if (data != null)
-            {
-                data.LastAccessed = DateTimeOffset.UtcNow;
-                await this.UpdateWithChildrenAsync(data);
-            }
-
-            return data;
-        }
-
         public async Task<IUrlCacheInfo> GetUrlCacheInfoForId(int id)
         {
             return await this.GetWithChildrenAsync<UrlCacheInfo>(id);
@@ -95,7 +64,8 @@ namespace artm.Fetcher.Core.Services
 
         private async Task<IUrlCacheInfo> DatabaseInsertUrlAsync(IFetcherWebRequest request, IFetcherWebResponse response, DateTimeOffset timestamp)
         {
-            var existingUrlCacheInfo = await GetEntryForRequestAsync(request);
+            var existingUrlCacheInfos = await GetUrlCacheInfoForRequest(request);
+            var existingUrlCacheInfo = existingUrlCacheInfos.FirstOrDefault();
             UrlCacheInfo hero = null;
             await this.RunInTransactionAsync(tran =>
             {
@@ -248,12 +218,18 @@ namespace artm.Fetcher.Core.Services
             if (headers == true)
             {
                 string serialized = string.Empty;
-                if (needle.Headers.Count > 0) serialized = JsonConvert.SerializeObject(needle.Headers);
+                if (needle.Headers?.Count > 0) serialized = JsonConvert.SerializeObject(needle.Headers);
 
                 result = result.Where(x => x.FetcherWebRequest.HeadersSerialized == serialized);
             }
             if (contentType == true)
                 result = result.Where(x => x.FetcherWebRequest.ContentType == needle.ContentType);
+
+            foreach (var item in result)
+            {
+                item.LastAccessed = DateTimeOffset.UtcNow;
+                await this.UpdateWithChildrenAsync(item);
+            }
 
             return result;
         }
