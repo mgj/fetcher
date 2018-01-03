@@ -87,7 +87,7 @@ IUrlCacheInfo response = await fetcher.FetchAsync(new FetcherWebRequest()
 
 ## Caching rules
 
-A new cache entry will be created (that is, a FetchAsync call is considered unique) if the FetcherWebRequest and accompanying UrlCacheInfo does not already exist. You can search through the cached items using the `IFetcherRepositoryService` interface. Example:
+A new cache entry will be created (that is, a FetchAsync call is considered unique) if the FetcherWebRequest (and accompanying UrlCacheInfo) does not already exist. You can search through the cached items using the `IFetcherRepositoryService` interface. Example:
 
 ```
 // Search cached entries by Url...
@@ -107,6 +107,8 @@ IEnumerable<IUrlCacheInfo> info2 = await repository.GetUrlCacheInfoForRequest(ne
     }
 });
 ```
+
+`GetUrlCacheInfoForRequest` has additional overloads, go explore :P
 
 Finally you can use the ID's from the underlying SQLite database:
 
@@ -130,7 +132,7 @@ await repository.DeleteEntriesOlderThan(14); // Days
 
 ## FAQ
 
-On android if you get an error popup about denied access to local libraries, add a reference to System.Data.SQLite in your Android project
+On android if you get an error popup about denied access to local libraries, add a reference to System.Data.SQLite in your Android project. PLEASE OPEN AN ISSUE IF YOU STILL EXPERIENCE THIS!
 
 ## For contributors
 
