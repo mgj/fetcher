@@ -100,7 +100,7 @@ You can modify this behavior either when instantiating/registering the `IFetcher
 IFetcherService fetcher = new FetcherService(webService, repository, loggerService, new AlwaysCachePolicy());
 ```
 
-`AlwaysCachePolicy` is included and will cache every response, regardless of the Http Status of the response.
+`AlwaysCachePolicy` is included and will cache every response, regardless of the Http Status of the response. The default cache policy used is `OnlySuccessfulResponsesCachePolicy`
 
 NOTE: Regardless of which `IFetcherCachePolicy` implementation is used, nothing will be cached if the server could not be reached.
 
