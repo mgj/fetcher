@@ -1,16 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using UIKit;
 using Cirrious.FluentLayouts.Touch;
 using artm.Fetcher.Core.Services;
 using artm.Fetcher.Touch.Services;
 using artm.Fetcher.Core.Entities;
 using System.Threading.Tasks;
-using System.Net;
 using artm.Fetcher.Core.Models;
 using Foundation;
-using SQLite;
 
 namespace Fetcher.Playground.Touch.Views
 {

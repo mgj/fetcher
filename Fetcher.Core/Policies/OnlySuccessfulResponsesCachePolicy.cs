@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using artm.Fetcher.Core.Entities;
+﻿using artm.Fetcher.Core.Entities;
 using artm.Fetcher.Core.Models;
 
 namespace artm.Fetcher.Core.Policies

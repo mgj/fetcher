@@ -1,6 +1,5 @@
 ﻿using artm.Fetcher.Core.Services;
 using Foundation;
-using System;
 using System.IO;
 
 namespace artm.Fetcher.Touch.Services

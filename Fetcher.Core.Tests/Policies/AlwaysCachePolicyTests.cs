@@ -1,12 +1,9 @@
 ﻿using artm.Fetcher.Core.Policies;
-using artm.Fetcher.Core.Services;
 using artm.Fetcher.Core.Tests.Services.Common;
 using artm.Fetcher.Core.Tests.Services.Mocks;
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace artm.Fetcher.Core.Tests.Policies

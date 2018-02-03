@@ -1,14 +1,11 @@
 ﻿using artm.Fetcher.Core.Entities;
 using artm.Fetcher.Core.Models;
-using Polly;
 using SQLite;
 using SQLiteNetExtensions.Extensions;
 using SQLiteNetExtensionsAsync.Extensions;
 using System;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
-using Polly.Retry;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 

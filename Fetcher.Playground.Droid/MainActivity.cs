@@ -5,13 +5,8 @@ using artm.Fetcher.Droid.Services;
 using artm.Fetcher.Core.Services;
 using artm.Fetcher.Core.Entities;
 using System.Threading.Tasks;
-using System.Diagnostics;
 using System;
-using System.Net;
-using artm.Fetcher.Core.Models;
-using System.Collections.Generic;
 using Android.Graphics;
-using SQLite;
 
 namespace Fetcher.Playground.Droid
 {

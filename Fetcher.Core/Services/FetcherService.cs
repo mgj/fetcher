@@ -1,7 +1,6 @@
 ﻿using artm.Fetcher.Core.Entities;
 using artm.Fetcher.Core.Models;
 using artm.Fetcher.Core.Policies;
-using Newtonsoft.Json;
 using Polly;
 using System;
 using System.Linq;

@@ -3,7 +3,6 @@ using artm.Fetcher.Core.Services;
 using Foundation;
 using System;
 using System.Threading.Tasks;
-using System.Net;
 using System.Linq;
 using artm.Fetcher.Core.Services.Fetcher;
 using artm.Fetcher.Core.Entities;

@@ -1,8 +1,4 @@
-﻿using artm.Fetcher.Core.Entities;
-using artm.Fetcher.Core.Models;
-using System;
-
-namespace artm.Fetcher.Core.Tests.Services.Mocks
+﻿namespace artm.Fetcher.Core.Tests.Services.Mocks
 {
     //internal class UrlCacheInfoStub : IUrlCacheInfo
     //{

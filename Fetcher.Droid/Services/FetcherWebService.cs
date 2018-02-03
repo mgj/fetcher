@@ -3,7 +3,6 @@ using artm.Fetcher.Core.Services;
 using Square.OkHttp;
 using artm.Fetcher.Core.Models;
 using System.Net;
-using System.Linq;
 using artm.Fetcher.Core.Services.Fetcher;
 using artm.Fetcher.Core.Entities;
 

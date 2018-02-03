@@ -1,11 +1,8 @@
-﻿using artm.Fetcher.Core.Models;
-using artm.Fetcher.Core.Policies;
+﻿using artm.Fetcher.Core.Policies;
 using artm.Fetcher.Core.Services;
 using artm.Fetcher.Core.Tests.Services.Common;
 using artm.Fetcher.Core.Tests.Services.Stubs;
 using Moq;
-using System;
-using System.Threading.Tasks;
 
 namespace artm.Fetcher.Core.Tests.Services.Mocks
 {
