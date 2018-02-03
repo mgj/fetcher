@@ -165,7 +165,7 @@ namespace artm.Fetcher.Core.Tests.Services
 
             IUrlCacheInfo hero1 = await sut.PreloadUrlAsync(request1, FetcherStubFactory.FetcherWebResponseSuccessFactory());
             IUrlCacheInfo hero2 = await sut.PreloadUrlAsync(request2, FetcherStubFactory.FetcherWebResponseSuccessFactory());
-            hero1.LastUpdated = DateTimeOffset.MinValue;
+            hero1.LastUpdated = DateTimeOffset.UtcNow;
             await sut.UpdateAsync(hero1);
 
             await sut.DeleteEntriesOlderThan(400);
@@ -179,7 +179,7 @@ namespace artm.Fetcher.Core.Tests.Services
             Assert.AreEqual(1, requests.Count);
             Assert.AreEqual(1, responses.Count);
             Assert.AreEqual(1, caches.Count);
-            Assert.IsTrue(cacheHero.FetcherWebRequest.Url.Contains("lorempixel.com"));
+            Assert.IsTrue(cacheHero.FetcherWebRequest.Url.Contains("google.com"));
         }
 
         [Test]
@@ -504,6 +504,146 @@ namespace artm.Fetcher.Core.Tests.Services
             Assert.NotNull(data);
             Assert.NotNull(dbResponse);
             Assert.AreEqual(1, dbResponse.UrlCacheInfoId);
+        }
+
+        [Test]
+        public async Task GetUrlCacheInfoForRequest_ContainsMultipleUrls_OnlyRelevantUrlsReturned()
+        {
+            FetcherServiceStub fetcherService = new FetcherServiceStub();
+            IFetcherRepositoryService sut = fetcherService.RepositoryService;
+
+            var request1 = new FetcherWebRequest
+            {
+                Url = "https://www.google.com"
+            };
+            var request2 = new FetcherWebRequest
+            {
+                Url = "https://jsonplaceholder.typicode.com/posts"
+            };
+
+            await fetcherService.FetchAsync(request1);
+            await fetcherService.FetchAsync(request2);
+
+            IEnumerable<IUrlCacheInfo> allData = await sut.GetAllUrlCacheInfo();
+            IEnumerable<IUrlCacheInfo> data = await sut.GetUrlCacheInfoForRequest(request1);
+
+            Assert.AreEqual(data.Count(), 1);
+            Assert.AreEqual(allData.Count(), 2);
+        }
+
+        [Test]
+        public async Task GetUrlCacheInfoForRequest_ContainsMultipleMethods_OnlyRelevantMethodsReturned()
+        {
+            FetcherServiceStub fetcherService = new FetcherServiceStub();
+            IFetcherRepositoryService sut = fetcherService.RepositoryService;
+
+            var request1 = new FetcherWebRequest
+            {
+                Url = "https://jsonplaceholder.typicode.com/posts",
+                Method = "GET"
+            };
+            var request2 = new FetcherWebRequest
+            {
+                Url = "https://jsonplaceholder.typicode.com/posts",
+                Method = "POST"
+            };
+
+            await fetcherService.FetchAsync(request1);
+            await fetcherService.FetchAsync(request2);
+
+            IEnumerable<IUrlCacheInfo> allData = await sut.GetAllUrlCacheInfo();
+            IEnumerable<IUrlCacheInfo> data = await sut.GetUrlCacheInfoForRequest(request1);
+
+            Assert.AreEqual(data.Count(), 1);
+            Assert.AreEqual(allData.Count(), 2);
+        }
+
+        [Test]
+        public async Task GetUrlCacheInfoForRequest_ContainsMultipleBodies_OnlyRelevantBodiesReturned()
+        {
+            FetcherServiceStub fetcherService = new FetcherServiceStub();
+            IFetcherRepositoryService sut = fetcherService.RepositoryService;
+
+            var request1 = new FetcherWebRequest
+            {
+                Url = "https://jsonplaceholder.typicode.com/posts",
+                Method = "POST",
+                Body = "[{\"title\":\"Hello world\"}]"
+            };
+            var request2 = new FetcherWebRequest
+            {
+                Url = "https://jsonplaceholder.typicode.com/posts",
+                Method = "POST",
+                Body = ""
+            };
+
+            await fetcherService.FetchAsync(request1);
+            await fetcherService.FetchAsync(request2);
+
+            IEnumerable<IUrlCacheInfo> allData = await sut.GetAllUrlCacheInfo();
+            IEnumerable<IUrlCacheInfo> data = await sut.GetUrlCacheInfoForRequest(request1);
+
+            Assert.AreEqual(data.Count(), 1);
+            Assert.AreEqual(allData.Count(), 2);
+        }
+
+        [Test]
+        public async Task GetUrlCacheInfoForRequest_ContainsMultipleHeaders_OnlyRelevantHeadersReturned()
+        {
+            FetcherServiceStub fetcherService = new FetcherServiceStub();
+            IFetcherRepositoryService sut = fetcherService.RepositoryService;
+
+            var request1 = new FetcherWebRequest
+            {
+                Url = "https://jsonplaceholder.typicode.com/posts",
+                Headers = new Dictionary<string, string>
+                {
+                    {"X-ZUMO-APPLICATION", "Hello world" }
+                }
+            };
+            var request2 = new FetcherWebRequest
+            {
+                Url = "https://jsonplaceholder.typicode.com/posts",
+                Headers = new Dictionary<string, string>
+                {
+                }
+            };
+
+            await fetcherService.FetchAsync(request1);
+            await fetcherService.FetchAsync(request2);
+
+            IEnumerable<IUrlCacheInfo> allData = await sut.GetAllUrlCacheInfo();
+            IEnumerable<IUrlCacheInfo> data = await sut.GetUrlCacheInfoForRequest(request1);
+
+            Assert.AreEqual(data.Count(), 1);
+            Assert.AreEqual(allData.Count(), 2);
+        }
+
+        [Test]
+        public async Task GetUrlCacheInfoForRequest_ContainsMultipleContentTypes_OnlyRelevantContentTypesReturned()
+        {
+            FetcherServiceStub fetcherService = new FetcherServiceStub();
+            IFetcherRepositoryService sut = fetcherService.RepositoryService;
+
+            var request1 = new FetcherWebRequest
+            {
+                Url = "https://jsonplaceholder.typicode.com/posts",
+                ContentType = "application/json; charset=utf-8"
+            };
+            var request2 = new FetcherWebRequest
+            {
+                Url = "https://jsonplaceholder.typicode.com/posts",
+                ContentType = "x-www-form-urlencoded"
+            };
+
+            await fetcherService.FetchAsync(request1);
+            await fetcherService.FetchAsync(request2);
+
+            IEnumerable<IUrlCacheInfo> allData = await sut.GetAllUrlCacheInfo();
+            IEnumerable<IUrlCacheInfo> data = await sut.GetUrlCacheInfoForRequest(request1);
+
+            Assert.AreEqual(data.Count(), 1);
+            Assert.AreEqual(allData.Count(), 2);
         }
 
         private static string JsonPlaceholderPostFactory()

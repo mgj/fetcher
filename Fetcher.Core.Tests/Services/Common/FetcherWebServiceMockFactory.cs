@@ -22,7 +22,6 @@ namespace artm.Fetcher.Core.Tests.Services.Common
         {
             var mock = new Mock<IFetcherWebService>();
             mock.Setup(x => x.DoPlatformRequest(It.IsAny<FetcherWebRequest>())).Throws(new Exception("IFetcherWebServiceInternetOff mock web exception"));
-            //mock.Setup(x => x.DoPlatformRequest(It.IsAny<FetcherWebRequest>())).Returns(() => null);
             return mock;
         }
 
@@ -34,6 +33,30 @@ namespace artm.Fetcher.Core.Tests.Services.Common
                     Task.Delay(delay).Wait();
                     return new FetcherWebResponse() { HttpStatusCode = 200, Body = "DoPlatformWebRequest Default Test Body" };
                 });
+            return mock;
+        }
+
+        public static Mock<IFetcherWebService> IFetcherWebServiceAlwaysHttpStatus200()
+        {
+            var mock = new Mock<IFetcherWebService>();
+            mock.Setup(x => x.DoPlatformRequest(It.IsAny<FetcherWebRequest>())).Returns(() => 
+            new FetcherWebResponse()
+            {
+                HttpStatusCode = 200,
+                Body = "DoPlatformWebRequest Http Status 200 body"
+            });
+            return mock;
+        }
+
+        public static Mock<IFetcherWebService> IFetcherWebServiceAlwaysHttpStatus500()
+        {
+            var mock = new Mock<IFetcherWebService>();
+            mock.Setup(x => x.DoPlatformRequest(It.IsAny<FetcherWebRequest>())).Returns(() =>
+            new FetcherWebResponse()
+            {
+                HttpStatusCode = 500,
+                Body = "DoPlatformWebRequest Http Status 500 body"
+            });
             return mock;
         }
     }
