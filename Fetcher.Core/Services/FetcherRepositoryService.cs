@@ -16,6 +16,8 @@ namespace artm.Fetcher.Core.Services
 {
     public class FetcherRepositoryService : SQLiteAsyncConnection, IFetcherRepositoryService
     {
+        private readonly DateTimeOffset PRELOAD_TIMESTAMP = DateTimeOffset.UtcNow.AddYears(-10);
+
         protected IFetcherLoggerService Logger { get; set; }
         
         public FetcherRepositoryService(IFetcherLoggerService loggerService, IFetcherRepositoryStoragePathService pathService) : base(pathService.GetPath(), false)
@@ -42,8 +44,7 @@ namespace artm.Fetcher.Core.Services
 
         public async Task<IUrlCacheInfo> PreloadUrlAsync(IFetcherWebRequest request, IFetcherWebResponse response)
         {
-            var timestamp = DateTimeOffset.UtcNow.AddYears(-1);
-            return await InsertUrlAsync(request, response, timestamp);
+            return await InsertUrlAsync(request, response, PRELOAD_TIMESTAMP);
         }
 
         public async Task<IUrlCacheInfo> InsertUrlAsync(IFetcherWebRequest request, IFetcherWebResponse response)
@@ -99,9 +100,6 @@ namespace artm.Fetcher.Core.Services
                     LastAccessed = timestamp
                 };
                 tran.InsertWithChildren(hero, true);
-
-                //theResponse.UrlCacheInfoId = hero.Id;
-                //tran.UpdateWithChildren(response);
             });
             return hero;
         }

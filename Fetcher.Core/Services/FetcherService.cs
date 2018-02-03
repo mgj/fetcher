@@ -1,5 +1,6 @@
 ﻿using artm.Fetcher.Core.Entities;
 using artm.Fetcher.Core.Models;
+using artm.Fetcher.Core.Policies;
 using Newtonsoft.Json;
 using Polly;
 using System;
@@ -17,12 +18,19 @@ namespace artm.Fetcher.Core.Services
         protected IFetcherWebService WebService { get; set; }
         protected IFetcherRepositoryService Repository { get; set; }
         protected IFetcherLoggerService Logger { get; set; }
+        protected IFetcherCachePolicy CachePolicy { get; set; }
 
         public FetcherService(IFetcherWebService webService, IFetcherRepositoryService repositoryService, IFetcherLoggerService loggerService)
+            : this(webService, repositoryService, loggerService, new OnlySuccessfulResponsesCachePolicy())
+        {            
+        }
+
+        public FetcherService(IFetcherWebService webService, IFetcherRepositoryService repositoryService, IFetcherLoggerService loggerService, IFetcherCachePolicy cachePolicy)
         {
             WebService = webService;
             Repository = repositoryService;
             Logger = loggerService;
+            CachePolicy = cachePolicy;
         }
 
         private void Log(string message)
@@ -63,6 +71,11 @@ namespace artm.Fetcher.Core.Services
             try
             {
                 var cacheHits = await Repository.GetUrlCacheInfoForRequest(request);
+                if(cacheHits?.Count() > 1)
+                {
+                    Logger.Log($"Warning: Found {cacheHits.Count()} cache entries for request - expected maximum 1");
+                }
+
                 var cacheHit = cacheHits.FirstOrDefault();
                 if (cacheHit != null)
                 {
@@ -73,8 +86,16 @@ namespace artm.Fetcher.Core.Services
                         Logger.Log("Refreshing cache");
                         try
                         {
-                            var response = await FetchFromWebAsync(request);
-                            await Repository.UpdateUrlAsync(request, cacheHit, response);
+                            IFetcherWebResponse response = await FetchFromWebAsync(request);
+                            if (CachePolicy.ShouldUpdateCache(request, cacheHit, response) == true)
+                            {
+                                Logger.Log("CachePolicy: Updating cache entry");
+                                await Repository.UpdateUrlAsync(request, cacheHit, response);
+                            }
+                            else
+                            {
+                                Logger.Log("CachePolicy: NOT caching response");
+                            }
                             cacheHit.FetchedFrom = CacheSourceType.Web;
                         }
                         catch (Exception)
@@ -84,7 +105,10 @@ namespace artm.Fetcher.Core.Services
                     }
                     else
                     {
-                        cacheHit.FetchedFrom = CacheSourceType.Local;
+                        if (DateTimeOffset.UtcNow - cacheHit.LastUpdated < TimeSpan.FromDays(365 * 9))
+                        {
+                            cacheHit.FetchedFrom = CacheSourceType.Local;
+                        }
                     }
 
                     return cacheHit;
@@ -96,8 +120,17 @@ namespace artm.Fetcher.Core.Services
                     try
                     {
                         response = await FetchFromWebAsync(request);
-                        cacheHit = await Repository.InsertUrlAsync(request, response);
-                        cacheHit.FetchedFrom = CacheSourceType.Web;
+                        if (CachePolicy.ShouldInsertCache(request, response) == true)
+                        {
+                            Logger.Log("CachePolicy: Inserting cache entry");
+                            cacheHit = await Repository.InsertUrlAsync(request, response);
+                            cacheHit.FetchedFrom = CacheSourceType.Web;
+                        }
+                        else
+                        {
+                            Logger.Log("CachePolicy: NOT caching response");
+                        }
+                        
                         return cacheHit;
                     }
                     catch (Exception ex)
@@ -140,11 +173,9 @@ namespace artm.Fetcher.Core.Services
 
         public static bool ShouldInvalidate(IUrlCacheInfo hero, TimeSpan freshnessTreshold)
         {
-            var delta = DateTimeOffset.UtcNow - hero.LastUpdated;
+            TimeSpan delta = DateTimeOffset.UtcNow - hero.LastUpdated;
             return delta > freshnessTreshold;
         }
-
-        
 
         public async Task PreloadAsync(IFetcherWebRequest request, IFetcherWebResponse response)
         {

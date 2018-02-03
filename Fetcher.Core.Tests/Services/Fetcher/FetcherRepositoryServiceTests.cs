@@ -165,7 +165,7 @@ namespace artm.Fetcher.Core.Tests.Services
 
             IUrlCacheInfo hero1 = await sut.PreloadUrlAsync(request1, FetcherStubFactory.FetcherWebResponseSuccessFactory());
             IUrlCacheInfo hero2 = await sut.PreloadUrlAsync(request2, FetcherStubFactory.FetcherWebResponseSuccessFactory());
-            hero1.LastUpdated = DateTimeOffset.MinValue;
+            hero1.LastUpdated = DateTimeOffset.UtcNow;
             await sut.UpdateAsync(hero1);
 
             await sut.DeleteEntriesOlderThan(400);
@@ -179,7 +179,7 @@ namespace artm.Fetcher.Core.Tests.Services
             Assert.AreEqual(1, requests.Count);
             Assert.AreEqual(1, responses.Count);
             Assert.AreEqual(1, caches.Count);
-            Assert.IsTrue(cacheHero.FetcherWebRequest.Url.Contains("lorempixel.com"));
+            Assert.IsTrue(cacheHero.FetcherWebRequest.Url.Contains("google.com"));
         }
 
         [Test]

@@ -45,6 +45,9 @@
     <Compile Include="Entities\FetcherWebRequest.cs" />
     <Compile Include="Entities\FetcherWebResponse.cs" />
     <Compile Include="Entities\IFetcherWebRequest.cs" />
+    <Compile Include="Policies\AlwaysCachePolicy.cs" />
+    <Compile Include="Policies\IFetcherCachePolicy.cs" />
+    <Compile Include="Policies\OnlySuccessfulResponsesCachePolicy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\FetcherRepositoryService.cs" />
     <Compile Include="Services\FetcherService.cs" />

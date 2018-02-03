@@ -42,52 +42,71 @@ nuget install artm.fetcher
 
 ```
 
-## Example time!
+Example time!
 
-Setup:
+## Setup:
 
 ```
-// Instantiate these on Android / iOS
+// 1. Instantiate these on Android / iOS. If using dependency injection, you can register them as singletons.
 IFetcherLoggerService loggerService = new FetcherLoggerService();
 IFetcherRepositoryStoragePathService path = new FetcherRepositoryStoragePathService();
-IFetcherWebService web = new FetcherWebService();
-FetcherRepositoryService repository = new FetcherRepositoryService(loggerService, path);
+IFetcherWebService webService = new FetcherWebService();
+IFetcherRepositoryService repository = new FetcherRepositoryService(loggerService, path);
 
-await repository.Initialize();
+// 2. Initialize the repository. This creates the underlying database and is safe to call on every app startup
+await ((FetcherRepositoryService)repository).Initialize();
+
+// 3. Primary interface you should use from your Core/PCL project
+IFetcherService fetcher = new FetcherService(webService, repository, loggerService);
 ```
 
-Using:
+## Using:
 
 ```
-// Primary interface you should use from your Core/PCL project
-IFetcherService fetcher = new FetcherService(web, repository);
-Uri url = new System.Uri("https://www.google.com");
+String url = "https://www.google.com";
 
 // Try our hardest to give you *some* response for a given url. 
 // If an url has been recently created or updated we get the response from the local cache.
 // If an url has NOT recently been created or updated we try to update 
 // the response from the network. 
 // If we cannot get the url from the network, and no cached data is available, we try to use preloaded data.
-IUrlCacheInfo response = await fetcher.FetchAsync(url);
+IUrlCacheInfo response = await fetcher.FetchAsync(new Uri(url));
 
 // (Optional) Cold start: You can ship with preloaded data, and thus avoid
 // an initial requirement for an active internet connection
-await fetcher.PreloadAsync(url, new FetcherWebResponse() { Body = "<html>Hello world!</html>" });
+await fetcher.PreloadAsync(new FetcherWebRequest()
+{
+    Url = url
+}, new FetcherWebResponse() { Body = "<html>Hello world!</html>" });
 
-// Dont like HTTP GET? No problem!
-IUrlCacheInfo response = await fetcher.FetchAsync(new FetcherWebRequest()
+// Dont like HTTP GET? Dont like the default cache expiration of 1 day? No problem!
+IUrlCacheInfo postResponse = await fetcher.FetchAsync(new FetcherWebRequest()
 {
     Url = url,
     Method = "POST",
     Headers = new System.Collections.Generic.Dictionary<string, string>(),
     Body = @"[{ ""myData"": ""data"" }]",
-    ContentType = string.Empty
-}, TimeSpan.FromDays(1));
+    ContentType = "application/json; charset=utf-8"
+}, TimeSpan.FromDays(14));
 ```
 
 ## Caching rules
 
-A new cache entry will be created (that is, a FetchAsync call is considered unique) if the FetcherWebRequest (and accompanying UrlCacheInfo) does not already exist. You can search through the cached items using the `IFetcherRepositoryService` interface. Example:
+By default, a new cache entry will be created (that is, a `FetchAsync` call is considered unique) if the `IFetcherWebRequest` (and accompanying `IUrlCacheInfo`) does not already exist. The default caching policy ONLY caches responses with a successful Http Status (200 - 300).
+
+You can modify this behavior either when instantiating/registering the `IFetcherService`, or by passing a `IFetcherCachePolicy` to the `IFetcherService.FetchAsync()` method:
+
+```
+IFetcherService fetcher = new FetcherService(webService, repository, loggerService, new AlwaysCachePolicy());
+```
+
+`AlwaysCachePolicy` is included and will cache every response, regardless of the Http Status of the response.
+
+NOTE: Regardless of which `IFetcherCachePolicy` implementation is used, nothing will be cached if the server could not be reached.
+
+## Searching the cache:
+
+You can search through the cached items using the `IFetcherRepositoryService` interface. Example:
 
 ```
 // Search cached entries by Url...
@@ -108,7 +127,7 @@ IEnumerable<IUrlCacheInfo> info2 = await repository.GetUrlCacheInfoForRequest(ne
 });
 ```
 
-`GetUrlCacheInfoForRequest` has additional overloads, go explore :P
+`GetUrlCacheInfoForRequest()` has additional overloads, go explore :P
 
 Finally you can use the ID's from the underlying SQLite database:
 
@@ -124,7 +143,7 @@ IEnumerable<IFetcherWebRequest> request = await repository.GetAllWebRequests();
 IEnumerable<IFetcherWebResponse> response = await repository.GetAllWebResponses();
 ```
 
-Cleanup:
+## Cleanup:
 
 ```
 await repository.DeleteEntriesOlderThan(14); // Days
